@@ -1,0 +1,33 @@
+Text, figures and cover artwork
+Copyright (c) 2026 John Khan. All rights reserved.
+
+Code (everything under code/ and scripts/, and preamble/quantbook.sty)
+MIT License
+
+Copyright (c) 2026 John Khan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Third-party material and sources
+- data/daily_policy_bond.csv: Bank of Canada Valet API series BD.CDN.5YR.DQ.YLD and V39079, taken from
+  github.com/ALENZACODES/canada-policy-rate-bond-yield-mortgage-rate (MIT licence). Bank of Canada terms
+  of use apply to the underlying data: https://www.bankofcanada.ca/terms/
+- Fonts: TeX Gyre Pagella (GUST Font License) in figures; Palatino clones from the psnfss/mathpazo
+  bundle in the text.
+- Open source projects that informed the writing style, figures and code are credited in CREDITS.md;
+  none of their code or text is copied into this repository.
+- Works listed in references.bib are cited for ideas only. No text, tables, figures or examination
+  questions from any published course or syllabus are reproduced.

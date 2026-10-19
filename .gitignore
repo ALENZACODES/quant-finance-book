@@ -1,0 +1,19 @@
+.venv/
+build/
+*.aux
+*.log
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.run.xml
+*.toc
+*.synctex.gz
+__pycache__/
+.pytest_cache/
+chapters/*-review.tex
+main.pdf
+# The public repository carries no PDF files; PDFs are built locally only.
+*.pdf

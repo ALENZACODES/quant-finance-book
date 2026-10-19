@@ -1,0 +1,30 @@
+\documentclass[11pt,twoside,openany]{book}
+\usepackage{quantbook}
+\addbibresource{references.bib}
+\newcommand{\pid}[1]{}
+
+\begin{document}
+\frontmatter
+\begin{titlepage}
+  \centering
+  \vspace*{1.4in}
+  {\color{qbred}\rule{0.62\textwidth}{0.8pt}\par}
+  \vspace{18pt}
+  {\color{qbblue}\fontsize{30}{36}\selectfont Quantitative Finance\\[4pt] for Alternative Investments\par}
+  \vspace{12pt}
+  {\color{qbgrey}\Large\itshape Mathematics, Models and Code\par}
+  \vspace{18pt}
+  {\color{qbred}\rule{0.62\textwidth}{0.8pt}\par}
+  \vfill
+  {\color{qbblue}\Large\scshape John Khan\par}
+  \vspace{0.9in}
+\end{titlepage}
+
+\chapter*{About this book}
+\input{chapters/about}
+
+\tableofcontents
+
+\mainmatter
+\input{chapters/ch01}
+\end{document}
