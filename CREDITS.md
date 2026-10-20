@@ -27,38 +27,47 @@ GitHub; projects are credited, not copied, unless a chapter states otherwise.
 | 17 | [JabRef/jabref](https://github.com/JabRef/jabref) | Reference management conventions for `references.bib` | all |
 | 18 | [cmichi/latex-template-collection](https://github.com/cmichi/latex-template-collection) | Template patterns for title pages and front matter | front matter |
 
-## Quantitative finance, statistics and numerical tools (16)
+## Quantitative finance, statistics and numerical tools (20)
 
 | # | Repository | Topics | Chapters |
 |---|---|---|---|
-| 1 | [lballabio/QuantLib](https://github.com/lballabio/QuantLib) | Compounding and day counts, term structures, stochastic processes, option engines | 3, 4 |
+| 1 | [lballabio/QuantLib](https://github.com/lballabio/QuantLib) | Compounding and day counts, term structures, stochastic processes, option engines | 3, 4, 5, 6 |
 | 2 | [numpy/numpy-financial](https://github.com/numpy/numpy-financial) | IRR, MIRR and NPV, used in the Chapter 1 tests as a check on the chapter's own root finder | 1 |
-| 3 | [statsmodels/statsmodels](https://github.com/statsmodels/statsmodels) | Jarque-Bera and Durbin-Watson statistics in the Chapter 1 tests, the Dickey-Fuller test in Chapter 3 and regressions with Newey-West standard errors in the Chapter 4 case study | 1, 3, 4 |
+| 3 | [statsmodels/statsmodels](https://github.com/statsmodels/statsmodels) | Jarque-Bera and Durbin-Watson statistics in the Chapter 1 tests, the Dickey-Fuller test in Chapter 3, regressions with Newey-West standard errors in the Chapter 4 case study and the hedge regressions of the Chapter 5 case study | 1, 3, 4, 5 |
 | 4 | [cantaro86/Financial-Models-Numerical-Methods](https://github.com/cantaro86/Financial-Models-Numerical-Methods) | Notebook treatments of distributions, PDEs, Monte Carlo, binomial trees | 3, 4 |
 | 5 | [yhilpisch/py4fi2nd](https://github.com/yhilpisch/py4fi2nd) | Python for Finance code: statistics, simulation, valuation, binomial trees | 3, 4 |
 | 6 | [wilsonfreitas/awesome-quant](https://github.com/wilsonfreitas/awesome-quant) | Index of quant libraries by topic | all |
 | 7 | [scipy/scipy](https://github.com/scipy/scipy) | Root finding (including Brent's method), distributions, statistics, quadrature, banded solvers, HiGHS linear programming (used throughout) | all |
 | 8 | [matplotlib/matplotlib](https://github.com/matplotlib/matplotlib) | All figures | all |
-| 9 | [Anexen/pyxirr](https://github.com/Anexen/pyxirr) | Independent IRR and XIRR implementation, used in the Chapter 2 tests | 2 |
-| 10 | [gnu-octave/octave](https://github.com/gnu-octave/octave) | GNU Octave, which runs the `.m` cross-checks in `code/ch01/octave` to `code/ch04/octave`, including quadrature and a sparse Crank-Nicolson solver for Chapter 3 and the GLPK linear programming solver, quadrature and fzero for Chapter 4 | 1, 2, 3, 4 |
-| 11 | [crflynn/stochastic](https://github.com/crflynn/stochastic) | Generators for Brownian motion, GBM, Ornstein-Uhlenbeck and other processes (MIT) | 3 |
-| 12 | [mattja/sdeint](https://github.com/mattja/sdeint) | Numerical integration of Ito and Stratonovich SDEs (GPL-3.0; studied, not copied) | 3 |
-| 13 | [domokane/FinancePy](https://github.com/domokane/FinancePy) | Curve bootstrapping, forwards and futures, CRR and Leisen-Reimer trees, Black-Scholes, Black-76 and Heston pricers (GPL-3.0; studied, not copied) | 4 |
-| 14 | [numpy/numpy](https://github.com/numpy/numpy) | Arrays and the seeded random number generator used by every simulation | all |
-| 15 | [wch/r-source](https://github.com/wch/r-source) | Read-only mirror of the R sources; R runs the `crosscheck.R` script in each of `code/ch01` to `code/ch04` (GPL-2.0 or later) | 1, 2, 3, 4 |
-| 16 | [pandas-dev/pandas](https://github.com/pandas-dev/pandas) | Reading and aligning the data files for the case studies | 1, 3, 4 |
+| 9 | [goldmansachs/gs-quant](https://github.com/goldmansachs/gs-quant) | Industrial quant toolkit design | 6 |
+| 10 | [Anexen/pyxirr](https://github.com/Anexen/pyxirr) | Independent IRR and XIRR implementation, used in the Chapter 2 tests | 2 |
+| 11 | [gnu-octave/octave](https://github.com/gnu-octave/octave) | GNU Octave, which runs the `.m` cross-checks in `code/ch01/octave` to `code/ch06/octave`, including quadrature and a sparse Crank-Nicolson solver for Chapter 3, the GLPK linear programming solver, quadrature and fzero for Chapter 4, quadrature, sparse finite difference schemes, fzero and fminbnd for Chapter 5, and ode45, quadgk and fsolve for Chapter 6 | 1, 2, 3, 4, 5, 6 |
+| 12 | [crflynn/stochastic](https://github.com/crflynn/stochastic) | Generators for Brownian motion, GBM, Ornstein-Uhlenbeck and other processes (MIT) | 3 |
+| 13 | [mattja/sdeint](https://github.com/mattja/sdeint) | Numerical integration of Ito and Stratonovich SDEs (GPL-3.0; studied, not copied) | 3 |
+| 14 | [domokane/FinancePy](https://github.com/domokane/FinancePy) | Curve bootstrapping, forwards and futures, CRR and Leisen-Reimer trees, Black-Scholes, Black-76 and Heston pricers (GPL-3.0; studied, not copied) | 4, 6 |
+| 15 | [vollib/py_vollib](https://github.com/vollib/py_vollib) | Black, Black-Scholes and Black-Scholes-Merton prices, Greeks and implied volatility by Jaeckel's "Let's Be Rational" (MIT; studied, not copied) | 5 |
+| 16 | [numpy/numpy](https://github.com/numpy/numpy) | Arrays and the seeded random number generator used by every simulation | all |
+| 17 | [wch/r-source](https://github.com/wch/r-source) | Read-only mirror of the R sources; R runs the `crosscheck.R` script in each of `code/ch01` to `code/ch06` (GPL-2.0 or later) | 1, 2, 3, 4, 5, 6 |
+| 18 | [pandas-dev/pandas](https://github.com/pandas-dev/pandas) | Reading and aligning the data files for the case studies | 1, 3, 4, 5, 6 |
+| 19 | [OpenSourceRisk/Engine](https://github.com/OpenSourceRisk/Engine) | Open Source Risk Engine: how a production library organises rates and credit instruments, built on QuantLib (studied, not copied) | 6 |
+| 20 | [nodejs/node](https://github.com/nodejs/node) | Node.js, which runs the private credit screener's `calc.js` in the Chapter 6 tests | 6 |
 
 ## John Khan's repositories (data and case material, read only)
 
 | Repository | Use |
 |---|---|
 | [ALENZACODES/canada-policy-rate-bond-yield-mortgage-rate](https://github.com/ALENZACODES/canada-policy-rate-bond-yield-mortgage-rate) | Chapter 1 and Chapter 3 case study data (Bank of Canada series snapshot, MIT licence) |
+| [ALENZACODES/private-credit-screener](https://github.com/ALENZACODES/private-credit-screener) | Chapter 6 private credit screen: the example loans and `calc.js`, copied unchanged into `code/ch06/vendor` (MIT licence) |
 
 ## Data
 
 Bank of Canada Valet API, series `BD.CDN.5YR.DQ.YLD` and `V39079`: https://www.bankofcanada.ca/valet/docs
 
 Chapter 4: Bank of Canada Valet API, Treasury bill series `TB.CDN.90D.MID`, `TB.CDN.180D.MID` and `TB.CDN.1Y.MID` and benchmark bond series `BD.CDN.2YR.DQ.YLD`, `BD.CDN.3YR.DQ.YLD`, `BD.CDN.5YR.DQ.YLD`, `BD.CDN.7YR.DQ.YLD`, `BD.CDN.10YR.DQ.YLD` and `BD.CDN.LONG.DQ.YLD`, retrieved 19 October 2026 and saved in `data/goc_bills_bonds.csv`.
+
+Chapter 5: Bank of Canada USD/CAD noon rate (`IEXE0101`, to 2016) and daily average rate (`FXUSDCAD`, from 2017) and one month Treasury bill yield (`TB.CDN.30D.MID`), via the Valet API, and the US one month Treasury yield from FRED (`DGS1MO`, https://fred.stlouisfed.org/series/DGS1MO), retrieved 19 October 2026, cut at 30 September 2026 and saved in `data/raw/`; `scripts/build_usdcad.py` builds `data/usdcad_rates.csv` from them.
+
+Chapter 6: the Government of Canada five year benchmark yield `BD.CDN.5YR.DQ.YLD` and the other benchmark series in the Chapter 4 file `data/goc_bills_bonds.csv` (Bank of Canada Valet API, retrieved 19 October 2026). The CDS quotes, the firm in the Merton section and the loans are illustrations.
 
 ## Other public sources for Chapter 2
 

@@ -2,7 +2,7 @@
 
 # Quantitative Finance for Alternative Investments
 
-*Mathematics, Models and Code*, by John Khan.
+*Mathematics, Models and Code*
 
 This is a twelve chapter book on the quantitative methods behind alternative investments, written in
 LaTeX with the code that produces it. Each chapter states a result, proves it, and checks it with a
@@ -10,7 +10,7 @@ number you can reproduce. No number in the text is typed by hand: the Python scr
 them, write them to a generated macro file, and draw every figure. Independent cross-checks in R and
 GNU Octave recompute the main results by different methods, and a test suite ties the three together.
 
-Chapters are released one at a time as each is finished; this copy holds Chapters 1, 2, 3 and 4. The repository holds the source only. Run the build below to produce the PDFs.
+Chapters are released one at a time as each is finished; this copy holds Chapters 1, 2, 3, 4, 5 and 6. The repository holds the source only. Run the build below to produce the PDFs.
 
 ## Chapters
 
@@ -20,8 +20,8 @@ Chapters are released one at a time as each is finished; this copy holds Chapter
 | 2 | Fund Structures, Fees and Distribution Waterfalls | Fund vehicles and master-feeder structures, open-end and drawdown funds, fund terms and governance, management fee bases, whole-fund and deal-by-deal waterfalls with hurdle, catch-up and clawback, carried interest as a portfolio of calls, a simulation of 6,000 funds, hedge fund incentive fees with high-water marks, fee annuities, funds of funds, real estate promotes and commitment pacing. | Released |
 | 3 | Random Walks and Stochastic Calculus | Random walks and the reflection principle, a construction of Brownian motion, quadratic variation, the Ito integral and isometry, Ito's lemma, geometric Brownian motion and the Ornstein-Uhlenbeck process, Euler and Milstein schemes, martingales and optional stopping, Girsanov's theorem and importance sampling, Feynman-Kac and a Crank-Nicolson solver. Case study: how badly the speed of mean reversion is estimated from Canadian yields. | Released |
 | 4 | Arbitrage, Forwards, Futures and Binomial Trees | Discount factors and bootstrapping, forward rates and FRAs, state prices and the one-period fundamental theorem, price bounds in incomplete markets, cost of carry and convenience yield, arbitrage bands with frictions, covered interest parity, futures against forwards under random rates, the Schwartz commodity model and roll yield, binomial replication, convergence to Black-Scholes, Leisen-Reimer trees, American options and the exercise boundary. Case study: whether Canadian forward rates forecast short rates. | Released |
-| 5 | Black-Scholes: Derivation, Greeks and Numerical Checks | Coming soon. | Coming soon |
-| 6 | Interest Rates, Credit Risk, Private Credit and Structured Products | Coming soon. | Coming soon |
+| 5 | Black-Scholes: Derivation, Greeks and Numerical Checks | The Black-Scholes equation by delta hedging and by risk-neutral expectation, the closed form, put-call parity and bounds, the Greeks and the gamma-theta relation, dividend yields, cash dividends, Black-76 and currency options, Monte Carlo with antithetic and control variates, explicit, implicit and Crank-Nicolson schemes with von Neumann stability, implied volatility by Newton and Brent, jump and stochastic volatility smiles, risk-neutral densities, the profit and loss of hedging at the wrong volatility, discrete rebalancing and transaction costs. Case study: selling and delta hedging one month USD/CAD options, 2007 to 2026. | Released |
+| 6 | Interest Rates, Credit Risk, Private Credit and Structured Products | Duration and convexity, short-rate models, swaps, structural and reduced-form credit models, private credit underwriting, tranching and copulas. Case study: whether five year commercial mortgages written each month could have been refinanced at maturity, using Government of Canada yields. | Released |
 | 7 | Portfolio Theory, Factor Models, Alpha and Beta | Coming soon. | Coming soon |
 | 8 | Risk and Performance Measurement | Coming soon. | Coming soon |
 | 9 | Hedge Funds, Managed Futures and Digital Assets | Coming soon. | Coming soon |
