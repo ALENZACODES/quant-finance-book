@@ -1,0 +1,1405 @@
+% Chapter 2. All quoted numbers come from chapters/ch02-numbers.tex, written by code/ch02/run_all.py.
+\input{chapters/ch02-numbers}
+\begin{refsection}
+\setcounter{chapter}{1}
+\chapter{Fund Structures, Fees and Distribution Waterfalls}
+\label{ch:structures}
+
+An investor in a private fund does not own the assets. It owns an interest in a vehicle, and the
+contract that creates the vehicle decides who controls the assets, when cash moves, and how gains are
+shared between the investors and the manager. Two funds that hold identical portfolios can deliver very
+different returns to their investors because their contracts differ. This chapter studies those
+contracts with the same care that Chapter~1 gave to return measurement: it describes the legal
+vehicles and the terms that matter, then turns the main fee and profit sharing rules into formulas, proves
+the properties that shape the manager's incentives, and checks each result with code.
+
+The return an investor receives is what is left after the money has passed through the contract,
+from the first capital call to the final distribution. The chapter follows it along that route, for
+one fund and then for \mcN{} simulated ones, and then asks what the fees are worth to the manager and
+what they encourage it to do. The same tools then serve for property promotes and for planning
+commitments.
+
+\begin{keybox}[Reproducing the numbers]
+The scripts in \texttt{code/ch02/} write the numbers they compute into a file of macros
+that the chapter reads, so no result is copied by hand; contract parameters such as an 8\% hurdle are
+stated assumptions, and the few figures taken from published sources are cited where they appear. Tests check the scripts against closed forms, Monte
+Carlo estimates, an independent IRR library and cross-checks run in R and GNU Octave. The simulations use NumPy's
+\texttt{default\_rng} with seeds 202 to 205, one for each simulation, and each seed is
+given where its simulation is described.
+\end{keybox}
+% =====================================================================================
+\section{Why the contract matters as much as the portfolio}
+\label{sec2:why}
+
+A fund is a contract between people who supply capital and people who supply judgement. The investors
+cannot watch every decision, and the manager knows more than they do about its own skill and, once it is
+investing, about the deals and its effort. After the money is
+committed the manager may serve itself, by taking too much risk, charging expenses to the fund or
+spending its time on a successor fund; economists call this hidden action \emph{moral hazard}. Before
+it is committed, investors cannot tell good managers from bad ones, and the managers keenest for
+capital on easy terms may be the weakest; this hidden information creates \emph{adverse selection}. Fund contracts respond in a few ways. Carried
+interest and incentive fees tie pay to performance, and a manager that invests its own money shares
+in the losses. Investors also get rights to information, to vote on conflicts and, in the last
+resort, to remove the manager.
+
+The same tools create new problems. A share of profits with no share of losses is an option, and
+the holder of a plain call gains from volatility; \cref{sec2:options} shows when carry does not. A fee charged on assets rewards asset growth whether or not the
+assets earn a return. Much of this chapter is about measuring those side effects precisely, because a
+carry term that costs investors little when returns are steady can cost them a lot when returns are
+volatile. Chapter~1 showed how to measure what a
+fund earned; this chapter shows how much of it reaches the investor.
+
+\FloatBarrier
+% =====================================================================================
+\section{What does an investor actually own?}
+\label{sec2:vehicles}
+
+Before a fund buys anything, its sponsor has to choose a legal wrapper, and the choice is a compromise.
+Investors want to lose no more than they commit, they want the fund's income taxed once and in their
+own hands, and they want terms they can bargain over. No single vehicle gives every investor all of
+this, which is why one fund often uses several.
+
+The \emph{limited partnership} is the usual answer for private equity, private credit and real estate
+funds, and for hedge funds sold to domestic investors. Its \emph{limited partners} (LPs) put up most of
+the capital and can lose that capital and any commitment still outstanding, but in general no more,
+subject to guarantees they give and to local law. One \emph{general partner} (GP) runs the fund and
+carries unlimited liability. Sponsors blunt that exposure by making the GP a limited liability company, so claims against the GP
+are ordinarily limited to the company's assets. That does not shield the principals from guarantees
+they sign, from their own misconduct or from statutory exceptions, and the details depend on the
+governing law.
+
+Limited partners generally leave the running of the fund to the GP, and how far they may go without
+risking their protection depends on local law. In many places an LP that takes part in managing the
+fund can lose its limited liability, and each jurisdiction's statute decides where voting on a
+conflict ends and taking part in management begins. In return the partnership is usually looked
+through for tax, so gains are taxed once in the partners' hands, and its terms come from an agreement
+the parties write for themselves. How much either is worth depends on the jurisdiction and on the investor.
+
+A company changes the bargain. Shareholders generally have limited liability with no duty to stay passive,
+subject to statutory exceptions, personal guarantees and their own misconduct,
+but in many jurisdictions the company is taxed as an entity, with the outcome depending on its
+classification and on the investor. For a taxable domestic investor that can mean a second layer of tax, depending on the local rules for
+taxing dividends and gains.
+For a pension plan or a foreign investor it can be an advantage, because income passed through a
+partnership may count as business income that such an investor would prefer not to receive directly.
+Offshore hedge funds are therefore usually companies (\cref{fig2:structure}). The \emph{limited
+liability company} (LLC) sits between the two, with limited liability for every member, flexible
+internal rules and, in the United States where the form began, pass-through tax by default; other
+countries may tax it as a company. Canada, for one, generally treats a US LLC as a corporation for its
+own tax purposes, with consequences that depend on the investor and on the tax treaty. Sponsors use it for the general partner,
+for the management company and to hold single assets.
+
+A manager with both kinds of investor can still run one portfolio. In the \emph{master-feeder} structure
+of \cref{fig2:structure}, each group enters through the feeder that suits its tax position, an onshore
+partnership or an offshore company, and both feeders put all their capital into a master fund. Trades
+happen once, at the master, and are allocated pro rata, so the feeders earn the same gross return;
+their net returns still differ by the costs, taxes and fees charged in each feeder.
+
+Smaller vehicles do narrower jobs. A \emph{special purpose vehicle} (SPV) holds one property, one loan
+pool or one co-investment, so that the asset and its debts sit apart from the rest of the sponsor's
+business. How far apart raises two separate questions: would the asset stay out of the sponsor's
+estate if the sponsor became insolvent, and must the sponsor consolidate the vehicle in its accounts?
+Documents that confine the vehicle to its purpose, limit its debts to those tied to its assets and
+require an independent director's vote for a bankruptcy filing are commonly used to make it
+\emph{bankruptcy remote}, though how well they work depends on ownership, guarantees and the
+insolvency law that applies. They lower the risk that the sponsor's insolvency reaches the asset
+without removing it. The securitisations of Chapter~6 depend on the first question: a true sale, and
+a vehicle that a court will not merge with the sponsor in its insolvency. Whether the sponsor
+consolidates the vehicle in its accounts is a separate accounting matter, and many consolidated
+vehicles serve their investors well.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.92\textwidth]{ch02/fig01_structure}
+  \caption{A master-feeder fund. Two feeders with different tax treatment invest in one master fund.
+  The general partner controls the partnership and receives the carried interest or incentive
+  allocation; the management company advises the fund and receives the management fee.}
+  \label{fig2:structure}
+\end{figure}
+
+The split between the general partner and the management company in \cref{fig2:structure} is
+deliberate. The management fee is income for services and is paid to the management company. The
+carried interest is a share of partnership profits and is allocated to the general partner. Its tax
+treatment depends on the fund's jurisdiction, the applicable rules and how the allocation is
+structured. Service providers sit around the structure: a
+prime broker or custodian holds the assets, an administrator keeps the books and computes the net asset
+value, and an auditor reports on the financial statements.
+
+\FloatBarrier
+% =====================================================================================
+\section{How do investors get in and out?}
+\label{sec2:openclosed}
+
+\paragraph{Open-end funds}
+An \emph{open-end} or \emph{evergreen} fund has no fixed life. Investors subscribe and redeem at the net
+asset value (NAV) on stated dealing dates, usually monthly or quarterly, after a notice period. Because
+investors can leave, the fund must manage liquidity against its redemption terms, with liquid
+assets, cash reserves, borrowing or contractual limits on redemptions. Strategies in
+liquid markets can do that, which is why most hedge funds are open-end. Liquidity terms protect the remaining investors from the cost of
+forced sales: a \emph{lock-up} bars redemptions for an initial period (a soft lock-up allows them for a
+fee), a \emph{gate} caps the share of the fund that can be redeemed on one date, and a \emph{side pocket}
+holds illiquid positions apart. An investor who redeems usually keeps its side pocket interest and is
+paid when those positions are sold, on terms the documents set. The documents also usually let the
+fund suspend redemptions in a crisis.
+
+In an open-end fund investors arrive at different times and at different NAVs. The
+\emph{high-water mark} means the manager earns an incentive fee only on gains that take the NAV above
+its highest level at an earlier fee date, or above its starting level if that is higher. With one mark for the whole fund,
+an investor who subscribes after a loss gets a free ride: it pays no incentive fee on its own gains
+until the fund regains the old mark. If the fund falls from 100 to 80 and
+an investor buys in at 80, a rise to 95 gives that investor a gain of almost 19\% and no incentive fee,
+because the fund is still below its mark of 100. Funds remove this with series accounting, which keeps separate
+accounting series for subscriptions with distinct fee histories, or with equalisation adjustments;
+\cref{sec2:hf} develops the economics of the high-water mark.
+
+\paragraph{Drawdown funds}
+A \emph{drawdown} fund, also called a closed-end or private equity style fund, raises
+\emph{commitments}: promises to provide capital up to a stated amount when asked. The general partner
+\emph{calls} capital as it finds investments, usually during an \emph{investment period} of about five
+years, then manages and sells the investments during a \emph{harvest period}, and distributes the
+proceeds. The fund has a fixed term, commonly ten years, with options to extend for one or two years to
+complete sales. Investors cannot redeem. They can sell their interest to another investor on the
+secondary market, usually at a negotiated price and with the general partner's consent. An LP that
+fails to meet a capital call is a \emph{defaulting} investor and faces penalties set in the partnership
+agreement, which may include the forfeiture of part of its interest.
+
+\paragraph{Risks particular to drawdown funds}
+A drawdown fund exposes its investors to several risks that are larger than in a liquid public
+market investment. The investor commits
+to a \emph{blind pool}, because the investments are not known when the commitment is made. It must keep
+liquidity available for calls of uncertain size and timing, which creates \emph{funding risk}. It has no
+contractual redemption right, although a secondary sale may offer an exit at a negotiated price, so
+it bears most of the illiquidity of the assets. Its returns depend on one team, so the departure
+of key people or a change of strategy is a large risk. And reported values in the early years are
+estimates that can be slow to reflect bad news, which, as Chapter~1 showed, can smooth the return series.
+Investors answer these risks chiefly by spreading commitments across managers and vintage years and by
+planning them with a cash flow model (\cref{sec2:pacing}); due diligence, key person clauses and
+secondary sales add some protection, though not complete protection.
+
+\paragraph{How fees differ}
+Hedge fund and private equity fees share a common outline, a recurring management fee and a fee or allocation linked to performance,
+but differ in the details that matter. A hedge fund usually charges its management fee on NAV and its
+incentive fee on gains above a high-water mark, usually crystallised and paid each year, though some
+funds crystallise more often and some less. A private equity
+fund usually charges its management fee on committed capital during the investment period and on
+invested capital afterwards, and earns carried interest only when gains are realised, usually by sales, on cumulative
+profits, usually after a preferred return. The private equity design measures performance over the whole life
+of the fund, and that is one reason for its more complex waterfall.
+
+\FloatBarrier
+% =====================================================================================
+\section{What does the management fee cost over a fund's life?}
+\label{sec2:mgmtfees}
+
+Let $K$ be committed capital, $f_1$ the fee rate during an investment period of $T_I$ years and $f_2$
+the rate afterwards, charged on the cost of investments not yet realised, $I_t$. With fees charged at
+the start of each year $t = 0, 1, \dots, T-1$,
+\begin{equation}\label{eq2:mgmtfee}
+  F_t = \begin{cases} f_1 K, & t < T_I,\\ f_2\, I_t, & t \ge T_I,\end{cases}
+  \qquad
+  F = \sum_{t=0}^{T-1} F_t = f_1 K T_I + f_2 \sum_{t=T_I}^{T-1} I_t .
+\end{equation}
+The fee is paid by calling capital from the LPs, so fees use up commitment. With no recycling or borrowing, at most $K - F$ of the commitment can be invested. Under the stated schedule the fee on committed capital is fixed for the
+investment period once the commitment is made, barring contractual reductions, suspension or early
+termination, and it is charged even on capital never invested. A fee on invested capital stops
+charging for capital once it is returned, but because it falls as investments are sold it gives the
+manager a reason to hold assets longer.
+
+\begin{example}{Fund B: management fees}\label{ex2:fees}
+Exits occur at the start of the year shown, before that year's fee is charged. Fund B has
+commitments of 100 and makes the four investments in \cref{tab2:deals}, at a total cost of
+\bInvested. It charges 2\% of commitments for the first five years and 1.5\% of the cost of
+unrealised deals afterwards. The fees are $5\times 2 = \bFeeIP$ for years 0 to 4. At the start of
+year 5 deals C and D are unrealised, with cost 30, so the fee is $0.015\times 30 = \bFeeYearFive$. In
+years 6 and 7 only deal D remains and the fee is \bFeeYearSix{} each year; the fund ends with the sale
+of D in year 8. Total fees are \bFeeTotal. The LPs pay in \bPaidIn, the cost of the deals plus the
+fees, and the rest of the commitment is never called; the fund distributes \bProceeds. Panel (a) of
+\cref{fig2:fees} shows the fee base
+dropping from commitments to invested cost.
+\end{example}
+
+\begin{table}[t]
+  \centering
+  \caption{The four investments of Fund B. Proceeds are received at the start of the year of exit,
+  before that year's fee.}
+  \label{tab2:deals}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Deal & Year invested & Cost & Year of exit & Proceeds & Profit \\
+    \midrule
+    A & 0 & 30 & 3 & 75 & \bDealAProfit \\
+    B & 1 & 25 & 5 & 40 & \bDealBProfit \\
+    C & 1 & 20 & 6 & 0  & \bDealCProfit \\
+    D & 2 & 10 & 8 & 20 & \bDealDProfit \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Fee terms that look similar can differ a lot over a fund's life. Panel (b) of \cref{fig2:fees} compares
+three sets of terms for a fund that invests 17 a year for five years and holds each investment for five
+years, so the cost of unrealised deals is 17, 34, 51, 68 and 85 in years 0 to 4 and then falls by 17 a
+year. A flat 2\% on commitments for ten years costs \altFeeFlat{} per 100 committed; stepping down to
+1.5\% of cost after the investment period costs \altFeeStep; charging 2\% of invested cost throughout
+costs \altFeeCost. Under the flat terms fees and investments together reach \altFlatTotal, more than the
+commitment, so the comparison treats the excess as paid out of proceeds, which an agreement can allow;
+it compares fee terms and leaves capital budgets aside. The difference between the first and the last, more than ten percent of commitments,
+is charged whatever the investments earn. \textcite{phalippou2009} documents how fees of this kind, together
+with transaction and monitoring fees charged to portfolio companies, can materially reduce gross
+private equity returns in his sample of funds.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig02_fees}
+  \caption{(a) Fund B: the fee base is commitments during the investment period and the cost of
+  unrealised deals afterwards; bars show the annual fee multiplied by ten. (b) Cumulative fees per 100 of
+  commitments under three fee terms for a fund that invests evenly over five years.}
+  \label{fig2:fees}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{How are distributions split?}
+\label{sec2:waterfall}
+
+\subsection{When have the investors earned the hurdle?}
+
+The \emph{distribution waterfall} is the clause of the partnership agreement that splits each
+distribution between the LPs and the GP. Proceeds flow through a sequence of tiers, and each tier fills
+before the next receives anything. The waterfall used in this chapter, a common
+private equity design, has four.
+\begin{enumerate}[label=(\roman*)]
+  \item \emph{Return of capital}: everything goes to the LPs until they have received back all capital
+        contributed, including capital called to pay fees and expenses.
+  \item \emph{Preferred return}: everything goes to the LPs until they have also received a return at the
+        \emph{hurdle rate} $h$ on that capital, compounded; the examples use 8\% a year, a common
+        choice, though each agreement sets its own rate and some funds have no preferred return.
+  \item \emph{Catch-up}: a share $k$ of each dollar, often all of it, goes to the GP until the GP has
+        received its carried interest share $c$, commonly 20\%, of all profits distributed so far.
+  \item \emph{Split}: the remainder is shared $1-c$ to the LPs and $c$ to the GP.
+\end{enumerate}
+The first two tiers can be stated together with one quantity.
+
+\begin{definition}[Hurdle balance]\label{def2:balance}
+Let the LPs contribute $C_i$ at times $t_i$ and receive distributions $L_j$ at times $s_j$, over a
+finite history, and let $h>-1$. The \emph{hurdle balance} at time $t$ is
+\begin{equation}\label{eq2:balance}
+  B(t) = \sum_{i:\,t_i\le t} C_i\,(1+h)^{t-t_i} \;-\; \sum_{j:\,s_j< t} L_j\,(1+h)^{t-s_j},
+\end{equation}
+the amount the LPs would need to receive at $t$ to have earned exactly $h$ on their flows to date.
+The balance is computed immediately before the distribution at $t$ is allocated: contributions made
+at $t$ count, and the distribution being allocated at $t$ does not. The balance can be
+negative. It models the LPs' preferred return as the waterfall above defines it; agreements word it in different ways.
+\end{definition}
+
+\begin{proposition}\label{prop2:balance}
+$B(t) \le 0$ if and only if the LPs' flows counted in \cref{eq2:balance}, that is, contributions up to
+and including $t$ and distributions strictly before $t$, have a nonnegative net present value at rate $h$.
+If those flows are conventional (at least one contribution, all contributions before all
+distributions, and at least one positive distribution), this holds if and only if the LPs' internal
+rate of return on those same flows is at least $h$.
+\end{proposition}
+\begin{proof}
+Multiplying \cref{eq2:balance} by $(1+h)^{-t} > 0$ gives
+$(1+h)^{-t}B(t) = \sum_i C_i (1+h)^{-t_i} - \sum_j L_j (1+h)^{-s_j} = -\NPV_h$, the negative of the NPV
+at rate $h$ of the LPs' flows with contributions counted as outflows. So $B(t)\le 0 \iff \NPV_h \ge 0$.
+For conventional flows, with the same cutoff, let $\tau$ be the date of the last contribution, which by
+assumption precedes every distribution counted. Then $f(r) = (1+r)^{\tau}\NPV_r = -\sum_i C_i(1+r)^{\tau-t_i} + \sum_j L_j(1+r)^{\tau-s_j}$
+has the same sign as $\NPV_r$, and, given at least one positive distribution, it is strictly
+decreasing on $r > -1$ because every exponent
+$\tau - t_i$ is nonnegative and every exponent $\tau - s_j$ is negative. As $r\downarrow-1$ the distribution terms grow without bound, so $f\to+\infty$, and as $r\to\infty$ they
+vanish while the contribution terms stay at or below $-C_\tau<0$, so $f$ is eventually negative. Hence
+$f$ has exactly one root $r^*$, the IRR, as in Chapter~1, and $\NPV_h \ge 0 \iff f(h) \ge 0 \iff h \le r^*$.
+\end{proof}
+
+Tiers (i) and (ii) therefore pay the LPs $\min\{X,\max\{B(t),0\}\}$ out of a distribution $X$. The split
+of that amount between capital and preferred return matters only for reporting: it is capital first,
+up to the unreturned contributions, then preferred return. The balance counts only what the LPs receive; carry paid to the GP does not enter it. Once the LPs have been paid in the split tier, $B(t)$ is negative,
+and in this sequential allocation that cushion absorbs later fee calls: a fee called after the hurdle
+sends the next distribution back to tiers (i) and (ii) only if it exceeds the cushion. The cushion
+decides only whether the LPs regain priority. Any call after the catch-up is complete raises the
+paid-in capital $P$ of \cref{prop2:catchup} without changing $D$ or the GP's carry $G$, so cumulative
+profit $D-P$ falls and the GP at once holds more than $c$ of it. Split tier dollars keep that excess
+(\cref{prop2:catchup}), and only the end-of-life true-up measured in \cref{sec2:mc} removes it. This is how the models in this chapter apply the
+tiers; agreements that track unreturned capital separately can sequence distributions differently.
+
+\subsection{How large is the catch-up?}
+
+\begin{proposition}[Size of the catch-up]\label{prop2:catchup}
+Suppose a distribution arrives after the hurdle is met. Let $P$ be the LPs' total contributions
+(paid-in capital rather than commitments), $D$ cumulative distributions to the LPs and the GP together,
+including the part of this one paid in tiers (i) and (ii), and $G$ the GP's cumulative
+carry so far. With catch-up rate $k > c$, the catch-up tier has size
+\begin{equation}\label{eq2:catchup}
+  y^{*} = \frac{c\,(D-P) - G}{k-c},
+\end{equation}
+when this is positive, and after it the GP's cumulative carry equals $c$ times cumulative profit,
+$G + k y^{*} = c\,(D + y^{*} - P)$. Every later dollar paid in the split tier keeps that equality.
+\end{proposition}
+\begin{proof}
+In the catch-up tier a dollar raises the GP's carry by $k$ and cumulative profit by one. The tier ends
+when $G + k y = c\,(D + y - P)$, which is linear in $y$ with solution \cref{eq2:catchup}; $k > c$ makes
+the denominator positive, so the GP's share of profit rises towards $c$ as $y$ grows. In the split tier
+a dollar raises carry by $c$ and profit by one, so if $G' = c\,(D'-P)$ before it, then
+$G' + c x = c\,(D' + x - P)$ after it.
+\end{proof}
+
+With a full catch-up ($k = 1$), one contribution $K$ and one distribution, so that $P=K$ and
+$D = H$, \cref{eq2:catchup} becomes
+$y^{*} = c(H-K)/(1-c)$, where $H$ is the hurdle amount. Each dollar of preferred return paid to the LPs
+must be matched by $c/(1-c)$ dollars of catch-up, or 0.25 with $c = 20\%$, to restore an 80/20
+split of profit.
+
+\subsection{Soft and hard hurdles}
+
+In the structures modelled here, the catch-up decides what kind of hurdle the fund has. With a catch-up the hurdle is \emph{soft}: it
+delays the carry but, once the fund is far enough above it, the GP receives $c$ of all profit, including
+the profit below the hurdle. Without a catch-up the hurdle is \emph{hard}: the GP earns carry only on
+profit above the hurdle amount. The difference is easiest to see in the simplest fund.
+
+\begin{proposition}[One contribution, one distribution]\label{prop2:single}
+Let the LPs contribute $K$ at time 0 and the fund distribute $V$ at time $T$, so the hurdle amount is
+$H = K(1+h)^T$. With catch-up rate $k>c$, define $V^{*} = (kH - cK)/(k-c)$. Then the carried interest is
+\begin{equation}\label{eq2:gpcases}
+  G(V) = \begin{cases}
+    0, & V \le H,\\[2pt]
+    k\,(V-H), & H < V \le V^{*},\\[2pt]
+    c\,(V-K), & V > V^{*},
+  \end{cases}
+\end{equation}
+and with a hard hurdle $G(V) = c\,(V-H)^{+}$, where $x^{+} = \max\{x,0\}$.
+\end{proposition}
+\begin{proof}
+For $V\le H$ tiers (i) and (ii) absorb everything. Above $H$ the catch-up pays the GP $k$ per dollar.
+By \cref{prop2:catchup} with $P=K$, $D = H$ and $G = 0$ it ends after $y^* = c(H-K)/(k-c)$, that is at
+\begin{equation*}
+  V = H + \frac{c(H-K)}{k-c} = \frac{(k-c)H + cH - cK}{k-c} = \frac{kH - cK}{k-c} = V^{*}.
+\end{equation*} At $V^{*}$ the GP
+holds $k y^{*} = c(V^{*}-K)$, and each further dollar adds $c$, so $G(V) = c(V-K)$ for $V > V^{*}$. With a
+hard hurdle tier (iii) is absent and tier (iv) starts at $H$.
+\end{proof}
+
+\begin{example}{A single-period fund}\label{ex2:single}
+Take $K = 100$, $T = 5$, $h = 8\%$ and $c = 20\%$, so $H = 100 \times 1.08^5 = \spH$ and, with full
+catch-up, $V^* = (\spH - 20)/0.8 = \spVstarFull$. Suppose the fund distributes gross proceeds
+$V = \spV$, all of it available to the waterfall. Tier (i)
+pays the LPs \spRoc, tier (ii) pays them \spPref, the catch-up pays the GP $0.25\times\spPref =
+\spCatch$, and the remaining $\spV - \spVstarFull = \spSplitTotal$ is split \spSplitLP{} to the LPs and \spSplitGP{}
+to the GP. The GP receives $\spGP = 0.2\times(\spV - 100)$, exactly 20\% of profit, and the LPs receive
+\spLP. An 80\% catch-up gives the same \spGPPart, because $V$ is above that design's threshold of
+\spVstarPart{} too. A hard hurdle gives only $0.2\times(\spV-\spH) = \spGPHard$. The fund's gross return
+is \spGrossIrr\% a year and the LPs' net return is \spLPirr\% a year.
+\end{example}
+
+\Cref{fig2:tiers} shows the whole picture. Panel (a) stacks the four tiers against $V$; panel (b) plots
+the GP's payoff under four designs. The kinks at $H$ and $V^*$ are where the incentives in
+\cref{sec2:behaviour} come from. \Cref{lst2:core} is a compact implementation of the single-period case
+that reproduces \cref{ex2:single}, including the hard hurdle case; the general version in \texttt{ch02lib.py} works with any dated flows.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig03_tiers}
+  \caption{The single-period waterfall with $K = 100$, $T = 5$, $h = 8\%$ and $c = 20\%$. (a) How
+  proceeds $V$ are paid through the tiers with a full catch-up. (b) Carried interest under a full
+  catch-up, an 80\% catch-up, a hard hurdle and no hurdle.}
+  \label{fig2:tiers}
+\end{figure}
+
+\Needspace*{21\baselineskip}
+\lstinputlisting[language=Python,caption={The single-period waterfall (\texttt{code/ch02/snippets/waterfall\_core.py}).},label=lst2:core]{code/ch02/snippets/waterfall_core.py}
+
+\FloatBarrier
+% =====================================================================================
+\section{What is the carry worth, and how does risk change it?}
+\label{sec2:options}
+
+\Cref{eq2:gpcases} is piecewise linear with slopes $0$, $k$ and $c$, which means it can be written with
+call option payoffs.
+
+\begin{proposition}[Option decomposition]\label{prop2:options}
+Under the conditions of \cref{prop2:single},
+\begin{equation}\label{eq2:decomp}
+  G(V) = k\,(V-H)^{+} \;-\; (k-c)\,(V-V^{*})^{+},
+\end{equation}
+so the carried interest is $k$ calls struck at $H$ less $k-c$ calls struck at $V^{*}$. A hard hurdle is
+$c$ calls struck at $H$, and no hurdle is $c$ calls struck at $K$.
+\end{proposition}
+\begin{proof}
+Check the three regions of \cref{eq2:gpcases}. For $V \le H$ both terms are zero. For $H < V \le V^*$ the
+second term is zero and the first is $k(V-H)$. For $V > V^*$ the right side is
+$k(V-H) - (k-c)(V-V^*) = cV - kH + (k-c)V^*$, and $(k-c)V^* = kH - cK$, so it equals $c(V-K)$.
+\end{proof}
+
+If the value of the fund's portfolio $V_t$ followed a geometric Brownian motion with constant
+volatility, paid nothing out before $T$ and could be traded continuously, and the interest rate were
+constant, \cref{prop2:options} would give the value of the carry today by the Black-Scholes formula
+derived in Chapter~5. Write $C(S,X,T,r,\sigma)$ for the price of a call on $S$ struck at $X$ and expiring at $T$.
+Then
+\begin{equation}\label{eq2:carryvalue}
+  \mathcal{G}_0 = k\,C(V_0, H, T, r, \sigma) - (k-c)\,C(V_0, V^{*}, T, r, \sigma),
+  \qquad C = S\,\Phi(d_1) - X e^{-rT}\Phi(d_2),
+\end{equation}
+with $d_{1,2} = [\ln(S/X) + (r \pm \sigma^2/2)T]/(\sigma\sqrt T)$. Private assets are not traded, so the replicating hedge behind the formula cannot be
+built and \cref{eq2:carryvalue} gives only a model value. It still answers this section's question: how
+the GP's claim responds to the risk of the portfolio.
+\textcite{metrick2010} value the carry of a large sample of funds with a related option model.
+
+\begin{example}{The value of carry}\label{ex2:carryvalue}
+Take the fund of \cref{ex2:single} with $V_0 = 100$, so the portfolio is worth its cost, a risk-free
+rate of 3\% and $T = 5$. With full catch-up the carry is worth \carryFullFifteen{} at 15\% volatility,
+\carryFullThirty{} at 30\% and \carryFullFortyFive{} at 45\%. With a hard hurdle the values are
+\carryHardFifteen, \carryHardThirty{} and \carryHardFortyFive; with no hurdle at 30\% it is
+\carryNoHurdleThirty. A Monte Carlo estimate (seed 202) with \carryMCn{} antithetic draws gives \carryMCThirty{} at
+30\% with a standard error of \carryMCse, within one standard error of the formula. If the GP's work
+lifts the portfolio to $V_0 = 115$ the carry at 30\% is worth \carryFullThirtyRich. These are model values. Carry rarely trades, and when it does, as in
+GP stakes deals, it is priced privately on other assumptions.
+\end{example}
+
+Panel (a) of \cref{fig2:carryoption} shows the value rising with volatility in each design, for a fund
+whose portfolio is worth its cost. The sign is not guaranteed in general: the payoff is a difference of calls, so its
+sensitivity to volatility can be negative at some portfolio values. Differentiating
+\cref{eq2:carryvalue},
+\begin{equation}\label{eq2:vega}
+  \frac{\partial \mathcal{G}_0}{\partial \sigma}
+  = \sqrt{T}\,V_0 \bigl[\, k\,\varphi\bigl(d_1(H)\bigr) - (k-c)\,\varphi\bigl(d_1(V^{*})\bigr) \bigr],
+\end{equation}
+where $\varphi$ is the standard normal density, because the vega of a call is $S\varphi(d_1)\sqrt T$.
+When $V_0$ is far above $V^*$, $d_1(H) > d_1(V^*) > 0$, so $\varphi(d_1(H))$ is the smaller density and
+the bracket can be negative: the short call struck at $V^*$ makes the payoff concave there. At 15\%
+volatility the carry gains \carryVegaLow{} per point of volatility when $V_0 = 100$ but changes by
+\carryVegaHigh{} per point when $V_0 = 200$, so there it loses value as volatility rises; at 30\% volatility and $V_0 = 200$ it gains
+\carryVegaHighThirty. Far above the catch-up threshold the GP gains much less from extra risk, and at low volatility loses
+from it, so it may prefer to protect its position; near or below the hurdle the gain from risk is
+largest.
+\textcite{carpenter2000} makes the same point for option pay in general: convex pay does not always
+raise the appetite for risk.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig04_carry_option}
+  \caption{Carried interest valued as options, with $K = 100$, $T = 5$, $h = 8\%$, $c = 20\%$ and a 3\%
+  risk-free rate. (a) Value against volatility when the portfolio is worth its cost, with Monte Carlo
+  checks. (b) Value against the current portfolio value; the dotted line is the value with zero
+  volatility.}
+  \label{fig2:carryoption}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{Does it matter whether carry is measured deal by deal?}
+\label{sec2:dbd}
+
+\paragraph{Two ways to measure profit}
+A \emph{whole-fund} or \emph{European} waterfall applies the tiers of \cref{sec2:waterfall} to the cash
+flows of the fund as a whole: the LPs get back all contributions, for every deal and for fees, plus the
+preferred return, before the GP receives any carry. A \emph{deal-by-deal} or \emph{American} waterfall
+applies the tiers to each investment separately, so the GP is paid carry on a profitable exit even if
+other investments are losing money. Many deal-by-deal agreements soften this by requiring that the
+costs of deals already realised, including written-off deals, be recovered first. Investor guidance
+generally favours the whole-fund form \parencite{ilpa2019}. Both descriptions are simplified
+archetypes; agreements differ in how invested capital, fees and realised losses enter each test.
+
+\begin{proposition}[Deal by deal pays at least as much without a hurdle]\label{prop2:subadd}
+Let deals $i = 1,\dots,n$ have profits $\pi_i$ measured at a common date and no hurdle. Then
+\begin{equation}\label{eq2:subadd}
+  \sum_{i=1}^{n} c\,\pi_i^{+} \;\ge\; c\Bigl(\sum_{i=1}^{n}\pi_i\Bigr)^{+},
+\end{equation}
+with equality if and only if the nonzero profits all have the same sign.
+\end{proposition}
+\begin{proof}
+The function $x\mapsto x^{+}$ is subadditive: $(a+b)^{+} \le a^{+} + b^{+}$, because $a+b \le a^{+}+b^{+}$
+and $0 \le a^{+}+b^{+}$. Induction on $n$ gives $(\sum\pi_i)^{+} \le \sum\pi_i^{+}$; multiply by $c>0$. If
+all $\pi_i \ge 0$ or all $\pi_i \le 0$ both sides agree. Otherwise some $\pi_i<0$, so $\sum\pi_i^{+} > \sum_i \pi_i$,
+and $\sum\pi_i^{+} > 0$, so $\sum\pi_i^{+} > \max\{\sum\pi_i, 0\} = (\sum\pi_i)^{+}$.
+\end{proof}
+
+With hurdles and dated flows the comparison is no longer exact: the whole-fund hurdle compounds on
+every contribution, fees and losing deals included, while a deal's hurdle compounds only on that
+deal's cost. A contractual \emph{clawback} seeks to reconcile the overpayment at the end of the fund,
+subject to any repayment caps and collection risk.
+
+\begin{definition}[Clawback]\label{def2:clawback}
+At the end of the fund, the GP must return to the LPs the excess of the carry it has received over the
+carry it would have received under the whole-fund waterfall applied to the fund's complete cash flows,
+\begin{equation}\label{eq2:clawback}
+  \mathrm{CB} = \Bigl(\sum_{\text{exits}} G^{\mathrm{deal}} - G^{\mathrm{fund}}\Bigr)^{+},
+\end{equation}
+often capped at the carry received less the taxes the GP's principals paid on it, $(1-\tau)\sum G^{\mathrm{deal}}$, where $\tau$ is the principals' tax rate on carry.
+This is the gross economic shortfall. The amount legally repayable can differ: agreements adjust for
+taxes, cap the repayment, hold part of the carry in escrow and set their own allocation rules.
+\end{definition}
+
+A clawback is only as good as the GP's ability to pay it. Investors protect it with an \emph{escrow} or
+holdback of part of each carry payment, with personal guarantees from the principals, and with interim
+clawback tests during the fund's life rather than only at the end.
+
+\begin{example}{Fund B under both waterfalls}\label{ex2:fundb}
+Return to Fund B (\cref{ex2:fees,tab2:deals}). Its LP flows are the deal costs called in years 0, 1 and 2, the fees called at the start
+of each year from 0 to 7 and the exit proceeds of \cref{tab2:deals}; they have an IRR of \bGrossIrr\% before
+carry and a total profit of \bProfit. \Cref{tab2:fundb} applies the whole-fund waterfall. The sale of A in
+year 3 and of B in year 5 only return capital and pay the preferred return; the hurdle balance is
+cleared only by the sale of D in year 8, which pays the GP a catch-up of \bWfCatchD{} and leaves \bWfSplitD{} for the
+split. The GP's carry is \bWfCarry, which is \bWfShare\% of the profit.
+
+Under a pure deal-by-deal waterfall each deal is tested on its own cost and an 8\% hurdle on that cost.
+Deal A cost 30 in year 0, so its hurdle amount is $30\times1.08^3 = \bDealAHurdle$. With a full catch-up the
+GP has 20\% of the deal's whole profit once proceeds pass $(\bDealAHurdle - 0.2\times30)/0.8$, which 75 does,
+so deal A pays carry of $0.2\times\bDealAProfit = \bDealACarry$ in year 3. That is carry paid early; the
+clawback below is the GP's eventual liability. Deal B pays \bDealBCarry{} in year 5, C pays nothing and D, whose hurdle amount
+is \bDealDHurdle, pays \bDealDCarry{} in year 8. The GP receives \bDbdCarry{} in total and owes a clawback
+of $\bDbdCarry - \bWfCarry = \bClawback$, well within a cap net of tax, which at a 40\% tax rate is $0.6\times\bDbdCarry =
+\bClawCap$. If realised losses are netted first, the GP's entitlement on the pool of realised deals is
+\bPoolEntOne{} after A, \bPoolEntTwo{} after B, \bPoolEntThree{} after the write-off of C and \bPoolEntFour{}
+after D. Carry already paid is never reduced before the end, so D pays nothing, the GP receives
+\bPoolCarry{} and it owes \bPoolClaw.
+
+The timing matters to the LPs even after the clawback has been paid. Their net IRR is \bLPirrWf\% under
+the whole-fund waterfall, \bLPirrDbdClaw\% under the deal-by-deal waterfall with the clawback paid in
+year 8, and \bLPirrDbdNoClaw\% if the clawback is never paid. The GP held \bDealACarry{} from year 3 and another \bDealBCarry{} from year 5, and received a further
+\bDealDCarry{} in year 8, against \bWfCarry{} that it would have received only in year 8 under the
+whole-fund waterfall; it returns the \bClawback{} excess in year 8 without interest.
+\end{example}
+
+\begin{table}[t]
+  \centering
+  \caption{Fund B under the whole-fund waterfall ($h = 8\%$, $c = 20\%$, full catch-up). Each row is one
+  distribution, received at the start of the year shown; tier columns show the incremental amounts
+  paid from that distribution, rounded to two decimals.}
+  \label{tab2:fundb}
+  \begin{tabular}{lrrrrrrr}
+    \toprule
+    Exit & Amount & Capital & Pref.\ return & Catch-up & Split & To LPs & To GP \\
+    \midrule
+    A, year 3 & 75 & \bWfRocA & \bWfPrefA & \bWfCatchA & \bWfSplitA & \bWfLPA & \bWfGPA \\
+    B, year 5 & 40 & \bWfRocB & \bWfPrefB & \bWfCatchB & \bWfSplitB & \bWfLPB & \bWfGPB \\
+    C, year 6 & 0  & \bWfRocC & \bWfPrefC & \bWfCatchC & \bWfSplitC & \bWfLPC & \bWfGPC \\
+    D, year 8 & 20 & \bWfRocD & \bWfPrefD & \bWfCatchD & \bWfSplitD & \bWfLPD & \bWfGPD \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig05_fundb}
+  \caption{Fund B. (a) Cumulative carry paid to the GP under the whole-fund waterfall and under
+  deal-by-deal waterfalls with and without netting of realised losses; the vertical drop in year 8 is
+  the clawback. (b) Contributions and distributions under the whole-fund waterfall.}
+  \label{fig2:fundb}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{What happens across many funds?}
+\label{sec2:mc}
+
+One fund proves little, so this section simulates \mcN{} funds. Each fund has commitments of 100 and
+makes ten investments of 8.4 at times drawn uniformly over the first five years. Each investment is
+held for a period drawn uniformly between two and seven years. With probability 12\% it is written
+off; otherwise its multiple of cost is $\exp(0.50 + 0.75 Z)$ with $Z$ standard normal, so the mean
+multiple over all deals is $0.88\,e^{0.50 + 0.75^2/2} = \mcMeanMult$. Fees are 2\% of commitments for
+five years and 1.5\% of the cost of unrealised deals for the next five. Deals are independent within and across funds, and every investment is sold
+at the end of its holding period. Ten investments of 8.4 use 84 of the commitment. Fees are 10 in the first five years and at most
+$5\times0.015\times84 = 6.3$ in the next five, so paid-in capital could reach 100.3 if every deal were
+still unrealised in each of years 5 to 9. The simulation therefore enforces the commitment: fee calls stop once paid-in capital would pass 100.
+The limit binds in \mcCapBindN{} of the 6,000 funds, and the largest paid-in capital is \mcPaidMax. The draws come from
+NumPy's \texttt{default\_rng} with seed 203. The parameters are illustrative, chosen to give a wide
+spread of outcomes; they are not estimates for any market.
+
+\Cref{tab2:mc} summarises the results over all \mcN{} funds. The medians of the three IRRs are taken
+separately; the fee and carry wedges are medians of the fund by fund differences, so they need not
+equal the differences of the medians. The median fee and carry wedges add up to about five percentage
+points of IRR, and the waterfall rule decides how often the GP is paid at all.
+
+\begin{table}[t]
+  \centering
+  \caption{Simulated funds: \mcN{} funds with commitments of 100. Amounts are per 100
+  committed. Carry received is before any clawback; means are over all funds; IRR costs are relative
+  to the whole-fund waterfall.}
+  \label{tab2:mc}
+  \small
+  \begin{tabular}{@{}lr@{}}
+    \toprule
+    Median deal level IRR before fees (\%) & \mcPreFeeIrr\\
+    Median IRR after fees (\%) & \mcGrossIrr\\
+    Median IRR after fees and carry (\%) & \mcNetIrr\\
+    Median fund by fund wedge: fees, carry (percentage points) & \mcWedgeFees, \mcWedgeCarry\\
+    Median multiple of paid-in capital before and after carry & \mcTVPI, \mcNetTVPI\\
+    \bottomrule
+  \end{tabular}
+
+  \medskip
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+     & Whole & Deal & Deal by deal,\\
+     & fund & by deal & netted\\
+    \midrule
+    Funds paying no carry (\%) & \mcZeroWf & \mcZeroDbd & \mcZeroPool\\
+    Mean carry received & \mcWfPaid & \mcDbdCarry & \mcPoolCarry\\
+    Funds owing a clawback (\%) & \mcWfOverProb & \mcClawProb & \mcPoolClawProb\\
+    Mean clawback owed & \mcWfOverAll & \mcOwed & \mcPoolOwed\\
+    95th percentile of the clawback & \mcWfOverNinetyFive & \mcOwedNinetyFive & \mcPoolOwedNinetyFive\\
+    LPs' median IRR cost after clawback (pp) & base & \mcDbdIrrCost & \mcPoolIrrCost\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Under the whole-fund waterfall \mcZeroWf\% of funds pay no carry, because they never clear the hurdle
+after fees; under the pure deal-by-deal waterfall almost every fund pays some, because one
+profitable deal is enough, and that is what drives the clawback rates in \cref{tab2:mc}.
+
+Even the whole-fund waterfall can pay too much. When capital is called for fees after the catch-up is
+complete, the profit on which the carry was computed later shrinks, and the split tier never gives
+the excess back (\cref{prop2:catchup}). In \mcWfOverProb\% of the simulated
+funds the whole-fund carry paid exceeds 20\% of final profit, by \mcWfOverMean{} on average when it
+does, which is why a whole-fund waterfall can still need a final reconciliation of carry. The entitlement used in \cref{tab2:mc} is therefore $\min\{G^{\mathrm{seq}}, c\,(D_{\mathrm{tot}}-P_{\mathrm{tot}})^{+}\}$,
+where $G^{\mathrm{seq}}$ is the carry paid by the sequential waterfall, $P_{\mathrm{tot}}$ is total paid-in
+capital and $D_{\mathrm{tot}}-P_{\mathrm{tot}}$ is the final profit. The minimum is the model's final
+recalculation of carry, a terminal profit true-up in the simulation that need not equal what a fund's
+actual clawback clause would recover. Every clawback in \cref{tab2:mc} is measured against this
+entitlement, not against the full recomputation of \cref{def2:clawback}. Carry received less the mean clawback is therefore
+\mcWfCarry{} to two decimals in every column of \cref{tab2:mc}, because each rule ends at this
+entitlement and assumes the GP repays in full, apart from the rare funds where a deal-level rule pays
+less than it and nothing is owed. A contractual clawback may differ, since it can be capped net of tax,
+and recovering it depends on the GP being able to pay.
+
+The clawback rates in \cref{tab2:mc} are high because of the model. The pure deal level rule measures profit before fees (fees average \mcFeesMean{} per 100 committed) and ignores losing deals, and the netted rule counts realised losses but still not fees, while about one
+deal in eight is written off and the deals are independent, so nearly every fund has a shortfall
+between the two rules. Under these distribution and true-up rules a simulated fund can owe back carry it has already
+received; the figures do not estimate how often real funds owe clawbacks.
+
+The more instructive result is the spike in panel (a) of \cref{fig2:mc} for the netted case: in
+\mcPoolFeeCluster\% of funds the clawback is exactly 20\% of the fees paid. Those are successful funds
+where both rules give the GP 20\% of profit, but the deal level rule measures profit before fees and
+the whole-fund rule after them. Even when the clawback is paid in full the LPs lose, because carry is
+paid early and returned late without interest. Panel (b) shows the gross to net mapping fund by fund.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig06_simulated_funds}
+  \caption{Simulated funds, amounts per 100 committed. (a) Distribution of the clawback owed at the end of
+  the fund under the pure deal-by-deal rule and with netting of realised losses. (b) Deal level IRR before fees against the LPs' net IRR under
+  the whole-fund waterfall, for a random half of the simulated funds so that the points stay legible.}
+  \label{fig2:mc}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{How do hedge fund fees accrue?}
+\label{sec2:hf}
+
+\paragraph{Conventions}
+A hedge fund's fees are computed each year (or each quarter) on its NAV. Let $A_{t-1}$ be the NAV at the
+start of year $t$, $g_t$ the gross return, $m$ the management fee rate, $p$ the incentive fee rate and
+$M_{t-1}$ the high-water mark, the highest NAV after fees at any earlier year end (initially $A_0$). This
+chapter uses the following order, which is common but not universal: the management fee is $m A_{t-1}$,
+deducted at the year end; the incentive fee is charged on the NAV after the management fee,
+$P_t = A_{t-1}(1+g_t) - mA_{t-1}$; and with a hurdle rate $h$ the threshold for the incentive fee is
+$M_{t-1}(1+h)$. The high-water mark is set after all fees, and the examples have no subscriptions or
+redemptions during the year. Then
+\begin{equation}\label{eq2:hffee}
+  I_t = \begin{cases}
+    p\,\bigl(P_t - M_{t-1}(1+h)\bigr)^{+} & \text{hard hurdle},\\[2pt]
+    p\,(P_t - M_{t-1})\,\mathbf{1}\{P_t > M_{t-1}(1+h)\} & \text{soft hurdle},
+  \end{cases}
+\end{equation}
+and then $A_t = P_t - I_t$ and $M_t = \max\{M_{t-1}, A_t\}$.
+With $h = 0$ the two cases agree. Without a high-water mark, $M_{t-1}$ is replaced by $A_{t-1}$, so the
+manager is paid on every year's gain whatever happened before.
+
+\begin{example}{Four years of hedge fund fees}\label{ex2:hf}
+A fund starts at 100 and charges 2\% and 20\% with a high-water mark and no hurdle. Gross returns are
+15\%, $-10\%$, 8\% and 20\%. \Cref{tab2:hf} shows the calculation. In year 1 the NAV after the
+management fee is \hfPreOne, so the incentive fee is $0.2\times(\hfPreOne-100) = \hfIncOne$ and the mark
+rises to \hfHwmOne. Years 2 and 3 end below the mark and pay no incentive fee, although year 3 is
+profitable. In year 4 the NAV before the incentive fee reaches \hfPreFour, and the fee is charged only
+on the gain above \hfHwmThree. Total fees are \hfTotalFees. The gross value would be \hfGrossEnd, a
+compound return of \hfGrossCagr\% a year; the investor earns \hfNetCagr\%. Without the high-water mark
+the manager would also have earned \hfNoHwmIncThree{} in year 3, and total fees would be
+\hfNoHwmTotal. A 5\% hard hurdle cuts the year 1 fee to $0.2\times(\hfPreOne-105) = \hfHardIncOne$; a
+5\% soft hurdle leaves it at \hfSoftIncOne{} because the threshold is passed.
+\end{example}
+
+\begin{table}[t]
+  \centering
+  \caption{Fees of \cref{ex2:hf}: 2\% management fee and 20\% incentive fee with a high-water mark.}
+  \label{tab2:hf}
+  \begin{tabular}{lrrrr}
+    \toprule
+     & Year 1 & Year 2 & Year 3 & Year 4 \\
+    \midrule
+    Opening NAV $A_{t-1}$         & \hfOpenOne & \hfOpenTwo & \hfOpenThree & \hfOpenFour \\
+    Gross NAV                      & \hfGrossOne & \hfGrossTwo & \hfGrossThree & \hfGrossFour \\
+    Management fee                 & \hfMgmtOne & \hfMgmtTwo & \hfMgmtThree & \hfMgmtFour \\
+    NAV before incentive fee $P_t$ & \hfPreOne & \hfPreTwo & \hfPreThree & \hfPreFour \\
+    Incentive fee $I_t$            & \hfIncOne & \hfIncTwo & \hfIncThree & \hfIncFour \\
+    Closing NAV $A_t$              & \hfCloseOne & \hfCloseTwo & \hfCloseThree & \hfCloseFour \\
+    High-water mark $M_t$          & \hfHwmOne & \hfHwmTwo & \hfHwmThree & \hfHwmFour \\
+    Net return (\%)                & \hfNetOne & \hfNetTwo & \hfNetThree & \hfNetFour \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Modified high-water marks}
+After a large loss a traditional high-water mark can leave the manager with no realistic prospect of an
+incentive fee for years, which gives it a reason to take more risk or to close the fund and start again.
+A \emph{modified} high-water mark, negotiated occasionally after a loss, has two parameters. After a loss of
+$\Lambda = M - A_{\min}$ from the mark $M$ to the trough $A_{\min}$, the manager earns a reduced rate
+$p' < p$ on gains above the latest NAV after fees until the NAV has recovered a multiple $\mu > 1$ of the
+loss, that is until it reaches $A_{\min} + \mu\Lambda$, and the full rate above that level. The investors
+bear the cost: during the recovery they pay the reduced rate on gains that a traditional mark would
+leave free of incentive fees. Because $\mu > 1$ the target lies above the old mark, so the full rate
+returns only once the investors are more than made whole. If the NAV falls below the trough before reaching
+the target, the recovery restarts from the new trough, still measured against the old mark $M$, so
+$\Lambda$ and the target are recomputed with the new $A_{\min}$.
+
+\begin{example}{A loss and a recovery}\label{ex2:modhwm}
+Take returns after management fees of $-25\%$ followed by five years of $+12\%$, a 20\% incentive fee,
+and a modified mark with $p' = 10\%$ and $\mu = 1.25$. These values are illustrative; halving the rate and
+asking for a quarter more than the loss keeps the arithmetic easy to follow, and any $p' < p$ and
+$\mu > 1$ give the same qualitative picture. The loss is 25 from a mark of 100, so the target is $75 + 1.25\times 25 = \modTarget$. Under the traditional mark the first incentive fee
+is \modTradIncFour{} in year 4; under the modified mark the manager earns \modModIncTwo{} in year 2,
+\modModIncThree{} in year 3 and \modModIncFour{} in year 4. In year 5 the NAV passes the target, so the fee
+is $0.1$ times the gain up to \modTarget{} plus $0.2$ times the gain above it, \modModIncFive. Over the
+six years the manager earns \modModSum{} under the modified mark and \modTradSum{} under the traditional
+one, and the investor's NAV ends at \modModCloseSix{} instead of \modTradCloseSix. The investor pays more in fees during the recovery (\cref{fig2:hwm}). Whether
+that buys a manager less inclined to gamble after the loss depends on the manager's other
+incentives, which the model does not capture.
+\end{example}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig07_hwm}
+  \caption{\Cref{ex2:modhwm}. (a) NAV after fees under a traditional and a modified high-water mark
+  after a 25\% loss. (b) Incentive fees by year.}
+  \label{fig2:hwm}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{What is a fee stream worth to the manager?}
+\label{sec2:views}
+
+\subsection{If the fund lasts}
+
+A management company is worth, in large part, the fees it expects to collect while its investors stay. \Cref{ex2:annuity} below values ten years of fees on a fund of 1,000 at \annPV, almost eighteen times the first year's
+incentive fee of \annIncOne, so protecting the stream can matter more than any one year's incentive fee.
+
+\begin{proposition}[Fees as a growing annuity]\label{prop2:annuity}
+Suppose a fund earns a constant, known gross return $g > m$ each year, above its high-water mark,
+survives for $T$ years, and pays fees at each year end, and that some fee is charged, so that
+$\phi = m + p(g-m) > 0$. Then the fee in year $t$ is $\phi A_{t-1}$, the NAV grows at $G = (1-p)(g-m)$, and, for a discount rate $d$ with $1+G>0$ and
+$1+d>0$, the present value of $T$ years of fees is
+\begin{equation}\label{eq2:annuity}
+  \mathrm{PV}_T = \frac{\phi A_0}{1+d}\,\frac{1-q^{T}}{1-q}, \qquad q = \frac{1+G}{1+d}\ne 1 .
+\end{equation}
+If $G<d$ the perpetuity $\lim_{T\to\infty}\mathrm{PV}_T$ exists, and if the fees are discounted at $d = g$
+it equals the initial NAV, $A_0$.
+\end{proposition}
+\begin{proof}
+By \cref{eq2:hffee} with $h=0$ and $P_t > M_{t-1} = A_{t-1}$, the fees are
+$mA_{t-1} + p\bigl(A_{t-1}(1+g) - mA_{t-1} - A_{t-1}\bigr) = A_{t-1}[m + p(g-m)] = \phi A_{t-1}$, and
+$A_t = A_{t-1}(1+g) - \phi A_{t-1} = A_{t-1}(1+G)$ because $g - \phi = (1-p)(g-m) = G$. So
+$A_{t-1} = A_0(1+G)^{t-1}$ and
+\begin{equation*}
+  \mathrm{PV}_T = \sum_{t=1}^{T} \frac{\phi A_0 (1+G)^{t-1}}{(1+d)^{t}}
+           = \frac{\phi A_0}{1+d} \sum_{t=0}^{T-1} q^{t}
+           = \frac{\phi A_0}{1+d}\,\frac{1-q^T}{1-q}.
+\end{equation*}
+If $g = d$ and $\phi > 0$, then $G = d - \phi < d$, so $0 < q < 1$ and $1 - q = \phi/(1+d)$. Hence
+$\mathrm{PV}_T = A_0(1-q^T)$ for every $T$, and the limit is $A_0$.
+\end{proof}
+
+If the fund earns exactly the rate at which its fees are discounted, the fees and the investors'
+claim, $A_0(1+G)^T/(1+d)^T$, add up to $A_0$ in present value for every $T$: they are two shares of
+one asset, and as $T$ grows the fees take all of it. The result holds only in this deterministic model. The manager's
+discount rate need not be the investors' required return, and finite lives and redemptions stop it
+happening in practice. What it shows is how much a long-lived franchise can be worth to its manager.
+
+\begin{example}{The value of a fee stream}\label{ex2:annuity}
+A fund of 1,000 earns 10\% gross, charges 2\% and 20\%, and the manager discounts at 10\%. Then
+$\phi = \annPhi\%$ and the NAV grows at \annNetGrowth\% a year. Ten years of fees are worth \annPV, of which
+\annPVm{} is management fees (\annMgmtShare\%) and \annPVi{} incentive fees; twenty years are worth
+\annPVtwenty, and the perpetuity is worth \annPVperp, the opening NAV, under the perpetual assumptions. Panel (b) of \cref{fig2:annuity}
+shows that the management fee dominates the value unless gross returns are high.
+\end{example}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig09_annuity}
+  \caption{The annuity view of fees for a fund of 1,000 discounted at 10\%. (a) Present value of fees
+  against the number of years the fund survives, at a 10\% gross return; the dotted line is a fund
+  charging the 2\% management fee with no incentive fee. (b) Present value of ten years of fees by
+  component against the gross return.}
+  \label{fig2:annuity}
+\end{figure}
+
+\subsection{One year at a time}
+
+Over one year the incentive fee is $p\,(P_t - M_{t-1})^{+}$, which has the payoff of a call option on
+the fund's NAV struck at the high-water mark. The terminal payoffs coincide, but the fee cannot be traded,
+hedged or sold separately from the fund, and the manager can influence the NAV it is struck on. The
+Black-Scholes price is still a useful benchmark, as in \cref{sec2:options}. Because the management fee is charged on the opening NAV $A_{t-1}$, the fee is exactly $p$ calls on the
+gross NAV struck at $M_{t-1} + mA_{t-1}$. Treating the fee instead as a call on the NAV net of the
+management fee, $S = (1-m)A_{t-1}$, struck at the mark is a pricing approximation and not an identity:
+the fee is charged on opening assets, so it is not removed in proportion from the terminal payoff, and
+the two strikes give different values. With the inputs used below and a 2\% management fee, the
+exact form is worth \optExactAtSigTwenty{} per 100 of mark when $S$ is at the mark, against
+\optAtSigTwenty{} for the approximation, so little is lost, and the approximation puts NAV and mark on
+one axis. The approximation is
+\begin{equation}\label{eq2:hfoption}
+  \mathcal{I}_0 \approx p\, C(S, M, 1, r, \sigma).
+\end{equation}
+\textcite{goetzmann2003} value the full multi-year high-water mark contract in a continuous time
+model and find that the fees are a claim on a significant share of the investors' wealth.
+
+\begin{proposition}[Where the incentive to add risk is strongest]\label{prop2:vegapeak}
+As a function of $S$, the vega of \cref{eq2:hfoption}, $p\,S\,\varphi(d_1)\sqrt{T}$, is largest at
+\begin{equation}\label{eq2:vegapeak}
+  S^{*} = M\exp\bigl\{(\tfrac12\sigma^2 - r)\,T\bigr\},
+\end{equation}
+close to the high-water mark when $\sigma^2/2$ and $r$ are small.
+\end{proposition}
+\begin{proof}
+Up to the constant factor $p\sqrt T$ the vega is
+\begin{equation*}
+  \nu(S) = S\varphi(d_1), \qquad d_1 = \frac{\ln(S/M) + (r+\sigma^2/2)T}{\sigma\sqrt T},
+  \qquad \frac{\partial d_1}{\partial S} = \frac{1}{S\sigma\sqrt T}.
+\end{equation*} Since $\varphi'(x) = -x\varphi(x)$,
+\begin{equation*}
+  \nu'(S) = \varphi(d_1) + S\,\varphi'(d_1)\,\frac{1}{S\sigma\sqrt T}
+          = \varphi(d_1)\Bigl(1 - \frac{d_1}{\sigma\sqrt T}\Bigr),
+\end{equation*}
+which is positive for $d_1 < \sigma\sqrt T$ and negative above, so the maximum is at $d_1 = \sigma\sqrt T$,
+that is $\ln(S/M) + (r + \sigma^2/2)T = \sigma^2 T$, which gives \cref{eq2:vegapeak}.
+\end{proof}
+
+With a 20\% incentive fee, $T=1$, a 3\% rate and 20\% volatility, the one-year fee is worth \optAtSigTwenty{} per 100 of high-water mark when $S$, the NAV net of the management fee, is at the mark,
+\optAtSigTen{} at 10\% volatility, \optUpSigTwenty{} when the NAV is 30\% above the mark, and only
+\optDownSigTwenty{} when it is 20\% below. A manager 20\% below the mark who doubles volatility to 40\%
+raises the value to \optDownSigForty. Per point of volatility the fee gains \optVegaAt{} at the mark,
+\optVegaDown{} at 20\% below and \optVegaUp{} at 30\% above (panel (b) of \cref{fig2:optionview}). The
+pressure to add risk is strongest near the mark and fades far above it, the same pattern as
+\cref{eq2:vega} for private equity carry.
+
+The option view also explains why, in the models here, fees take a larger share of expected gains from
+riskier funds. The comparison holds the expected gross return fixed and changes only the dispersion
+around it, so it is a property of the fee formula and makes no claim about how real funds' returns
+and risks are related.
+
+\begin{proposition}[Convexity of the incentive fee]\label{prop2:convex}
+If the gross gain above the mark is $X \sim \N(\mu, s^2)$, the expected incentive fee
+$p\,\E[X^{+}] = p\,[\mu\Phi(\mu/s) + s\varphi(\mu/s)]$ is strictly increasing in $s$, with
+$\partial\,\E[X^{+}]/\partial s = \varphi(\mu/s)$.
+\end{proposition}
+\begin{proof}
+Write $X = \mu + sZ$. Then $\E[X^{+}] = \int_{-\mu/s}^{\infty}(\mu + s z)\varphi(z)\dd z = \mu\Phi(\mu/s) + s\varphi(\mu/s)$,
+using $\int_a^\infty z\varphi(z)\dd z = \varphi(a)$ and the symmetry of $\varphi$. Differentiate with $u = \mu/s$,
+$\partial u/\partial s = -\mu/s^2$ and $\varphi'(u) = -u\varphi(u)$:
+\begin{align*}
+  \frac{\partial}{\partial s}\E[X^{+}]
+  &= \mu\varphi(u)\Bigl(-\frac{\mu}{s^2}\Bigr) + \varphi(u) + s\bigl(-u\varphi(u)\bigr)\Bigl(-\frac{\mu}{s^2}\Bigr)\\
+  &= -\frac{\mu^2}{s^2}\varphi(u) + \varphi(u) + \frac{\mu^2}{s^2}\varphi(u) = \varphi(u) > 0. \qedhere
+\end{align*}
+\end{proof}
+
+Panel (c) of \cref{fig2:optionview} shows the effect over ten years, using \shareN{} simulated paths
+(seed 204). Each year's gross return is lognormal, $1+g = \exp\{\ln 1.08 - s^2/2 + sZ\}$, so the
+expected gross return is 8\% a year whatever the volatility $s$; fees are 2\% and 20\%, crystallised at
+each year end, with the mark updated after fees. Fees are measured as expected gross minus expected
+net terminal value, as a share of the expected gross gain. With no volatility the fees take \shareDet\% of
+the expected gross gain. With a high-water mark they take \shareHwmTen\% at 10\% volatility,
+\shareHwmTwenty\% at 20\% and \shareHwmForty\% at 40\%. Without a high-water mark the shares are
+\shareNoHwmTen\%, \shareNoHwmTwenty\% and \shareNoHwmForty\%. The high-water mark is worth most to
+investors in the funds where the incentive fee is most valuable to the manager.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig08_option_view}
+  \caption{The option view of hedge fund fees (20\% incentive fee, 3\% rate). (a) Black-Scholes model value
+  of one year's incentive fee per 100 of high-water mark against the ratio of $S$, the NAV net of the management fee, to the mark. (b) Its sensitivity to
+  one point of volatility. (c) Simulated fees as a share of the expected ten year gross gain, over \shareN{} paths; the
+  dotted line is the case of no volatility.}
+  \label{fig2:optionview}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{What do the fee terms encourage?}
+\label{sec2:behaviour}
+
+A payoff shows what a manager stands to gain. That suggests what to watch for in its conduct, but it
+does not show what the manager will do. In the normal model the incentive fee always gains from
+volatility (\cref{prop2:convex}), most strongly near the mark (\cref{prop2:vegapeak}), while carry,
+by \cref{eq2:vega}, can lose value far above the catch-up threshold.
+
+A GP or hedge fund manager well below its threshold holds an out-of-the-money claim, which gains
+in value from more volatility while the investors bear the extra risk. That makes risk more
+attractive to the manager without settling what it will choose. Its own capital at risk, the value of
+future fees and the threat of withdrawals can outweigh that pull.
+
+A manager with large gains early in a fee period is in a different position. Much of the fee is
+already accrued, and a reversal before it crystallises could reduce or remove it, so a risk-averse
+manager may cut risk for the rest of the period to lock it in, even when the investors would prefer
+it to keep investing, though the fee's option value still rises with volatility.
+
+When the management fee is most of the value of the fee stream (\cref{ex2:annuity}), raising assets
+can pay the manager more than earning returns, which creates an incentive to grow the fund, possibly
+beyond the capacity of its strategy. A manager may then keep growing it until the lost returns, the weaker record and the redemptions
+that follow cost it more than the extra fees bring in. How strong this is depends on the fee base: a fee on NAV rewards growth in the fund's value,
+while a fee on gross assets also rewards leverage. A manager can also protect the fee stream by
+holding a portfolio close to its benchmark while charging active fees, so that the investors pay for
+active management and receive an index.
+
+Where positions are valued with discretion, a manager near a threshold has a reason to report values
+that clear it or to smooth reported returns, which Chapter~1 showed lowers measured volatility; having
+a reason does not mean it acts on it. Exit
+timing in private funds is a separate matter. Whether a GP near the hurdle gains from delaying a sale
+or from bringing one forward depends on whether the fund's value already clears the hurdle balance and on
+how fast that balance compounds against the asset's expected growth; a GP far below the hurdle may have a
+weaker immediate carry incentive, although future fees, reputation and its own invested capital can still
+reward effort.
+
+\paragraph{Evidence}
+The evidence supports some of these predictions and qualifies others, and it is correlational. \textcite{agarwal2009} find that
+hedge funds with higher incentive fees, high-water marks and larger manager ownership deliver better
+performance, consistent with incentives that align interests. \textcite{brown2001} find that funds
+that do well in the first half of a year reduce volatility in the second half and poor performers
+raise it, but the shifts track performance relative to other funds more closely than the distance to
+the high-water mark, and the risk that a poorly performing fund is closed moderates the incentive to
+gamble. Career concerns and the value of the future fee stream (\cref{prop2:annuity}) therefore pull
+against the option incentive.
+
+\paragraph{Fees on fees}
+A fund of funds adds its own fees, 1\% and 10\% in the illustration below (terms vary), on top of the
+fees of the funds it holds, which are charged first, inside the underlying funds' NAVs.
+The two layers are not simply additive, because each underlying manager is paid on its own gains.
+
+\begin{proposition}[Netting risk]\label{prop2:netting}
+Let a portfolio hold weights $w_i\ge 0$, $\sum w_i = 1$, in funds whose gains above their thresholds are
+$X_i$. The portfolio pays incentive fees $p\sum_i w_i X_i^{+}$, while one fund with the same holdings and
+the same fee rate would pay $p\,(\sum_i w_i X_i)^{+}$. Pathwise and in expectation,
+\begin{equation}\label{eq2:netting}
+  p\sum_i w_i X_i^{+} \;\ge\; p\Bigl(\sum_i w_i X_i\Bigr)^{+},
+\end{equation}
+and the gap does not shrink under a mean-preserving spread of the $X_i$ under the weights $w_i$,
+defined in the proof.
+\end{proposition}
+\begin{proof}
+$x\mapsto x^{+}$ is convex, so by Jensen's inequality for the discrete distribution with weights $w_i$,
+$(\sum w_i X_i)^{+} \le \sum w_i X_i^{+}$ on every path; take expectations.
+Call $(X_i')$ a \emph{mean-preserving spread} of $(X_i)$ under the weights $w_i$ if $X_i' = X_i + \varepsilon_i$
+where, for each value $x$ taken by the $X_i$, the weighted mean of the $\varepsilon_i$ over the funds with
+$X_i = x$ is zero: $\sum_{i:X_i=x} w_i\varepsilon_i = 0$. Equal weighted means alone are not enough; with
+two equally weighted funds, $X=(-1,1)$ and $X'=(0,0)$ have the same mean but the gap falls from $\tfrac12$
+to zero. Fix a value $x$ and let $W_x = \sum_{i:X_i=x} w_i > 0$. Jensen's inequality for the weights
+$w_i/W_x$ over that group gives
+\[
+  \sum_{i:X_i=x} \frac{w_i}{W_x}(x+\varepsilon_i)^{+} \;\ge\; \Bigl(x + \sum_{i:X_i=x}\frac{w_i}{W_x}\varepsilon_i\Bigr)^{+} = x^{+}.
+\]
+Multiplying by $W_x$ and summing over the values $x$ gives $\sum w_i X_i'^{+} \ge \sum w_i X_i^{+}$, so
+the left side of \cref{eq2:netting} does not fall. Summing $\sum_{i:X_i=x} w_i\varepsilon_i = 0$ over $x$
+gives $\sum w_i X_i' = \sum w_i X_i$, so the right side is unchanged and the gap does not shrink.
+\end{proof}
+
+With equal amounts in two funds that gain 30\% and lose 10\% before fees, each charging 1.5\% of assets and 20\% of the gain above the management fee,
+the fees are $1.5 + 0.2\times(30-1.5) = \netFeeA\%$ and \netFeeB\% (no incentive fee on a loss), an average of \netPaid\% on a gross portfolio return of \netGross\%. A single fund
+with the same terms on the combined return would charge \netSingle\%. The investor pays an effective
+incentive rate of \netEffRate\% on the portfolio's gain above the management fee. \Cref{fig2:fof}
+repeats the comparison for ten funds with normally distributed one-year gross returns, mean 10\% and
+volatility 15\%, equal pairwise correlation, and fees charged once at the year end with no high-water
+mark (200{,}000 draws, seed 205). With
+uncorrelated funds the underlying fees take \fofUnderZero\% of the expected gross return, against
+\fofSingleZero\% for a single fund with the same terms, and adding the fund of funds layer brings the
+total to \fofTotalZero\%. As correlation rises to one the netting gap closes (\fofUnderOne\% against
+\fofSingleOne\%), but from one side only: each fund's expected fee does not depend on correlation, so the
+underlying fees barely move, and it is the single fund's charge that rises to meet them once all the
+funds win or lose together. \textcite{brown2003} study these fees
+on fees and their effect on the net returns of funds of funds.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\textwidth]{ch02/fig10_fof}
+  \caption{Expected fees as a share of expected gross return for ten equally weighted funds (10\%
+  expected return, 15\% volatility, 1.5\% and 20\% fees) against their correlation: underlying fees only,
+  underlying fees plus a 1\% and 10\% fund of funds layer, and a single fund charging 1.5\% and 20\% on the
+  combined return. One-year normal returns with equal pairwise correlation; fees charged once at the
+  year end with no high-water mark.}
+  \label{fig2:fof}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{What does the contract do about these incentives?}
+\label{sec2:terms}
+
+Four conflicts come out of the payoff calculations. Carry is an option, so a GP below the
+hurdle can gain from risk the investors bear (\cref{sec2:options,sec2:behaviour}). Carry measured deal
+by deal can pay the GP before the fund as a whole has earned anything (\cref{sec2:dbd,sec2:mc}). A GP
+far below the hurdle has more to gain from its next fund than from this one (\cref{sec2:behaviour}).
+And a fee on assets rewards size whatever the return (\cref{sec2:mgmtfees}). Because taking part in management may put an LP's limited liability at risk under the governing law,
+an LP usually answers these pressures with rights negotiated in advance and in writing, and leaves
+day-to-day control to the GP. \Cref{tab2:terms} lists which term answers which.
+
+The investor learns the strategy, team and terms from a \emph{private placement memorandum} (PPM),
+which describes the offer and its risks; the investor's enforceable rights and remedies come mainly
+from the governing documents, any representations made and the applicable securities law. It joins by signing a
+\emph{subscription agreement}, which fixes its commitment and confirms that it is eligible to invest.
+Its rights come from the \emph{limited partnership agreement} (LPA), together with any \emph{side letter}
+it negotiates for itself and, through a \emph{most favoured nation} clause, terms granted to comparable
+investors, usually those of similar or smaller size. The LPA also fixes what the fund may buy, how
+large it may grow and how long it lasts, and the penalties for an investor that defaults on a call.
+Investors do not usually see the operating agreement of the management company, which divides fees
+and carry among the principals.
+
+\begin{table}[t]
+  \centering
+  \caption{Contract terms and the pressure each one answers.}
+  \label{tab2:terms}
+  \small
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.37\textwidth}>{\raggedright\arraybackslash}p{0.18\textwidth}@{}}
+    \toprule
+    Term & Pressure it answers & Derived in\\
+    \midrule
+    GP commitment paid in cash & Gains from risk below the hurdle & \cref{sec2:options}\\
+    Whole-fund waterfall, clawback, escrow & Carry paid before the fund has earned it & \cref{sec2:dbd,sec2:mc}\\
+    Key person clause, successor-fund limits & Attention moving to the next fund & \cref{sec2:behaviour}\\
+    Fee on invested capital after the investment period & A fee that rewards size & \cref{sec2:mgmtfees}\\
+    Allocation rules, fee offsets, advisory committee & Conflicts between funds and with portfolio companies & this section\\
+    Removal for cause or without cause & Failure of the other terms & this section\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Sharing the downside}
+The direct answer to the option incentive is to make the GP lose money when the investors do. A
+commitment by the GP gives the principals a share of investment losses alongside the LPs, and
+practitioners call it \emph{hurt money} because it should be large next to the principals' own wealth.
+Its size relative to that wealth, how it is financed and how it is shared among the principals say
+more about alignment than the headline percentage. A commitment funded by waiving management fees
+puts at risk fee income that the LPs paid for and leaves the principals' after-tax savings untouched,
+which is why many investors give it less weight than cash.
+The whole-fund waterfall and the clawback deal with timing: carry waits until the LPs have their
+capital and preferred return, and carry paid too early comes back at the end. \Cref{sec2:mc} showed
+that late repayment still costs the LPs the time value of the carry, and a clawback is worth only what
+the GP can pay, which is why agreements add escrow, interim clawback tests or guarantees from the
+principals.
+
+\paragraph{Keeping attention on the fund}
+Investors back people, and a manager far below its hurdle may have weaker reasons to spend its time
+on the existing portfolio, especially when it can raise another fund. A
+\emph{key person} clause names the principals the fund depends on and requires each to give it a
+stated share of working time. A typical trigger is that two of three named principals leave or stop
+meeting that test. Many agreements then suspend the investment period, which ends unless investors
+vote to reinstate it, usually after the GP proposes replacements; others end it at once. Limits on
+raising a successor fund until most of the current one is invested answer the same drift directly.
+
+\paragraph{Conflicts between funds}
+A manager with several funds must decide which of them gets a deal, may offer co-investment to some
+LPs and not others, may sell an asset from one fund to another and may collect transaction and
+monitoring fees from portfolio companies. The LPA handles these with rules set in advance: an
+allocation policy, an offset of portfolio company fees against the management fee, limits on
+recycling proceeds into new deals and limits on fund level borrowing and guarantees. Cases the rules
+do not settle go to the \emph{limited partner advisory committee} (LPAC), made up of representatives
+of the larger investors. It reviews conflicts and, where the agreement gives it that authority,
+valuation questions and waivers of the investment restrictions. It does not take investment
+decisions, since that would compromise the LPs' passive status. The Institutional Limited Partners
+Association, a body of private fund investors, publishes principles on alignment, governance and
+transparency that many investors use as a reference when they negotiate \parencite{ilpa2019}.
+
+\paragraph{Replacing the manager}
+When the rules fail, the investors' last protection is to replace the GP, and agreements usually
+offer two routes with thresholds and consequences negotiated fund by fund. Removal \emph{for cause}
+follows a defined wrong such as fraud or a material breach of the agreement, often as found by a court
+or an arbitrator. Since the GP is at fault the vote needed tends to be lower, and the GP can lose some
+or all of its carry on unrealised investments and its future fees. Removal \emph{without cause} needs
+only lost confidence, and it asks for more, commonly two thirds to three quarters of interests,
+because the investors are taking away fees and carry the GP expected to earn through no fault of its
+own. The GP then usually keeps the carry earned to date and may receive compensation such as a period
+of fees. Removing the GP, ending the investment period and dissolving the fund are different outcomes:
+the first changes who manages the fund, the second stops new investments while the existing ones are
+managed to exit, and the third winds up the partnership. An agreement may attach a different vote to
+each.
+
+The same logic applies inside the management company to principals who leave. Carry usually vests
+over the investment period. A \emph{good leaver}, who leaves for an accepted reason such as illness or
+retirement, keeps what has vested; a \emph{bad leaver}, who joins a competitor or leaves after
+misconduct, forfeits some or all of it. Vesting, forfeiture, repurchase and the definition of cause all depend on
+the management company's own agreements.
+
+\FloatBarrier
+% =====================================================================================
+\section{How do property sponsors share profits?}
+\label{sec2:promote}
+
+Real estate syndications and joint ventures share profits between an investor and a sponsor that
+finds, finances and manages the property. The sponsor usually invests a small share of the equity and
+earns a \emph{promote}, a share of distributions above its pro rata share, in tiers set by the
+investor's return. The tiers are often defined by IRR hurdles and sometimes by equity multiples.
+
+\begin{definition}[Tiered promote]\label{def2:promote}
+Let $C_i$ be the total equity contributed at time $t_i$, of which the investor provides the share $s$,
+that is $sC_i$, and the sponsor $1-s$. Tier $j$ has a promote
+$\pi_j$ and a hurdle: an IRR $h_j$ or an equity multiple $\mu_j$, measured on the investor's own cash
+flows at their actual dates. Within tier $j$ the sponsor first takes $\pi_j$ of each dollar
+distributed and the rest is split pro rata, so the investor receives $(1-\pi_j)s$ per dollar; as a
+modelling assumption that follows a common contractual form, the promote applies to distribution
+dollars, not to profit dollars. Tier $j$ begins where tier $j-1$ ends
+and ends when the investor's flows reach hurdle $j$, measured by the investor balance
+\begin{equation}\label{eq2:tierbalance}
+\begin{aligned}
+  B_j(t) &= \sum_{i:\,t_i\le t} s\,C_i (1+h_j)^{t-t_i} - \sum_{u<t} L_u (1+h_j)^{t-u} - \ell_{<j}(t)
+  \quad\text{or}\\
+  B_j(t) &= \mu_j \sum_{i:\,t_i\le t} s\,C_i - \sum_{u<t} L_u - \ell_{<j}(t),
+\end{aligned}
+\end{equation}
+where $L_u$ are the investor's distributions at earlier dates and $\ell_{<j}(t)$ is what the investor has
+already received from tiers $1,\dots,j-1$ of the distribution at $t$. A distribution $X$ at $t$ fills
+tier $j$ with $x_j = \min\{X_j, B_j^{+}/((1-\pi_j)s)\}$, where $X_j$ is what is left of $X$ after the
+earlier tiers.
+\end{definition}
+
+The size of each tier follows from the per dollar split. If the investor still needs $B_j>0$ after
+what earlier tiers paid it at this date, and it receives $(1-\pi_j)s$ per dollar, the tier holds
+$B_j/((1-\pi_j)s)$ dollars of the distribution before anything enters the next tier. Without the term
+$\ell_{<j}(t)$ the tiers would overlap within one distribution and count the same dollars twice. The
+last tier has no hurdle.
+
+\begin{example}{A five year property}\label{ex2:promote}
+An investor provides 9 and a sponsor 1 of the equity of 10 for a property. It pays cash flow of 0.55 in
+year 1, rising 2\% a year, and is sold in year 5 for net proceeds of \reP, paid together with that year's cash flow. Tier 1 is pro rata until
+the investor's IRR reaches 8\%, tier 2 carries a 20\% promote until the investor's IRR reaches 12\%, and
+tier 3 a 30\% promote. Total distributions are \reDist, the project IRR is \reProjIrr\% and the profit is
+\reProfit. The distributions of years 1 to 4 are all in tier 1. In year 5 the investor's 8\% balance is
+$9\times1.08^5$ less its earlier receipts compounded at 8\%, which is \reBalOne, so tier 1 takes
+$\reBalOne/0.9 = \reTierOneSize$ of the \reYrFive{} paid that year. The 12\% balance net of that tier 1
+receipt is \reBalTwo, so tier 2 takes $\reBalTwo/(0.8\times0.9) = \reTierTwoSize$, and the remaining
+\reTierThreeSize{} goes to tier 3. In all the investor receives \reTierOneInv{} in tier 1, \reTierTwoInv{} in tier 2 and \reTierThreeInv{}
+in tier 3, a total of \reInvTot{} and an IRR of \reInvIrr\%. The sponsor receives \reTierOneSpo,
+\reTierTwoSpo{} and \reTierThreeSpo, a total of \reSpoTot, of which \rePromote{} is promote above its 10\%
+pro rata share. The sponsor's IRR is \reSpoIrr\% and it takes \reSpoShareProfit\% of the profit for 10\%
+of the equity.
+\end{example}
+
+\paragraph{IRR or multiple hurdles}
+With equity multiple hurdles of 1.0 and 1.6 times in place of the 8\% and 12\% IRR hurdles, the sponsor
+receives \reMulSpoTot{} in \cref{ex2:promote} and the investor's IRR falls to \reMulInvIrr\%. The two
+kinds of hurdle respond differently to time. If the cash is spread over ten years instead of five, with the 0.55
+cash flow growing at 2\% for ten years and the sale price reduced so that total cash stays \reDist, the project IRR falls to \reTenIrr\%, and so does the investor's, which never reaches the 8\% hurdle; with
+IRR hurdles the sponsor gets only its pro rata \reTenSpoIrrTiers{} and no promote, while with multiple
+hurdles it still gets \reTenSpoMulTiers, because multiples ignore time. Total cash is the same in both cases, so the comparison isolates timing. An IRR hurdle rewards
+speed and can be cleared on a quick sale with a small profit; a multiple hurdle rewards the size of the
+profit and can be cleared by holding a mediocre asset for a long time. Many agreements use both, and
+require both to be met. \Cref{fig2:promote} shows the sponsor's share of profit against the project IRR
+for both designs.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig11_promote}
+  \caption{The promote of \cref{ex2:promote}. (a) Sponsor's share of total profit against the project
+  IRR, varying the sale price, for IRR hurdles and for equity multiple hurdles. (b) Distributions by tier
+  in the base case with IRR hurdles.}
+  \label{fig2:promote}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{How much should an investor commit each year?}
+\label{sec2:pacing}
+
+An investor that wants a stable allocation to private funds must commit before it knows when capital
+will be called or returned. \textcite{takahashi2002} give a deterministic model of one fund's cash flows
+that is widely used for this planning. The version here is simplified: the published model also has a
+yield term, omitted here, and the cap $\min\{1,\cdot\}$ on the distribution rate is a choice made for this
+book. Within each year the opening NAV grows at $G$, the distribution is taken from the grown NAV,
+and the year's contribution is added afterwards; $RC_t$ is a fraction of the uncalled commitment and
+$RD_t$ a fraction of the grown NAV before the contribution.
+
+\begin{definition}[Takahashi-Alexander model]\label{def2:ta}
+For a commitment of 1 made at time 0, with contribution rates $RC_t$, a growth rate $G$, a fund life $L$
+and a bow $B$, define for $t = 1, 2, \dots$
+\begin{align}
+  C_t &= RC_t\,U_{t-1}, \qquad U_t = U_{t-1} - C_t, \qquad U_0 = 1, \label{eq2:taC}\\
+  D_t &= RD_t\,\mathrm{NAV}_{t-1}(1+G), \qquad RD_t = \min\{1, (t/L)^{B}\}, \label{eq2:taD}\\
+  \mathrm{NAV}_t &= \mathrm{NAV}_{t-1}(1+G) + C_t - D_t, \qquad \mathrm{NAV}_0 = 0. \label{eq2:taNAV}
+\end{align}
+\end{definition}
+
+The uncalled commitment has the closed form $U_t = \prod_{s=1}^{t}(1-RC_s)$, by induction on
+\cref{eq2:taC}. A larger bow $B$ keeps distribution rates low for longer, so the NAV builds a higher
+hump; $RD_t = 1$ for $t\ge L$ means that from age $L$ the fund pays out everything it holds, so
+its NAV after that is only the capital called in that year, $\mathrm{NAV}_t = C_t$. That decays
+geometrically when the contribution rate stays constant and below 100\%; in general it follows the
+remaining contribution schedule.
+
+\begin{example}{One fund}\label{ex2:ta}
+Take $RC = 25\%$, $1/3$ and then 50\% a year, $G = 12\%$, $B = 2.5$ and $L = 12$. By \cref{eq2:taC},
+$U_1 = 0.75$, $U_2 = 0.5$ and $U_t = 0.25\times 0.5^{t-3}$ for $t\ge 3$, so \taCalledFive{} of the commitment
+is called by year 5 and \taCalledTotal{} in all. The NAV peaks at \taPeakNav{} in year \taPeakYear, total
+distributions are \taDistTotal, and the multiple of paid-in capital is \taTVPI. Cumulative net cash
+reaches its low of $-\taTroughCash$ in year \taTroughYear{} and turns positive in year \taBreakeven, the
+J-curve of Chapter~1. \Cref{fig2:pacingsens} shows that the peak NAV is \taPeakBowLow, \taPeakBowMid{} and
+\taPeakBowHigh{} for bows of 1.5, 2.5 and 4, and the multiple is \taTVPIGLow, \taTVPIGMid{} and
+\taTVPIGHigh{} for growth rates of 4\%, 12\% and 20\%.
+\end{example}
+
+\begin{proposition}[Steady state of a commitment programme]\label{prop2:steady}
+Suppose an investor commits 1 every year to funds that follow \cref{def2:ta}, and let $\mathrm{NAV}_a$,
+$U_a$, $C_a$ and $D_a$ be the values for one fund at age $a$, with $U_0 = 1$. Assume $G>-1$, every contribution
+rate lies in $[0,1]$, and the contribution rate is eventually a constant in $(0,1]$, as in \cref{ex2:ta}. As the programme ages its totals converge to constants:
+\begin{equation}\label{eq2:steady}
+  \overline{\mathrm{NAV}} = \sum_{a\ge 0}\mathrm{NAV}_a, \qquad \overline{U} = \sum_{a\ge 0} U_a, \qquad
+  \overline{D} - \overline{C} = \sum_{a\ge 1} D_a - \sum_{a\ge 1} C_a .
+\end{equation}
+In particular, steady net cash flow per year equals the total net cash flow of one fund over its life.
+\end{proposition}
+\begin{proof}
+The model is linear in the commitment and does not depend on calendar time, so the fund committed in
+year $v$ contributes $\mathrm{NAV}_{t-v}$ to the programme's NAV in year $t$. Summing over $v \le t$ gives
+$\sum_{a=0}^{t}\mathrm{NAV}_a$. The same argument applies to $U$, $C$ and $D$. For $a\ge L$, including $a=L$ itself, $RD_a = 1$, so $D_a = \mathrm{NAV}_{a-1}(1+G)$ and
+\cref{eq2:taNAV} leaves $\mathrm{NAV}_a = C_a$; and $C_a$ and $U_a$ fall geometrically once the contribution rate is constant (the assumption of the
+proposition),
+so every sum converges as $t\to\infty$; for $a \ge L$ the year's distribution $D_a$ is the previous NAV
+grown at $G$, which decays at the same rate.
+\end{proof}
+
+With the parameters of \cref{ex2:ta}, a programme of 1 a year settles at a NAV of \progNavSteady{} and
+uncalled commitments of $1 + 0.75 + 0.5 + 0.25\sum_{n\ge 0}0.5^{n} = \progUncalledSteady$, and returns a
+net \progNetCash{} a year, equal to the lifetime net cash of one fund. An investor that wants a steady NAV
+of 100 must commit \progCommitForHundred{} a year, and its total exposure (NAV plus uncalled
+commitments) is then \progOvercommit{} times its NAV (\cref{fig2:pacing}). The ratio sizes the liquidity that must stand behind the uncalled commitments; it is a planning
+figure and says nothing by itself about whether a given call can be met.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{ch02/fig12_pacing}
+  \caption{The Takahashi-Alexander model with $RC = 25\%, 1/3, 50\%, \dots$, $G = 12\%$, $B = 2.5$, $L = 12$.
+  (a) Contributions, distributions, NAV and cumulative net cash of one fund. (b) A programme that
+  commits 1 every year.}
+  \label{fig2:pacing}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.86\textwidth]{ch02/fig13_pacing_sensitivity}
+  \caption{Sensitivity of the Takahashi-Alexander model. (a) NAV of one fund for three values of the bow
+  $B$. (b) Cumulative net cash for three growth rates $G$.}
+  \label{fig2:pacingsens}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{Summary}
+\label{sec2:summary}
+
+\begin{itemize}
+  \item A limited partnership generally combines limited liability for the LPs with flexible terms and
+        pass-through tax, subject to the jurisdiction and the investor; when
+        investors need different tax treatment, a master-feeder lets them hold the same portfolio.
+  \item An open-end investor can leave only on the fund's terms, which may lock it in, gate it or
+        suspend it. A drawdown investor must fund calls it does not control, cannot redeem, and can
+        leave only by selling its interest at a negotiated price.
+  \item The waterfall pays capital, a compounding preferred return, a catch-up and a split. The
+        hurdle balance is nonpositive exactly when the LPs' NPV at the hurdle rate is nonnegative.
+  \item Carried interest is $k$ calls struck at the hurdle less $k-c$ calls struck at the catch-up
+        threshold. In the option model its sensitivity to risk is positive near the hurdle and can be
+        negative far above it.
+  \item Deal-by-deal carry is at least whole-fund carry without hurdles. The modelled deal-by-deal
+        arrangement produces frequent clawback liabilities, and repayment at termination does not
+        undo the cost of earlier carry payments.
+  \item Hedge fund incentive fees have the payoff of options on NAV struck at the high-water mark. In the
+        models here fees take a larger share of expected gains from riskier funds, and in the deterministic perpetuity model a fee
+        stream discounted at the fund's gross return is worth the opening NAV; real valuations depend
+        on survival, performance, expenses and the discount rate.
+  \item A fund of funds pays incentive fees to winning managers without netting the losers, so the
+        incentive charge on a positive portfolio gain can exceed the headline rate; whether it does
+        depends on how the underlying returns are spread.
+  \item Each pressure in the fee terms has a contractual answer, from the GP's own capital and the
+        clawback to key person clauses and, as a last resort, removal of the GP.
+  \item Promote hurdles based on IRR reward speed; hurdles based on multiples reward size.
+  \item Commitment programmes reach a steady state equal to the sum of one fund's profile over its ages,
+        which helps estimate the annual commitments and liquidity reserves needed to sustain a target
+        allocation.
+\end{itemize}
+
+\FloatBarrier
+% =====================================================================================
+\section{Exercises}
+\label{sec2:exercises}
+
+\begin{enumerate}[label=\textbf{\thechapter.\arabic*}, leftmargin=*]
+  \item\label{exr2:1} A fund with commitments of 200 charges 2\% of commitments for five years and then
+        1.5\% of invested cost, which averages 120 over the following five years. Find total
+        management fees and the amount of commitment left for investment.
+  \item\label{exr2:2} (a) Show from \cref{eq2:catchup} that with a full catch-up and a single
+        distribution the catch-up tier has size $y^* = c(H-K)/(1-c)$ and the GP's share of profit is
+        exactly $c$ once $V \ge V^*$. (b) Using \cref{prop2:single}, find $V^*$ for $k = 0.5$ and $c = 0.2$ in
+        terms of $H$ and $K$.
+  \item\label{exr2:3} A fund calls 100 at time 0 and distributes 150 at year 4, with an 8\% hurdle
+        and 20\% carry. Find the GP's carry with a full catch-up and with a hard hurdle.
+  \item\label{exr2:4} A hedge fund starts at 100 with 1.5\% and 20\% fees and a high-water mark.
+        Gross returns are 20\%, $-15\%$ and 12\%. Find the incentive fee and closing NAV each year.
+  \item\label{exr2:5} Prove that $(a+b)^{+} \le a^{+} + b^{+}$ for all real $a$, $b$, and use it to
+        explain why a fund of funds investor can pay incentive fees in a year when its portfolio loses
+        money.
+  \item\label{exr2:6} A fund of 500 earns 8\% gross with 1.5\% and 15\% fees and the manager discounts
+        at 8\%. Use \cref{eq2:annuity} to value five years of fees.
+  \item\label{exr2:7} Use \cref{eq2:vegapeak} to find the NAV at which the vega of a one-year
+        incentive fee is greatest when $\sigma = 40\%$ and $r = 3\%$, as a percentage of the high-water
+        mark. Explain what this means for a manager whose fund has fallen 15\%.
+  \item\label{exr2:8} In \cref{ex2:ta}, verify the steady uncalled commitment of
+        \progUncalledSteady{} from the closed form for $U_t$, and explain why it does not depend on
+        $G$, $B$ or $L$.
+\end{enumerate}
+
+\subsection*{Answers}
+\begin{enumerate}[label=\textbf{\thechapter.\arabic*}, leftmargin=*]
+  \item $0.02\times200\times5 + 0.015\times120\times5 = 20 + 9 = \exOneA$; if all commitments are
+        eventually called, $200 - \exOneA = \exOneB$ can be invested.
+  \item (a) With $k=1$, $P=K$, $D=H$ and $G=0$, \cref{eq2:catchup} gives $y^* = c(H-K)/(1-c)$, so
+        $V^* = H + y^*$. There the GP holds $y^* = c(H-K) + c\,y^* = c(V^*-K)$, and each later dollar
+        adds $c$ to carry and one to profit, so the share stays $c$. (b) $V^* = (kH - cK)/(k-c) =
+        (0.5H - 0.2K)/0.3 = (5H - 2K)/3$.
+  \item $H = 100\times1.08^4 = \exThreeH$ and $V^* = (\exThreeH - 20)/0.8 = \exThreeVstar < 150$, so the
+        GP receives $0.2\times50 = \exThreeGP$. With a hard hurdle it receives
+        $0.2\times(150 - \exThreeH) = \exThreeGPHard$.
+  \item Year 1: $120 - 1.5 = 118.5$, fee $0.2\times18.5 = \exFourIncOne$, NAV \exFourCloseOne{} (the new
+        mark). Year 2: $\exFourCloseOne\times0.85 - 0.015\times\exFourCloseOne = \exFourCloseTwo$, no
+        incentive fee. Year 3: $\exFourCloseTwo\times1.12 - 0.015\times\exFourCloseTwo = \exFourCloseThree$,
+        below the mark, so no incentive fee.
+  \item $a + b \le a^{+} + b^{+}$ and $0 \le a^{+} + b^{+}$, so $\max\{a+b, 0\} \le a^{+} + b^{+}$. If one
+        underlying fund gains and another loses more, the portfolio loses, but the winning fund still
+        charges $p$ times its own gain: the left side is zero and the right side is positive.
+  \item $\phi = 0.015 + 0.15\times0.065 = 2.475\%$, $G = 0.85\times0.065 = 5.525\%$,
+        $q = 1.05525/1.08$, and $\mathrm{PV}_5 = \frac{0.02475\times500}{1.08}\cdot\frac{1-q^5}{1-q} = \exSixPV$.
+  \item $S^*/M = \exp(0.08 - 0.03) = \exSevenRatio$, about 105\% of the mark. At the peak the fee gains
+        \exSevenVegaPeak{} per point of volatility per 100 of mark; at 85\% of the mark it still gains
+        \exSevenVegaDown. At high volatility the vega curve is wide (panel (b) of
+        \cref{fig2:optionview}), so a manager 15\% below the mark still has a strong incentive to add risk.
+  \item $\sum_{a\ge0}U_a = 1 + 0.75 + 0.5 + 0.25\,(1 + 0.5 + 0.25 + \dots) = 2.25 + 0.5 = 2.75$. The
+        uncalled commitment depends only on the contribution rates in \cref{eq2:taC}; the
+        growth and distribution parameters do not enter it.
+\end{enumerate}
+
+\FloatBarrier
+% =====================================================================================
+\section{Notes, sources and credits}
+\label{sec2:credits}
+
+\paragraph{Sources}
+The promote tier rates are illustrative assumptions with no market data behind them. The cash flow
+modelling of \cref{sec2:pacing} anticipates Chapter~10. The option
+valuation uses the formula of \textcite{black1973}, derived in Chapter~5; \textcite{hull2022} and
+\textcite{wilmott2006} give background. Statements about common terms, such as fund life, GP commitment, removal votes and hurdle rates,
+describe general market practice; the empirical findings are cited where they appear. Further reading: \textcite{metrick2010} on the economics of private equity fees, \textcite{phalippou2009}
+on fees and costs, \textcite{goetzmann2003} on high-water marks, \textcite{carpenter2000} on option pay and
+risk, \textcite{agarwal2009} and \textcite{brown2001} on hedge fund incentives, \textcite{brown2003} on
+fees in funds of funds, \textcite{takahashi2002} on commitment pacing and \textcite{ilpa2019} on investor
+guidance for fund terms.
+
+\paragraph{Open source projects}
+The code uses NumPy \parencite{numpy}, SciPy \parencite{scipy} and Matplotlib \parencite{matplotlib}; pyxirr \parencite{pyxirr} provides an independent IRR
+implementation used in the tests, the R cross-checks run on R \parencite{rcore} and the Octave cross-checks on GNU Octave
+\parencite{octave}. The
+full list, with links, is in \texttt{CREDITS.md}.
+
+\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
+\end{refsection}

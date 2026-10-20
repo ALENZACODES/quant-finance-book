@@ -10,16 +10,16 @@ number you can reproduce. No number in the text is typed by hand: the Python scr
 them, write them to a generated macro file, and draw every figure. Independent cross-checks in R and
 GNU Octave recompute the main results by different methods, and a test suite ties the three together.
 
-Chapters are released one at a time as each is finished; this copy holds Chapter 1. The repository holds the source only. Run the build below to produce the PDFs.
+Chapters are released one at a time as each is finished; this copy holds Chapters 1, 2, 3 and 4. The repository holds the source only. Run the build below to produce the PDFs.
 
 ## Chapters
 
 | # | Chapter | What it covers | Status |
 |---|---|---|---|
 | 1 | Returns, Rates and the Shape of Risk | Compounding, simple and log returns, returns on collateralised positions, the IRR and the ways it fails, MIRR, time and money weighting, multiples and public market equivalents, the J-curve, lognormal returns, higher moments, correlation and beta, smoothing and unsmoothing, variance ratios and the size and power of normality tests. Case study: daily Government of Canada five year yields. | Released |
-| 2 | Fund Structures, Fees and Distribution Waterfalls | Coming soon. | Coming soon |
-| 3 | Random Walks and Stochastic Calculus | Coming soon. | Coming soon |
-| 4 | Arbitrage, Forwards, Futures and Binomial Trees | Coming soon. | Coming soon |
+| 2 | Fund Structures, Fees and Distribution Waterfalls | Fund vehicles and master-feeder structures, open-end and drawdown funds, fund terms and governance, management fee bases, whole-fund and deal-by-deal waterfalls with hurdle, catch-up and clawback, carried interest as a portfolio of calls, a simulation of 6,000 funds, hedge fund incentive fees with high-water marks, fee annuities, funds of funds, real estate promotes and commitment pacing. | Released |
+| 3 | Random Walks and Stochastic Calculus | Random walks and the reflection principle, a construction of Brownian motion, quadratic variation, the Ito integral and isometry, Ito's lemma, geometric Brownian motion and the Ornstein-Uhlenbeck process, Euler and Milstein schemes, martingales and optional stopping, Girsanov's theorem and importance sampling, Feynman-Kac and a Crank-Nicolson solver. Case study: how badly the speed of mean reversion is estimated from Canadian yields. | Released |
+| 4 | Arbitrage, Forwards, Futures and Binomial Trees | Discount factors and bootstrapping, forward rates and FRAs, state prices and the one-period fundamental theorem, price bounds in incomplete markets, cost of carry and convenience yield, arbitrage bands with frictions, covered interest parity, futures against forwards under random rates, the Schwartz commodity model and roll yield, binomial replication, convergence to Black-Scholes, Leisen-Reimer trees, American options and the exercise boundary. Case study: whether Canadian forward rates forecast short rates. | Released |
 | 5 | Black-Scholes: Derivation, Greeks and Numerical Checks | Coming soon. | Coming soon |
 | 6 | Interest Rates, Credit Risk, Private Credit and Structured Products | Coming soon. | Coming soon |
 | 7 | Portfolio Theory, Factor Models, Alpha and Beta | Coming soon. | Coming soon |

@@ -105,6 +105,8 @@
 \setcounter{biburlnumpenalty}{9000}
 \RequirePackage[capitalise,noabbrev]{cleveref}
 \crefname{example}{Example}{Examples}
+% the only labelled list items in the book are exercises
+\crefname{enumi}{Exercise}{Exercises}\Crefname{enumi}{Exercise}{Exercises}
 \creflabelformat{equation}{#2(#1)#3}
 
 % theorem environments share one counter through aliascnt so cleveref names each type correctly
