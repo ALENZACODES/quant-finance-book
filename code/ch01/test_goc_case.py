@@ -27,6 +27,8 @@ def close(a, b, tol):
 def test_goc_case_claims():
     import pandas as pd
     df = pd.read_csv(ROOT / "data" / "daily_policy_bond.csv").dropna(subset=["BD.CDN.5YR.DQ.YLD"])
+    df = df[df.date <= "2026-09-30"]          # the book's data cut
+    assert pd.Timestamp(df.date.max()) <= pd.Timestamp("2026-09-30")
     dy = df["BD.CDN.5YR.DQ.YLD"].diff().dropna().values * 100
     close(RAW["gocDN"], len(dy), 0)
     assert RAW["gocJBp"] < 1e-10

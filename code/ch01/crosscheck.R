@@ -20,6 +20,7 @@ jb <- function(x) {
 }
 y <- read.csv("data/daily_policy_bond.csv", check.names = FALSE)
 y <- y[!is.na(y[["BD.CDN.5YR.DQ.YLD"]]), ]
+y <- y[y$date <= "2026-09-30", ]   # the book's data cut, as in goc_case.py
 dy <- diff(y[["BD.CDN.5YR.DQ.YLD"]]) * 100
 jbr <- jb(dy)
 mkt <- c(2.0, -1.5, 3.0, 0.5, -2.5, 1.5); fnd <- c(1.2, -0.4, 2.1, 0.8, -1.0, 1.1)

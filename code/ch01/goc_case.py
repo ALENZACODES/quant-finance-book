@@ -11,6 +11,9 @@ from scipy import stats
 from numbers_ch01 import N, RAW, put, pct, save, finish, L, plt, BLUE, RED, GREY, SKY, ROSE, PALE, ROOT, SEED  # noqa: F401
 
 
+SAMPLE_END = "2026-09-30"   # the book's data cut; the archived file itself is used unchanged
+
+
 # =============================================================== 1.15 case study: GoC 5 year yield
 def par_bond_duration_convexity(y, n_years=5, freq=2):
     """Modified duration and convexity of a par bond (coupon = yield), per unit of yield."""
@@ -28,6 +31,9 @@ def par_bond_duration_convexity(y, n_years=5, freq=2):
 
 def goc_case():
     df = pd.read_csv(ROOT / "data" / "daily_policy_bond.csv", parse_dates=["date"])
+    N["gocFileEnd"] = df.date.max().strftime("%-d %B %Y")
+    # the archived file runs past the book's data cut; the sample ends with September 2026
+    df = df[df.date <= SAMPLE_END]
     df = df.rename(columns={"BD.CDN.5YR.DQ.YLD": "y5", "V39079": "policy"}).dropna(subset=["y5"])
     df = df.sort_values("date").reset_index(drop=True)
     put("gocN", len(df), "{:,d}"); N["gocStart"] = df.date.iloc[0].strftime("%-d %B %Y")

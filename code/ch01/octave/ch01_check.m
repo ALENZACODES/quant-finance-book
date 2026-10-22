@@ -48,7 +48,8 @@ r = add(r, 'jbCrit', -2 * log(0.05));
 % JB on the daily Government of Canada five year yield changes
 fid = fopen('data/daily_policy_bond.csv'); fgetl(fid);
 C = textscan(fid, '%s %f %f', 'Delimiter', ',', 'EmptyValue', NaN); fclose(fid);
-y = C{3}; y = y(~isnan(y)); dy = diff(y) * 100;
+keep = ~isnan(C{3}) & cellfun(@(q) datenum(q, 'yyyy-mm-dd') <= datenum('2026-09-30', 'yyyy-mm-dd'), C{1});   % the book's data cut
+y = C{3}(keep); dy = diff(y) * 100;
 z = dy - mean(dy); m2 = mean(z .^ 2); S = mean(z .^ 3) / m2 ^ 1.5; K = mean(z .^ 4) / m2 ^ 2 - 3;
 r = add(r, 'gocDskew', S); r = add(r, 'gocDexk', K); r = add(r, 'gocJB', numel(dy) / 6 * (S ^ 2 + K ^ 2 / 4));
 here = fileparts(mfilename('fullpath'));

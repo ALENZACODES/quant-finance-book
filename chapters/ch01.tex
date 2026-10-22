@@ -1113,8 +1113,8 @@ benchmark bond yield (series \texttt{BD.CDN.5YR.DQ.YLD}) from the Bank of Canada
 taken from a public snapshot of Canadian policy rates and bond yields \parencite{khan2026policy} that
 also carries the target for the overnight rate (series \texttt{V39079}). The yields are the Bank's
 published values; everything else in this section is computed from them by \texttt{goc\_case.py}.
-The snapshot ends on \gocEnd, and the sample runs from \gocStart{} to that date with \gocN{} daily
-observations. The file is archived with the code as \texttt{data/daily\_policy\_bond.csv}; its
+The snapshot runs to \gocFileEnd, and the code cuts it at 30 September 2026, so the sample runs from
+\gocStart{} to \gocEnd, the last September date with a yield, with \gocN{} daily observations. The file is archived with the code as \texttt{data/daily\_policy\_bond.csv}; its
 SHA-256 digest is
 \begin{center}\small\texttt{\gocShaA\gocShaB}\end{center}
 and a test checks it, so the numbers below can be reproduced from exactly this file. Changes are measured between consecutive trading days, so a change across a weekend
@@ -1308,7 +1308,9 @@ The case study uses Bank of Canada series \texttt{BD.CDN.5YR.DQ.YLD} and \texttt
 at commit \texttt{815cb7b}. A copy is in this book's \texttt{data/} folder. Its SHA-256 digest, printed in
 \cref{sec:case} and listed in \texttt{data/SOURCES.md}, can be checked with any SHA-256 tool
 against the file at that commit, whose download address is also in \texttt{data/SOURCES.md}; a test
-compares the copy with both, the second when a network is available. The
+compares the copy with both, the second when a network is available. The file runs to \gocFileEnd;
+the code reads it unchanged and drops every date after 30 September 2026, so no later observation
+enters any result, in Python, R or Octave. The
 observations themselves are the Bank of Canada's, published through its Valet service; the snapshot
 only collects them.
 
