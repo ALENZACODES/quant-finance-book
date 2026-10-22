@@ -1,0 +1,1669 @@
+% Chapter 9. All quoted numbers come from chapters/ch09-numbers.tex, written by code/ch09/run_all.py.
+\input{chapters/ch09-numbers}
+\begin{refsection}
+\setcounter{chapter}{8}
+\chapter{Hedge Funds, Managed Futures and Digital Assets}
+\label{ch:hedge}
+
+An investment committee that adds hedge funds, a trend following programme or a sleeve of bitcoin to
+a portfolio of stocks and bonds is buying something it cannot fully see. The manager's positions
+change from month to month, the published track records come from databases that keep the winners
+and lose the losers, and the newest assets have a history that is short, violent and chosen after the
+fact. This chapter asks what each of these holdings is, what its record can and cannot show, and what
+it did to a conventional portfolio. It ends with a test on public data: did a trend fund, after a
+standard fee, improve a portfolio of 60\% US equities and 40\% US Treasury bonds over the twenty five
+years from 2001, and did a small position in bitcoin improve it from 2015?
+
+The chapter starts with the main families of hedge fund strategy and the kind of risk each one sells.
+Trend following gets two sections, because it is a strategy whose rules can be stated explicitly and
+tested on public prices without relying on a manager's reported returns: first what a trend rule can earn in theory, then a programme on seven markets
+built from public data. A section on carry and roll yield adds the part of a futures return that the
+programme leaves out. The middle of the chapter is about evidence. Fund databases overstate returns in
+ways that can be computed, a regression splits a return into parts in a way that depends on the
+factors chosen, and a regression clone of a fund shows how much of its return a few liquid positions
+could have delivered. Then come fees: hurdles, high-water marks and the option value of an incentive
+fee, and the second layer of a fund of funds, whose fees do not net across managers. The last part
+turns to digital assets: the arithmetic of the protocol, volatility and correlation and how they have
+changed, the selection that went into studying the survivors, and the size of position at which
+bitcoin carries a given share of a portfolio's risk.
+
+\begin{keybox}[How to read this chapter]
+The numbers in the text are computed by thirteen scripts in \texttt{code/ch09/} (\texttt{trend},
+\texttt{theory}, \texttt{carry}, \texttt{bias}, \texttt{survival}, \texttt{replicate},
+\texttt{decompose}, \texttt{fees}, \texttt{fof}, \texttt{crypto}, \texttt{onchain},
+\texttt{case\_portfolio} and \texttt{exercises}), and the tests in \texttt{code/ch09/test\_*.py} check
+the library against simulation and numerical integration. Five short listings in
+\texttt{code/ch09/snippets/} (\texttt{tsmom.py}, \texttt{permutation.py}, \texttt{rolldown.py},
+\texttt{fees.R} and \texttt{barrier.m}) are printed in the text; a sixth, \texttt{issuance.m}, is
+cited in \cref{sec9:crypto} but not printed; each prints the numbers quoted beside
+it, and \texttt{code/ch09/test\_assets.py} checks them. An independent R script rebuilds the seven
+market series from the daily files, runs the trend programme and its fee with its own loops, fits the
+quarterly regression with \texttt{lm}, and recomputes the database formulas, the closure formulas
+by numerical integration, the carry splits from the raw rate files, the attribution regression, the
+fee formulas, Nakamoto's attacker table, the Fisher test, the fund of funds fees, the bitcoin statistics
+and the risk shares. GNU Octave recomputes the normal formulas, the hurdle and closure formulas by
+quadrature, the issuance sum, the risk share weight with \texttt{fzero} and the case study statistics
+from the saved programme returns.
+
+The trend programme uses monthly returns from \tfFirst{} to \tfLast, \tfMonths{} months. US equities are
+the market excess return of the Kenneth R. French Data Library \parencite{frenchlib}, which also gives
+the one month bill rate. The US 10 year yield, the price of WTI crude oil and the exchange rates of the
+euro, the yen and the Canadian dollar against the US dollar are FRED series \parencite{fredch9}. The
+Canadian 10 year benchmark yield and 90 day bill rate are from the Bank of Canada \parencite{bocvalet};
+the carry section adds the 7 year benchmark yield and the one month bill yields of Canada and the US
+used in Chapter~5. The programme's returns are built from these spot prices and yields, so they
+approximate the returns of a futures programme and cannot be bought as an index.
+Bitcoin and ether are the daily Coinbase prices published on FRED \parencite{coinbasefred}. The bitcoin
+series starts on \btSeriesStart, and each month is sampled at its last available price, from
+\btFirstPrice{} to \btLast, which gives monthly returns from \btFirst{} (ether from \ceFirst). The hedge funds of the database and replication sections
+are simulated, and are labelled as such wherever they appear.
+
+Random draws come from NumPy's default generator with base seed \texttt{9473} and a stream number
+fixed in each script. The seed is an arbitrary label that makes the runs repeatable; it carries no
+date or other meaning.
+
+Notation. $r_t$ is a monthly excess return, the return over the one month bill, and $w_t$ a position
+set at the end of month $t$ and held through month $t+1$. $\theta$ is an annual Sharpe ratio, $\sigma$
+a volatility, $\varrho$ a correlation, and $\Phi$ and $\varphi$ are the standard normal distribution and
+density. A fund's gain is its return over a year before incentive fees, and $x^+=\max(x,0)$.
+\end{keybox}
+
+\FloatBarrier
+% =====================================================================================
+\section{What a hedge fund sells}
+\label{sec9:families}
+
+A hedge fund is a pooled vehicle with few limits on what it holds: it can sell short, borrow, trade
+derivatives and hold assets that are hard to value. Its fees, a management fee on assets and an
+incentive fee on gains above a high-water mark, were the subject of Chapter~2. The name says less
+than it seems to. Many hedge funds hedge only part of their market exposure, and some hedge none of
+it. A more useful description of a strategy says which risk it takes on and in which states of the
+world it loses money. \Cref{tab9:families} sorts the main families that way.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{The main hedge fund strategy families, the source of their return and the shape of
+  their payoff against the risk they carry. The descriptions are typical, and single funds differ.}
+  \label{tab9:families}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}p{0.2\textwidth}p{0.4\textwidth}p{0.34\textwidth}@{}}
+    \toprule
+    Family & Main source of return & Payoff against its main risk\\
+    \midrule
+    Equity long/short & stock selection, plus a partial equity beta & roughly linear in the market\\
+    Event driven & merger spreads, distressed debt & often like a short put on the deal or the market\\
+    Relative value & convergence of close substitutes, carry & often like a short put on liquidity\\
+    Global macro & views on rates, currencies and indices & varies with the manager\\
+    Managed futures & trends in futures prices & often convex in sustained moves, like a long straddle\\
+    Multi-strategy & a mix of the above & a mix of the above\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Three features recur across the table. First, much of the return is a payment for bearing a risk that
+can be named and that public markets also price. An equity long/short fund with a beta of one half
+earns half the equity premium before any skill. A merger arbitrage fund buys the target after a bid
+is announced and earns the spread if the deal closes; \textcite{mitchell2001} show that its returns
+behave like those of a short put on the market, with small steady gains and large losses in the months
+when the market falls sharply and deals fail. Second, the payoffs are often nonlinear. Strategies that
+earn a carry or a spread resemble the sale of insurance, and \textcite{agarwal2004} find that the
+returns of many hedge fund indices load on the returns of out of the money index puts. Trend
+followers are the exception that buys convexity, and \textcite{fung2001} show that their returns look
+like those of lookback straddles. Third, many of the assets are illiquid, and a fund that marks them
+from appraisals or stale quotes reports returns that are smoothed. Chapter~8 showed what smoothing
+does to measured volatility and Sharpe ratios, and Chapter~7 that it hides beta; \textcite{asness2001}
+find that adding lagged market returns to the regression raises the measured equity beta of hedge
+fund indices substantially.
+
+The rest of the chapter takes these points one at a time. Managed futures come first, because their
+rules can be written down and run on public prices, so their record can be rebuilt rather than taken
+from a database.
+
+\FloatBarrier
+% =====================================================================================
+\section{What a trend rule earns}
+\label{sec9:theory}
+
+A \emph{time series momentum} rule, in the form studied by \textcite{moskowitz2012}, holds each market
+long when its own return over the past year was positive and short when it was negative. The sign of
+the position depends only on the market's own past, and the size is set so that each market carries a
+similar risk. Before building such a programme it helps to know what the rule can earn and from where.
+Three results answer that: one for the sign rule under normality, one for a market whose returns are
+unpredictable, and an identity that shows why the payoff of a trend rule looks like that of an option.
+
+\begin{proposition}[The sign rule]\label{prop9:sign}
+Let $X$ and $Y$ be jointly normal with mean zero, standard deviations $\sigma_X$ and $\sigma_Y$, and
+correlation $\varrho$. Then
+\begin{equation}\label{eq9:sign}
+  \E[\operatorname{sign}(X)\,Y] = \sqrt{2/\pi}\;\varrho\,\sigma_Y .
+\end{equation}
+For any $X$ and $Y$ with finite second moments,
+\[
+  \E[\operatorname{sign}(X)Y]=\E[\operatorname{sign}(X)]\,\E[Y]+\Cov(\operatorname{sign}(X),Y).
+\]
+\end{proposition}
+
+\begin{proof}
+Write $Y=\varrho\sigma_Y X/\sigma_X+\varepsilon$, where $\varepsilon$ is normal, independent of $X$ and has
+mean zero. Then $\E[\operatorname{sign}(X)\varepsilon]=\E[\operatorname{sign}(X)]\E[\varepsilon]=0$ and
+$\E[\operatorname{sign}(X)X]=\E|X|=\sigma_X\sqrt{2/\pi}$, so
+$\E[\operatorname{sign}(X)Y]=\varrho\sigma_Y\sqrt{2/\pi}$. The second statement is the definition of the
+covariance.
+\end{proof}
+
+Take $X$ to be the past year's return and $Y$ the next month's. A sign rule scaled to one unit of the
+market's volatility then has an annual Sharpe ratio of about $\sqrt{12}\sqrt{2/\pi}\,\varrho$. The
+approximation takes the rule's standard deviation to be $\sigma_Y$; the exact one is
+$\sqrt{\sigma_Y^2-m^2}$, with $m$ the rule's mean, which is very close when $\varrho$ is small. A correlation of
+0.05 between the past year and the next month is then worth a Sharpe ratio of about 0.14 per market. The
+second statement of the proposition splits what the rule earns into two parts. The first,
+$\E[\operatorname{sign}(X)]\E[Y]$, is a reward for being long on average in a market that drifts up; it
+needs no predictability at all. The second, the covariance, is the timing part, and only it measures
+whether the past says anything about the future.
+
+\begin{proposition}[No trend, no profit]\label{prop9:mart}
+Suppose that $\E[r_{t+1}\mid\mathcal F_t]=0$ for every $t$, where $\mathcal F_t$ is the information
+available at the end of month $t$, and let $w_t$ be any position chosen with that information, with
+$\E|w_tr_{t+1}|<\infty$. Then $\E[w_tr_{t+1}]=0$. If instead the returns are independent with a common
+mean $\mu$, then $\E[w_tr_{t+1}]=\mu\,\E[w_t]$.
+\end{proposition}
+
+\begin{proof}
+By the tower property, $\E[w_tr_{t+1}]=\E\bigl[w_t\,\E[r_{t+1}\mid\mathcal F_t]\bigr]=0$. When the returns
+are independent with mean $\mu$ and $w_t$ depends only on returns up to $t$,
+$\E[r_{t+1}\mid\mathcal F_t]=\mu$ and the same step gives $\mu\E[w_t]$.
+\end{proof}
+
+A trend programme that trades a market whose excess returns are a martingale difference earns
+nothing before costs and loses its costs after them, however clever the rule. Whatever it earns
+beyond the drift term must come from dependence between past and future returns. This gives a test
+that needs no model: shuffle the months of the data and rerun the programme. A shuffle keeps each
+month's returns across markets together but randomises their order in time, which breaks the link
+between past and future returns that a trend rule could exploit. The shuffled runs still earn the
+drift term, $\mu\,\E[w_t]$ in \cref{prop9:mart}, so what the test measures is timing.
+
+\begin{proposition}[The straddle identity]\label{prop9:straddle}
+Let $S_t=r_1+\dots+r_t$ with $S_0=0$, and hold the position $w_{t-1}=S_{t-1}$ through period $t$, so that
+the position grows with the move since the start. Then
+\begin{equation}\label{eq9:straddle}
+  \sum_{t=1}^n S_{t-1}r_t = \tfrac12\Bigl(S_n^2-\sum_{t=1}^n r_t^2\Bigr).
+\end{equation}
+If the $r_t$ are independent and identically distributed with mean zero and variance $\sigma^2$, the expected profit is zero and the
+probability of a loss tends to $2\Phi(1)-1\approx0.683$ as $n\to\infty$.
+\end{proposition}
+
+\begin{proof}
+$S_t^2=S_{t-1}^2+2S_{t-1}r_t+r_t^2$; summing from $t=1$ to $n$ and using $S_0=0$ gives \cref{eq9:straddle}.
+The expectation of the right side is $\tfrac12(n\sigma^2-n\sigma^2)=0$. A loss occurs when
+$S_n^2/(n\sigma^2)<\sum r_t^2/(n\sigma^2)$. The right side tends to one by the law of large numbers and
+$S_n/(\sigma\sqrt n)$ tends in law to a standard normal $Z$ by the central limit theorem, so the
+probability tends to $\Pr(Z^2<1)=2\Phi(1)-1$.
+\end{proof}
+
+The identity is exact for any path. Its right side is the payoff of a straddle on the total move,
+$\tfrac12S_n^2$, paid for with the realised variance of the path, $\tfrac12\sum r_t^2$. The linear trend
+rule therefore has a convex payoff in the total move, though it is not a purchased straddle and its
+profit can be negative: it gains on large moves in either direction and loses a little, the realised
+variance, on paths that go nowhere. On \stNpath{} simulated years of \stNday{} daily returns with mean zero, the two sides of
+\cref{eq9:straddle} agree to within a relative error of \stMaxErr, rounding error only. The rule loses
+money in \stLossShare\% of the years, with a simulation standard error of \stLossSe{} points. For normal
+returns with mean zero the exact share follows from \cref{eq9:straddle}: since
+$\sum r_t^2=S_n^2/n+\sum(r_t-\bar r)^2$, the rule loses exactly when $\lvert t\rvert<1$, where $t$ is
+the usual $t$ statistic of the mean of the $n$ returns, so the probability is
+$\Pr(\lvert t_{n-1}\rvert<1)$, \stLossFinite\% for $n=\stNday$, against the limit of
+\stLossTheory\%; the simulated share is a draw about \stLossZ{} standard errors low on this seed. Its profits have a skewness
+of \stSkew, against $2\sqrt2\approx2.8$ in the limit, where the profit is a multiple of $Z^2-1$. Panel (a) of \cref{fig9:straddle} shows the parabola.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig03_straddle}
+  \caption{(a) Profit of the linear trend rule of \cref{prop9:straddle} against the total move over a
+  simulated year of daily returns, with the parabola $\tfrac12(S^2-n\sigma^2)$. (b) Annual Sharpe ratios,
+  after trading costs and before fees, of the trend programme of \cref{sec9:programme} on \pmN{} samples with the months shuffled, and the
+  ratio on the data in order (vertical line).}
+  \label{fig9:straddle}
+\end{figure}
+
+
+\paragraph{What the data say about the sign rule}
+For each of the seven markets of the next section, the correlation between the past year's return and
+the next month's return is small: \srRhoEq{} for US equities, \srRhoJpy{} for the yen and \srRhoOil{} for
+oil, and \srRhoAvg{} on average. \Cref{eq9:sign}, which has no drift in it, would then predict a timing
+gain of \srPredSRavg. The rule in fact earned a Sharpe ratio of \srRealSRavg{} per market on average. Of that,
+the drift term of \cref{prop9:sign} accounts for \srDriftAvg{} and the timing term for \srTimingAvg; for
+US equities the two are \srDriftEq{} and \srTimingEq. A timing gain with almost no linear correlation
+means that the dependence is not of the joint normal kind \cref{eq9:sign} assumes. One possible reason,
+which would need a test of its own, is that large moves are followed by moves of the same sign more
+often than small ones, and a correlation, dominated by the many small months, hardly registers that.
+\Cref{fig9:deciles} looks for that pattern and does not find it. Pooled over the seven markets, with
+each series in units of its own standard deviation, the \dqObs{} market months have a correlation of
+\dqRho. The bottom decile of past returns was followed by an average return of \dqBottom{} standard
+deviations, a reversal, and the top decile by \dqTop; the months in between averaged \dqMid. The two
+extreme deciles together took \dqTailShareAbs\% off the sign rule's pooled average, so what the rule
+earned came from the middle of the distribution. The signals overlap from month to month and the
+markets move together, so the decile means are not independent and the picture describes the sample
+without testing anything.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.74\textwidth]{ch09/fig17_deciles}
+  \caption{Mean next-month return by decile of the past 12 month return, pooled over the seven markets,
+  \tfFirst{} to \tfLast, each series divided by its own standard deviation, with the least-squares line
+  through all \dqObs{} market months. The bars are placed at the mean signal of each decile.}
+  \label{fig9:deciles}
+\end{figure}
+
+
+The shuffle test of \cref{prop9:mart} asks whether the programme as a whole earned more than chance.
+The null is that the months are exchangeable. On \pmN{} shuffles, which keep each market's drift and
+remove any dependence over time, the Sharpe ratio after trading costs and before fees has mean \pmMean{} and standard deviation \pmSd,
+and its 95th percentile is \pmQ. Before trading costs the shuffled mean is \pmMeanGross, what the drift
+earns, and the costs take most of that. The ratio on the data in order, \tfSR, is matched or exceeded by
+\pmCount{} of the shuffles, a $p$-value of $(1+\pmCount)/(\pmN+1)=\pmP$ (\cref{fig9:straddle}, panel (b)). Under the exchangeability null this is significant at the 5\% level, but one quarter century of
+seven markets would not persuade a sceptic of a stable timing advantage; that is why the longer
+histories of \textcite{hurst2017}, which go back more than a century, carry more weight.
+
+\FloatBarrier
+% =====================================================================================
+\section{A trend programme on seven markets}
+\label{sec9:programme}
+
+\paragraph{The markets}
+The programme trades seven markets: US equities, the US and Canadian 10 year government bonds, WTI
+crude oil, and the euro, yen and Canadian dollar against the US dollar. A professional programme
+would trade futures on these and many more. Here each market's monthly excess return is built from
+public month-end prices. US equities are the French market excess return. A bond return is that of a
+par bond bought at the month-end yield $y_0$ with ten years to run and sold a month later at the new
+yield $y_1$, with semiannual coupons:
+\begin{equation}\label{eq9:bond}
+  r^{\mathrm{bond}} = P\bigl(y_0,y_1,10-\tfrac1{12}\bigr)-1+\frac{y_0}{12},\qquad
+  P(c,y,m)=\frac cy\bigl(1-(1+y/2)^{-2m}\bigr)+(1+y/2)^{-2m},
+\end{equation}
+less the one month US bill rate for the US bond and less one twelfth of the 90 day Canadian bill rate
+for the Canadian bond, so that each is the return of a position financed in its own currency. The Canadian bond excess
+return is measured in Canadian dollars; treating it as a US-dollar portfolio contribution assumes the
+Canadian-dollar exposure is hedged, with forward-hedging costs and basis omitted from this proxy. The
+currency returns are spot changes only, so the interest differential that a currency future would
+earn or pay is left out, and the oil return is the change in the spot price, which leaves out the roll
+yield of Chapter~4. Both omissions change the level of returns in those markets more than they change
+the trend signals, but with them the programme is a proxy built from spot prices and par yields, and
+its returns are those of no traded futures position. The bond formula is itself a yield-based
+approximation: it prices a par bond with a fractional maturity, and the actual semiannual coupon dates,
+accrued interest and settlement are not modelled. The Canadian bond's first signal is set at the end of \tfGocFirst, after a year of returns, so it
+first holds a position in \tfGocFirstPos.
+
+\paragraph{The rule}
+At the end of each month $t$ the programme computes, for each market, the compounded excess return over
+the past 12 months and the annualised standard deviation $\hat\sigma_{i,t}$ of up to 24 past monthly
+returns (at least 12). It then holds through month $t+1$
+\begin{equation}\label{eq9:weights}
+  w_{i,t} = \operatorname{sign}\Bigl(\prod_{s=t-11}^{t}(1+r_{i,s})-1\Bigr)\,\frac{0.20}{N_t\,\hat\sigma_{i,t}},
+\end{equation}
+where $N_t$ is the number of markets with a signal, and pays 5 basis points on every unit of notional
+traded. Each market therefore targets an annual volatility of 20\% divided by $N_t$. The split is made
+before allowing for the correlations between markets, so it is not a volatility target for the
+programme as a whole. The positions are
+notional exposures financed at the bill rate, as futures are; the median sum of absolute positions is
+\tfLevMed{} times capital and the largest \tfLevMax, and the turnover is \tfTurn{} times capital a year.
+
+The listing below is the rule in pandas. The line that sets \texttt{held} is the one-month lag: a
+position computed from returns up to the end of month $t$ earns the return of month $t+1$, and
+dropping that shift is the easiest way to give a backtest information it could not have had. Run from
+the repository root it prints Sharpe ratios of \lbSROne, \lbSRThree{} and \lbSRTwelve{} for lookbacks
+of one, three and twelve months.
+\Needspace*{32\baselineskip}
+\lstinputlisting[language=Python]{code/ch09/snippets/tsmom.py}
+
+The shuffle test of \cref{prop9:mart}, reported in \cref{sec9:theory}, is a loop around this
+function. Each shuffle moves whole months, so each month's cross-section and each market's drift are
+kept and only the order in time is lost; the \pmHeld{} months from \pmHeldFirst{} to \pmHeldLast, before the Canadian bond
+series has a return, stay where they are, and only the \pmLive{} months with all seven returns are shuffled, so every shuffled
+month keeps its whole cross-section. This is a permutation test under exchangeability of whole-month
+return vectors; serial dependence in volatility or other time-varying features can invalidate its
+nominal significance. On the chapter's random stream for the test it finds \pmCount{} of \pmN{} shuffles at least
+as good as the data and $p=\pmP$. The 1 added to the numerator and the denominator counts the data in order as one of the
+equally likely orderings, so the $p$-value cannot be zero.
+\Needspace*{20\baselineskip}
+\lstinputlisting[language=Python]{code/ch09/snippets/permutation.py}
+
+\paragraph{Results}
+From \tfFirst{} to \tfLast{} the programme earned an excess return of \tfMean\% a year with a volatility
+of \tfVolP\%, a Sharpe ratio of \tfSR{} before fees, against \tfSReq{} for US equities over the same
+months (\cref{fig9:trend}). Its correlation with equities was \tfCorrEq{} and its beta \tfBetaEq. Its
+worst drawdown was \tfMdd\%, against \tfMddEq\% for equities, and it rose in \tfYearsUp{} of the
+\tfYears{} full calendar years, with the best year \tfBestYearLab{} (\tfBestYear\%) and the worst
+\tfWorstYearLab{} (\tfWorstYear\%).
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig01_trend}
+  \caption{(a) Growth of one unit invested in the excess return of the trend programme, before and
+  after a fee of 2\% of assets and 20\% of gains above a high-water mark, and of US equities, \tfFirst{}
+  to \tfLast, log scale. (b) Drawdowns of the programme before fees and of US equities.}
+  \label{fig9:trend}
+\end{figure}
+
+
+The record in the worst months for equities is the reason investors hold such programmes. From
+November 2007 to February 2009, when US equities lost \tfGfcEqAbs\% in total return, the programme
+returned \tfGfcP\% including the bill rate. In 2022, when equities lost \tfTwentyTwoEqAbs\% and the US 10
+year bond \tfTwentyTwoUstAbs\%, it returned \tfTwentyTwoP\%, and in February and March 2020 it gained \tfCovidP\% while equities lost
+\tfCovidEqAbs\%. These are total returns, after the programme's trading costs and before any fee; the
+monthly figures that follow are excess returns. In the ten worst months for equities, which
+averaged \tfWorstTenEq\%, it averaged \tfWorstTenP\% and rose in \tfWorstTenUp{} of them. A
+twelve month signal turns slowly, and a crash that follows a long rise finds the programme long; the
+protection comes in falls that last long enough for the signals to turn.
+\Cref{fig9:positions} shows the positions month by month. The programme was short equities in
+\psGfcShortEq{} of the \psGfcMonths{} months from November 2007 to February 2009, from
+\psGfcFirstShort{} on. It went into February and March 2020 long equities, with positions of
+\psEqFebTwenty{} and \psEqMarTwenty{} times capital, and held a short position of \psEqAprTwenty{} times
+capital only in April. Through 2022 it was short both bonds in all \psTwoTwoShortUst{} months.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.96\textwidth]{ch09/fig15_positions}
+  \caption{Positions held by the programme in each month, \tfFirst{} to \tfLast, in units of capital, long
+  in blue and short in red. The boxes mark November 2007 to February 2009, February and March 2020, and
+  2022.}
+  \label{fig9:positions}
+\end{figure}
+
+
+\paragraph{The smile}
+\Cref{prop9:straddle} suggests that a trend programme's return should be a convex function of the
+move in the markets it trades. \Cref{fig9:smile} plots the programme's return in each of \slQuarters{}
+calendar quarters against the equity excess return in the same quarter. A regression of the first on
+the second and its square gives a slope of \slLin{} ($t=\slLinT$) and a coefficient on the square of
+\slQuad{} ($t=\slQuadT$), with returns in decimals, and an intercept of \slIcpt\% a quarter. The
+positive coefficient on the square says that the relation was convex in this sample; it is too
+imprecise to promise the same protection in another. In the fifth of quarters with the
+lowest equity returns the programme averaged \slLowP\%, in the middle three fifths \slMidP\% and in the
+best fifth \slHighP\%. The shape is that of \textcite{fung2001}, with a weaker right arm: the programme
+gained most when equities fell hard, and little when they rose hard.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{ch09/fig02_smile}
+  \caption{Quarterly return of the trend programme before fees against the US equity excess return in
+  the same quarter, \slQuarters{} quarters, with the fitted quadratic.}
+  \label{fig9:smile}
+\end{figure}
+
+
+\paragraph{The lookback and the markets}
+\Cref{fig9:lookback} repeats the programme with lookbacks from one to 24 months. The Sharpe ratio is
+\lbSROne{} at one month, \lbSRThree{} at three, \lbSRNine{} at nine, \lbSRTwelve{} at twelve and
+\lbSRTwentyFour{} at 24. The standard error of an annual Sharpe ratio estimated from \tfMonths{} months
+is about \lbSE. The variants are highly correlated, so their differences are estimated more precisely
+than that, but not precisely enough to make nine months a better choice than twelve, and picking the
+best lookback after the fact would overstate what a manager could have expected. Market
+by market, the sleeves earned Sharpe ratios from \tfSROil{} for oil and \tfSREur{} for the euro to
+\tfSRJpy{} for the yen and \tfSREq{} for US equities.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig04_lookback}
+  \caption{(a) Sharpe ratio of the programme before fees for lookbacks of 1 to 24 months. (b) Sharpe
+  ratio of each market's sleeve with the 12 month lookback, over the months the sleeve was active.}
+  \label{fig9:lookback}
+\end{figure}
+
+
+The programme's ratio is about twice the average of its sleeves, and a short calculation says why.
+
+\begin{proposition}[Diversification across markets]\label{prop9:diversify}
+Let $n$ strategies have the same expected excess return $m$, the same volatility $s$, so the same
+Sharpe ratio $\theta=m/s$, and pairwise correlation $\varrho$. The equally weighted combination has
+Sharpe ratio
+\begin{equation}\label{eq9:diversify}
+  \theta_n = \theta\sqrt{\frac{n}{1+(n-1)\varrho}},
+\end{equation}
+which rises with $n$ to the limit $\theta/\sqrt\varrho$ when $\varrho>0$.
+\end{proposition}
+
+\begin{proof}
+The combination has mean $m$ and variance $n^{-2}\bigl(ns^2+n(n-1)\varrho s^2\bigr)=s^2\bigl(1+(n-1)\varrho\bigr)/n$.
+Dividing gives \cref{eq9:diversify}; the limit follows by dividing numerator and denominator by $n$.
+\end{proof}
+
+The seven sleeves have an average Sharpe ratio of \tfSRavg, each over its own active months, and an
+average pairwise correlation of \tfRhoAvg{} over the \scMonths{} months from \tfGocFirstPos{} to
+\tfLast{} when all seven were active. The \tfSRavg{} is above the \srRealSRavg{} of the one-unit sign
+rule per market in \cref{sec9:theory} because each sleeve sizes its position by the inverse of its
+trailing volatility and pays trading costs. \Cref{eq9:diversify} then gives \tfSRpred, against
+the programme's \tfSR. The agreement is closer than such a rough formula deserves, since the sleeves
+have neither equal ratios nor equal risks, but the lesson is general: diversification across
+imperfectly correlated markets lifts a trend programme's ratio well above that of its average market,
+and no single market accounts for its quality. It
+is also why the many markets of a commercial programme matter, and why a seven market version is a
+modest stand-in.
+\Cref{fig9:sleevecorr} shows how far the sleeves are from one common correlation. Over those
+\scMonths{} months the pairwise correlations run from \scMin{} for \scMinPair{} to \scMax{} for
+\scMaxPair, with a standard deviation of \scSdPairs{} across the \scPairs{} pairs. The two bond
+sleeves behave almost as one market, and \scNeg{} pairs are negatively correlated.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{ch09/fig16_sleevecorr}
+  \caption{Correlations of the monthly returns of the seven sleeves over the \scMonths{} months, \tfGocFirstPos{}
+  to \tfLast, in which all seven held positions. The colour scale runs from $-0.7$ to $0.7$; the diagonal is left blank.}
+  \label{fig9:sleevecorr}
+\end{figure}
+
+
+\paragraph{After fees}
+A fee of 2\% of assets a year, charged monthly, and 20\% of gains above a high-water mark,
+crystallised each December and at the end of the record, takes \tfFeeDrag\% a year from the programme. The net excess return falls
+to \tfMeanNet\% and the Sharpe ratio from \tfSR{} to \tfSRnet{} (\cref{fig9:trend}). The management fee
+is the larger part, \tfFeeMgmt{} of the \tfFeeExact{} points before rounding. A programme run at a
+volatility of \tfVolP\% that earns \tfMean\% a year over bills before fees loses half of that to a fee
+of 2\% of assets whatever happens. The incentive fee takes the other \tfFeeInc{} points. That is close
+to \tfIncShareGain\% of the fund's gain after the management fee, \tfGainMgmt\% a year with the bill rate
+of \tfRfMean\% included, but \tfIncShareLeft\% of the \tfLeftMgmt\% it earns over bills (both shares before
+rounding), because it is charged on the whole gain above the high-water mark, bill rate included, in good years only, with
+nothing returned in bad ones. The net volatility is \tfVolNet\%. Chapter~2 showed how much such a fee stream is worth to the
+manager. For the investor the lesson is that a fixed fee on assets is heavy for a programme run at a
+moderate volatility, since the fee does not shrink with the risk taken.
+The R listing below applies the fee to the gross programme: the management fee first, every month,
+then at each December the incentive fee on the whole gain above the mark, bill rate included. It
+prints the split of \tfFeeMgmt{} and \tfFeeInc{} points and the Sharpe ratios of \tfSR{} and \tfSRnet,
+and checks \cref{eq9:hwm} below on the whole record: the incentive fees paid equal $f/(1-f)$ times the
+rise in the high-water mark.
+\Needspace*{26\baselineskip}
+\lstinputlisting[language=R]{code/ch09/snippets/fees.R}
+
+\FloatBarrier
+% =====================================================================================
+\section{Carry and roll yield}
+\label{sec9:carry}
+
+A managed futures programme holds futures and forwards, and the return of a futures position is more
+than the change in the price of the underlying. The difference is the \emph{carry}: the return the
+position would earn if the spot price did not move, with the futures price converging to it. \textcite{koijen2018} define carry in this
+way for every asset class and show that it predicts returns in many of them. For commodities the same
+quantity is usually called the roll yield, and \textcite{erb2006} argue that differences in roll
+returns account for much of the difference in long-run returns across commodity futures. The trend
+programme above leaves out the carry of currencies and the roll of oil by working with spot prices,
+and its bond returns include the coupon carry but not the roll-down. This
+section shows what that leaves out, first in general and then for a currency and a bond.
+
+\begin{proposition}[Futures return, spot return and carry]\label{prop9:carry}
+Let $S_t$ be the spot price and $F_t$ the price at $t$ of a futures contract that expires at $t+1$, so
+that $F_{t+1}=S_{t+1}$. Define the carry $C_t=(S_t-F_t)/F_t$ and the spot return $r^S=(S_{t+1}-S_t)/S_t$.
+The return of a long futures position per unit of notional, which leaves out the interest on its
+collateral and so is an excess return, is
+\begin{equation}\label{eq9:carry}
+  r^F=\frac{F_{t+1}-F_t}{F_t}=C_t+(1+C_t)\,r^S .
+\end{equation}
+If the futures price is set by the cost of carry, $F_t(\tau)=S_t\,e^{(r-y)\tau}$ for a contract with time
+$\tau$ to expiry, with $r$ the financing rate and $y$ the yield of holding the underlying, then
+$C_t=e^{(y-r)\Delta}-1$ for a contract with $\tau=\Delta$. A contract bought with time $\tau$ to expiry and
+held for a period $\Delta$, while $r$ and $y$ stay constant, earns
+\begin{equation}\label{eq9:roll}
+  \log\frac{F_{t+\Delta}(\tau-\Delta)}{F_t(\tau)}=\log\frac{S_{t+\Delta}}{S_t}-(r-y)\Delta ,
+\end{equation}
+so a position rolled at the end of each period earns the log spot return plus $y-r$ per unit of time.
+The simple return in \cref{eq9:carry} has the cross term $C_tr^S$; the additive split into spot return
+and carry is exact for log returns under the cost of carry.
+\end{proposition}
+
+\begin{proof}
+$(S_{t+1}-F_t)/F_t=(S_t-F_t)/F_t+(S_{t+1}-S_t)/F_t$, and $S_t/F_t=1+C_t$, which gives \cref{eq9:carry}. Under the
+cost of carry $S_t/F_t(\Delta)=e^{(y-r)\Delta}$. For \cref{eq9:roll}, the contract bought at $t$ with time
+$\tau$ to run has time $\tau-\Delta$ to run at $t+\Delta$, and
+$\log F_{t+\Delta}(\tau-\Delta)-\log F_t(\tau)=\log S_{t+\Delta}+(r-y)(\tau-\Delta)-\log S_t-(r-y)\tau$.
+\end{proof}
+
+The yield $y$ is what holding the asset pays. For a currency it is the foreign interest rate, so the
+carry of a long currency forward is the foreign rate less the domestic one; covered interest parity,
+which sets the forward price, has held only approximately since 2008 \parencite{du2018}. For a bond it
+is the coupon, and a bond also rolls down an upward sloping curve. For a commodity it is the
+convenience of holding the physical good less the cost of storing it. A commodity curve that rises
+with maturity, in contango, has negative carry: with spot at \oilS{} dollars and the one month future at
+\oilFOne, \cref{eq9:roll} says a rolled long position earns, beyond the spot return, $12\log(\oilS/\oilFOne)$, about
+\oilRoll\% a year in log terms, if the curve keeps its shape and is priced by the cost of carry. Positive carry is not a free
+return. It is what the holder is paid, and the spot price may move against the holder by more.
+
+\paragraph{The Canadian dollar}
+Take an investor who holds one month Canadian Treasury bills funded by borrowing at the US one month
+bill rate, the cash version of a long position in a Canadian dollar forward. Let $S$ be the price of a
+US dollar in Canadian dollars and $i^{c}$ and $i^{u}$ the two bill yields, quoted as annual rates and
+accrued at one twelfth a month, an approximation whose accuracy depends on how each yield is quoted.
+The excess return in US dollars of the funded position over a month then splits exactly as
+\begin{equation}\label{eq9:fxcarry}
+  \Bigl(1+\tfrac{i^c}{12}\Bigr)\frac{S_t}{S_{t+1}}-\Bigl(1+\tfrac{i^u}{12}\Bigr)
+  =\underbrace{\frac{S_t}{S_{t+1}}-1}_{\text{spot}}
+  +\underbrace{\frac{i^c-i^u}{12}}_{\text{carry}}
+  +\underbrace{\frac{i^c}{12}\Bigl(\frac{S_t}{S_{t+1}}-1\Bigr)}_{\text{cross}} ,
+\end{equation}
+which the code checks to within \cadIdGap{} a month. From \cadFirst{} to \cadLast, \cadMonths{} months, the
+position earned \cadEx\% a year with a volatility of \cadVol\%: the spot part gave \cadSpot\%, the carry
+\cadCarry\% and the cross term \cadCross\%. The carry was positive in \cadCarryPos\% of months and ranged
+from \cadCarryMin\% to \cadCarryMax\% a year, small beside an exchange rate that moves by several percent
+in a month (\cref{fig9:carry}, panel (a)). A regression of the monthly excess return on the carry
+known at the start of the month has a slope of \cadSlope{} with a standard error of \cadSlopeSe. Uncovered
+interest parity predicts a slope of zero, and a random walk in the exchange rate predicts one; one
+currency pair over two decades cannot tell them apart. The evidence for currency carry comes from many
+pairs at once \parencite{koijen2018}.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig13_carry}
+  \caption{(a) Canadian bills funded at the US bill rate, \cadFirst{} to \cadLast: cumulative sums of the
+  monthly excess return in US dollars and of its spot and carry parts in \cref{eq9:fxcarry}. (b) The
+  Canada 10 year par bond over the 90 day bill, \gcFirst{} to \gcLast: cumulative sums of the realised
+  excess return, of the carry, and of carry and roll-down together, all monthly.}
+  \label{fig9:carry}
+\end{figure}
+
+
+\paragraph{The Canada 10 year bond}
+For a par bond with yield $y_{10}$ financed at the bill rate $b$, the carry over a month is
+$(y_{10}-b)/12$, and the roll-down is the gain from repricing the bond a month later at the yield of a 9
+year 11 month bond on the same curve. The code interpolates that yield between the 7 and 10 year
+benchmark yields of the Bank of Canada and prices the bond with the par bond formula. The expected
+return on an unchanged curve, carry and roll-down together, is known at the start of each month. The
+realised return prices the same bond at the next month's interpolated yield, so the difference between
+the two is the effect of the change in the interpolated curve between 7 and 10 years, which the
+quoted 10 year yield alone does not capture. From \gcFirst{} to \gcLast{} the carry averaged
+\gcCarry\% a year and the roll-down \gcRoll\%, for an expected \gcExp\%; the realised excess return was
+\gcReal\%. The remaining \gcRest{} percentage points is the realised-minus-expected return under the
+interpolated-curve model; it reflects changes in the curve, over a period when the 10 year yield fell
+from \gcYStart\% to \gcYEnd\%, and is not separately identified as the effect of that yield alone. The expected
+return was positive in \gcExpPos\% of months. Its volatility was \gcVolExp\% a year against \gcVolReal\% for
+the realised return, so in any one month the expected return is lost in the noise. Over twenty five
+years carry alone gave \gcCarryShare\% of the bond's excess return, and carry and roll-down together
+\gcExpShare\% (\cref{fig9:carry}, panel (b)). The slope of the realised
+on the expected monthly return is \gcSlope, with a standard error of \gcSlopeSe.
+The listing below does the calculation from the Bank of Canada file and prints the means of the
+carry, \gcCarry\%, the roll-down, \gcRoll\%, the realised excess return, \gcReal\%, and the curve term,
+\gcRest\%, in percent a year. The curve term is realised minus expected by construction, which is the
+sense in which it measures the change in the interpolated curve.
+\Needspace*{24\baselineskip}
+\lstinputlisting[language=Python]{code/ch09/snippets/rolldown.py}
+
+\FloatBarrier
+% =====================================================================================
+\section{What fund databases leave out}
+\label{sec9:biases}
+
+Most of what is known about hedge fund returns comes from commercial databases to which funds report
+voluntarily. A fund starts reporting when it chooses, usually after a good start, and stops when it
+chooses, often after losses or before closing. Three biases follow. \emph{Survivorship bias} arises when
+the funds that stopped reporting are dropped from the sample. \emph{Backfill} or \emph{instant history bias}
+arises when a fund that joins the database brings its earlier, and selected, history with it.
+\emph{Selection bias} arises because the funds that report at all differ from those that do not.
+\textcite{brown1992} showed for mutual funds how survivorship alone creates apparent persistence
+in performance, \textcite{fung2000} and \textcite{liang2000} measured the first two in hedge fund
+databases, and \textcite{aiken2013}, using returns of funds that do not report, found that the
+funds missing from commercial databases did worse than those in them. Each bias can be computed under simple assumptions.
+
+\begin{proposition}[The mean of the survivors]\label{prop9:survivor}
+Let a fund's $T$ monthly returns be independent $\N(\mu,\sigma^2)$, and let it survive when its average
+return $\bar R$ exceeds $c$. With $s=\sigma/\sqrt T$, $a=(c-\mu)/s$ and $\lambda(a)=\varphi(a)/(1-\Phi(a))$,
+\begin{equation}\label{eq9:survivor}
+  \E[\bar R\mid\bar R>c] = \mu + s\,\lambda(a),
+\end{equation}
+and the fraction that survives is $1-\Phi(a)$.
+\end{proposition}
+
+\begin{proof}
+$\bar R$ is $\N(\mu,s^2)$. Write $\bar R=\mu+sZ$; then $\E[Z\mid Z>a]=\int_a^\infty z\varphi(z)\dd z/(1-\Phi(a))
+=\varphi(a)/(1-\Phi(a))$, because $z\varphi(z)=-\varphi'(z)$.
+\end{proof}
+
+The bias $s\lambda(a)$ grows with the volatility of the funds and shrinks with the length of the
+record, and it is positive for every cut-off. With $\mu=\svMu\%$ and $\sigma=\svSig\%$ a month and a
+three year record, a rule that keeps funds with a positive average lets \svShareZero\% survive, and
+their average exceeds the truth by \svBiasZeroTh\% a year. A simulation of 40,000 funds gives
+\svBiasZero\%, and across cut-offs from minus 1\% to 1.2\% a month the formula and the simulation differ
+by at most \svMaxGap{} basis points a month (\cref{fig9:survivor}). The bias is largest when the cut-off
+removes most funds, which is the case for a database of funds that survived a long and difficult period.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{ch09/fig05_survivor}
+  \caption{Survivorship bias in the average return of funds with $T=\svT$ months of independent normal
+  returns, $\mu=\svMu\%$ and $\sigma=\svSig\%$ a month, against the survival cut-off on the monthly mean:
+  \cref{eq9:survivor} (line) and a simulation (points). The dashed line, on the right scale, is the share
+  of funds that survive.}
+  \label{fig9:survivor}
+\end{figure}
+
+
+\begin{proposition}[Backfill]\label{prop9:backfill}
+Let a fund's returns be independent $\N(\mu,\sigma^2)$, and let it join the database after an
+incubation of $K$ months only if its average over those months exceeds $c$, bringing that history with
+it, and report $M$ further months. Among the funds that join, the average of the $M$ later months has
+mean $\mu$, and the average of the whole record of $K+M$ months has mean
+\begin{equation}\label{eq9:backfill}
+  \mu + \frac{K}{K+M}\,\frac{\sigma}{\sqrt K}\,\lambda\Bigl(\frac{(c-\mu)\sqrt K}{\sigma}\Bigr).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The later returns are independent of the incubation returns, so conditioning on the incubation leaves
+their mean at $\mu$. The incubation average has the conditional mean of \cref{prop9:survivor} with
+$T=K$, and the record average is the weighted mean of the two averages with weights $K/(K+M)$ and
+$M/(K+M)$.
+\end{proof}
+
+With the same fund parameters, a two year incubation, entry when the incubation's compounded return
+is positive and five years of later reporting, \bfEnterShare\% of funds join. Their incubation months
+average \bfIncMean\% a year in simulation against \bfIncTheory\% from \cref{eq9:survivor}, and their
+later months \bfAfterMean\%, the true mean. The formula selects on a positive arithmetic mean and the
+simulation on a positive compounded return, so it is an approximation here. The full record is biased by
+\bfRecordBias\% a year, against \bfRecordTheory\% from \cref{eq9:backfill} with the same approximation. The cure is simple when the
+entry date is known: drop the months before it.
+
+\paragraph{A simulated database}
+The two biases act together in a database. The simulation behind \cref{fig9:backfill} starts
+\dbFunds{} funds at random dates. Each has its own mean, drawn around 0.6\% a month with a standard
+deviation of 0.2\%, and a monthly volatility of 3\%. A fund joins after a two year incubation with a
+positive compounded return, and stops reporting at the first of three events: a trailing twelve month
+return below minus 15\%, a random exit with a probability of 0.4\% a month, or ten years of reporting. Over a window of
+\dbMonths{} months the database ends with \dbNdb{} funds that ever reported, of which \dbNlive{} still
+report at the end; \dbDeadShare\% of those that reported stopped during the window. The true average
+return of all fund months in the window is \dbTruth\% a year. The funds alive at the end average
+\dbLive\%, a survivorship bias of \dbSurvBias\%. All reporting funds, dead ones included but with their
+backfilled histories, average \dbBack\%; dropping the months before entry gives \dbClean\%, so the
+backfill bias is \dbBackBias\% and \dbCleanBias\% remains, the differences computed before rounding. That remainder is the selection of which funds
+enter, which no treatment of the database can undo.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{ch09/fig06_backfill}
+  \caption{Average return of the simulated funds by month relative to their entry into the database.
+  The bars before entry are backfilled history; the dashed line is the true average of all fund
+  months.}
+  \label{fig9:backfill}
+\end{figure}
+
+
+In this simulation the backfilled months average \dbPreEntry\% a year and the months after entry,
+averaged month by month over the \dbEventLast{} months that follow it as in \cref{fig9:backfill},
+\dbPostEntry\%, against the \dbClean\% of all post-entry months pooled.
+\Cref{fig9:backfill} shows the step at the entry date. The estimates for real
+databases depend on the database and the period. \textcite{fung2000} put survivorship bias at a few
+percent a year and instant history bias at somewhat over one percent, and \textcite{ackermann1999}
+found smaller figures in a different sample. The simulation is not a calibration to any of them. It
+shows that biases of this size arise from simple and plausible reporting rules, and that they can be
+large beside the alpha a fund is supposed to deliver.
+
+\paragraph{Funds that close after a deep loss}
+Funds also leave because they fail. A simple rule is that a fund closes the first time it has lost a
+fraction $\ell$ of its starting value, which makes survival depend on the whole path of returns. In
+continuous time the survival probability and the survivors' mean have closed forms.
+
+\begin{proposition}[Closure at a loss limit]\label{prop9:closure}
+Let the log value of a fund be $X_t=\mu t+sW_t$, with $W$ a standard Brownian motion, and let the fund
+close at the first time $X$ reaches $-b$, where $b=-\log(1-\ell)>0$. Write $m=\mu T$, $v=s\sqrt T$ and
+$k=e^{-2\mu b/s^2}$. The probability that the fund is still open at $T$ is
+\begin{equation}\label{eq9:closure}
+  P_T=\Phi\Bigl(\frac{m+b}{v}\Bigr)-k\,\Phi\Bigl(\frac{m-b}{v}\Bigr),
+\end{equation}
+and the mean log return of the funds still open at $T$ is
+\begin{equation}\label{eq9:closuremean}
+  \E[X_T\mid \text{open at }T]=\frac1{P_T}\Bigl[m\,\Phi\Bigl(\tfrac{m+b}{v}\Bigr)+v\,\varphi\Bigl(\tfrac{m+b}{v}\Bigr)
+  -k\Bigl((m-2b)\,\Phi\Bigl(\tfrac{m-b}{v}\Bigr)+v\,\varphi\Bigl(\tfrac{m-b}{v}\Bigr)\Bigr)\Bigr].
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+By the reflection principle for Brownian motion with drift \parencite{shreve2004}, the paths that stay
+above $-b$ up to $T$ and end near $x>-b$ have density
+$v^{-1}\bigl[\varphi\bigl((x-m)/v\bigr)-k\,\varphi\bigl((x+2b-m)/v\bigr)\bigr]$. Integrating over $x>-b$ gives
+\cref{eq9:closure}. For the mean, $\int_{-b}^\infty x\,v^{-1}\varphi((x-m)/v)\dd x=m\Phi((m+b)/v)+v\varphi((m+b)/v)$, and
+the substitution $u=x+2b$ turns the second integral into $\int_b^\infty(u-2b)v^{-1}\varphi((u-m)/v)\dd u
+=(m-2b)\Phi((m-b)/v)+v\varphi((m-b)/v)$, using $\varphi$ even. Dividing by $P_T$ gives \cref{eq9:closuremean}.
+\end{proof}
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig12_closure}
+  \caption{Funds with no skill, a volatility of \clSig\% and closure after a loss of \clLoss\%. (a) The share
+  still open: \cref{eq9:closure} with continuous monitoring, the same formula with the barrier moved for
+  monthly monitoring, and a monthly simulation of \clFunds{} funds. (b) The survivors' mean log return
+  per year, from \cref{eq9:closuremean} and the simulation; the true mean is zero.}
+  \label{fig9:closure}
+\end{figure}
+
+A database checks a fund once a month, and a fund that dips below the limit between month ends is not
+caught. \textcite{broadie1997} show, for barrier options, that monitoring at intervals $\Delta t$ is close to
+continuous monitoring of a barrier moved away by $0.5826\,s\sqrt{\Delta t}$, a correction that becomes
+exact as $\Delta t$ shrinks and is only approximate for monthly checks; the same correction applies here. Take funds with no skill,
+$\mu=0$, a volatility of \clSig\% and a loss limit of \clLoss\%, so $b=\clB$, and simulate \clFunds{} of them
+month by month for \clYears{} years (\cref{fig9:closure}). After five years \clSurvSimFive\% are open, against
+\clSurvFive\% from \cref{eq9:closure} and \clSurvBgkFive\% with the correction; after ten years the figures are
+\clSurvSimTen\%, \clSurvTen\% and \clSurvBgkTen\%, with a simulation standard error of \clSurvSe{} points. The
+survivors' mean log return, which is zero for every fund before selection, is \clMeanSimFive\% a year
+after five years and \clMeanSimTen\% after ten in the simulation, \clMeanBgkFive\% and \clMeanBgkTen\% with the
+corrected formula. The bias grows with the horizon, because more of the losers have been removed, and
+it comes with no sign in the survivors' own records that anything was removed.
+The Octave listing evaluates \cref{eq9:closure}, checks it by integrating the density of the
+survivors, the normal density less its image about the barrier, and then moves the barrier, not the
+volatility, for monthly checks. It prints \clSurvFive\% and \clSurvBgkFive\% at five years and
+\clSurvTen\% and \clSurvBgkTen\% at ten.
+\Needspace*{21\baselineskip}
+\lstinputlisting[language=Octave]{code/ch09/snippets/barrier.m}
+
+\FloatBarrier
+% =====================================================================================
+\section{Where a fund's return comes from}
+\label{sec9:decomp}
+
+Before asking whether a fund can be copied, it helps to split its return into parts. There are two
+standard splits. The first adds up the profit of each position and needs the fund's holdings. The
+second regresses the fund's return on the returns of a set of factors and needs only the fund's
+record; the intercept is called alpha and the rest is attributed to the factors. Least squares makes
+the second split exact in sample, whatever factors are chosen.
+
+\begin{proposition}[Return attribution by regression]\label{prop9:attrib}
+Let $y_1,\dots,y_T$ be a fund's returns and $f_t\in\mathbb R^k$ factor returns, and fit
+$y_t=\hat\alpha+\hat\beta^\top f_t+\hat e_t$ by least squares with an intercept. Then, with bars for sample
+means and $\widehat{\Var}$ for sample variances,
+\begin{equation}\label{eq9:attrib}
+  \bar y=\hat\alpha+\hat\beta^\top\bar f,\qquad
+  \widehat{\Var}(y)=\widehat{\Var}(\hat\beta^\top f)+\widehat{\Var}(\hat e).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The normal equations say the residuals are orthogonal to the constant and to each factor:
+$\sum_t\hat e_t=0$ and $\sum_t\hat e_tf_t=0$. Averaging the fitted equation and using the first gives the
+mean identity. The second makes the residuals uncorrelated in sample with $\hat\beta^\top f_t$, so the
+sample variance of the sum is the sum of the sample variances.
+\end{proof}
+
+The identity holds for any choice of factors, and that is its weakness: the split of the mean into
+alpha and factor parts depends entirely on which factors are used. \Cref{tab9:decomp} applies both splits
+to the trend programme of \cref{sec9:programme} over its \dcMonths{} months. The sleeve split is exact by
+construction and shows where the \dcMean\% a year came from: most of it from US equities, the yen and the
+two bond markets, with oil and the euro close to zero. The first regression uses the seven market
+returns of the same month, over the \dcRegMonths{} months in which all seven have a return. Its $R^2$ is \dcRtwoA, its alpha \dcAlphaA\% a year with a $t$ statistic of \dcTA,
+and the code confirms the mean identity of \cref{eq9:attrib} to within \dcIdGap. The $t$ statistic uses
+ordinary least squares errors, so with serial dependence and changing volatility it is descriptive. The alpha is larger than
+the mean return because the regression betas on US equities and the Canadian bond, two markets that
+rose over the period, are negative.
+
+\textcite{fung2001} explained trend followers' returns with lookback straddles, options whose payoff
+depends on the range of prices within the month. A crude stand-in, the absolute return of each market
+in the same month, adds seven factors that a straddle on each market would roughly pay. The $R^2$ rises
+only to \dcRtwoB; of the seven coefficients, \dcAbsPos{} are positive and none has a $t$ statistic above two.
+The alpha becomes \dcAlphaB\% a year with a $t$ statistic of \dcTB, and the part of the mean attributed
+to the factors rises from \dcLoadPartA\% to \dcLoadPart\% a year, a shift of \dcLoadShift{} points, on almost
+no change in fit. \Cref{prop9:straddle} is exact only for the linear rule; the programme's sign rule
+shares its convexity in moves that build over the twelve month lookback without being the same payoff,
+and a factor built from one month's move misses most of such a move. Both regressions illustrate \cref{eq9:attrib}: they fit equally badly and
+attribute the same mean in opposite ways.
+
+\begin{table}[t]
+  \centering
+  \caption{The trend programme, gross of fees, \tfFirst{} to \tfLast. Sleeve: the mean excess return of each
+  market's positions, in percent a year, which add up to the programme's \dcMean\% before rounding. Market beta: the
+  coefficient on the market's monthly return in the regression on the seven markets, over the
+  \dcRegMonths{} complete months. Absolute move:
+  the coefficient on the absolute monthly return of the market, and its $t$ statistic, when those seven
+  are added.}
+  \label{tab9:decomp}
+  \small
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Market & Sleeve, \% a year & Market beta & Absolute move & $t$ \\
+    \midrule
+    US equities & \dcSlEq & \dcBetaEq & \dcAbsEq & \dcAbsTEq \\
+    US 10 year bond & \dcSlUst & \dcBetaUst & \dcAbsUst & \dcAbsTUst \\
+    Canada 10 year bond & \dcSlGoc & \dcBetaGoc & \dcAbsGoc & \dcAbsTGoc \\
+    WTI crude oil & \dcSlOil & \dcBetaOil & \dcAbsOil & \dcAbsTOil \\
+    Euro & \dcSlEur & \dcBetaEur & \dcAbsEur & \dcAbsTEur \\
+    Yen & \dcSlJpy & \dcBetaJpy & \dcAbsJpy & \dcAbsTJpy \\
+    Canadian dollar & \dcSlCad & \dcBetaCad & \dcAbsCad & \dcAbsTCad \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\FloatBarrier
+% =====================================================================================
+\section{Can a clone do the job?}
+\label{sec9:replication}
+
+If a fund's return is mostly a set of exposures to liquid markets, a portfolio of those markets with
+the same exposures could deliver it at a lower fee. \textcite{hasanhodzic2007} fitted such linear
+clones to many hedge funds and found that for several categories of fund a clone built from a handful
+of liquid factors came close to the funds' own returns, while for others it did not. A clone is a regression: at the end
+of each month, regress the fund's last 24 monthly returns on the returns of a set of instruments, with
+no intercept, and hold the fitted coefficients for the next month. Two results describe what can go
+wrong.
+
+\begin{proposition}[The cost of estimating a clone]\label{prop9:clone}
+Let $y=x^\top\beta+e$, where the $k$ regressors $x$ are $\N(0,\Sigma)$ and $e$ is $\N(0,\sigma^2)$ and
+independent of them. Fit $\hat\beta$ by least squares, without an intercept, on $T>k+1$ independent
+draws, and apply it to a new independent draw $(x_0,y_0)$. Then
+\begin{equation}\label{eq9:clone}
+  \E\bigl[(y_0-x_0^\top\hat\beta)^2\bigr] = \sigma^2\Bigl(1+\frac{k}{T-k-1}\Bigr),
+\end{equation}
+while the mean squared residual within the fitting window has expectation $\sigma^2(T-k)/T$.
+\end{proposition}
+
+\begin{proof}
+With $X$ the $T\times k$ matrix of regressors, $\hat\beta-\beta=(X^\top X)^{-1}X^\top e$, so
+$y_0-x_0^\top\hat\beta=e_0-x_0^\top(X^\top X)^{-1}X^\top e$. Given $X$ and $x_0$ the two terms are
+independent with mean zero, and the variance is $\sigma^2\bigl(1+x_0^\top(X^\top X)^{-1}x_0\bigr)$. Since $x_0$
+is independent of $X$, $\E[x_0^\top(X^\top X)^{-1}x_0]=\operatorname{tr}\bigl(\Sigma\,\E[(X^\top X)^{-1}]\bigr)$, and
+$X^\top X$ is Wishart with $T$ degrees of freedom and scale $\Sigma$, whose inverse has mean
+$\Sigma^{-1}/(T-k-1)$ \parencite{muirhead1982}. The trace is then $k/(T-k-1)$. Within the window the
+residual sum of squares is $\sigma^2$ times a chi-squared variable with $T-k$ degrees of freedom.
+\end{proof}
+
+A clone on seven instruments fitted to 24 months has an expected squared error out of sample of
+$1+7/16=\pvTheory$ times the irreducible variance; a simulation of \pvSims{} fits gives \pvSim{}
+(standard error \pvSimSe). Within the window it looks better than it is, with a residual variance of
+\pvInSample{} times the truth, so the clone's error out of sample is about twice what the fit suggests.
+
+\begin{proposition}[No linear clone of a straddle]\label{prop9:linear}
+Let $X$ have a distribution symmetric about zero with $0<\E X^2<\infty$, and let $g$ be an even function
+with $\E g(X)^2<\infty$. Then $\Cov(X,g(X))=\E[Xg(X)]=0$, so in the least squares regression of $g(X)$ on a
+constant and $X$, and also without the constant, the coefficient on $X$ is zero:
+the best linear clone of the payoff $g(X)$ holds no position in $X$.
+\end{proposition}
+
+\begin{proof}
+$Xg(X)$ is an odd function of $X$, so its mean is zero by symmetry, and $\E X=0$ for the same reason.
+Hence $\Cov(X,g(X))=\E[Xg(X)]-\E X\,\E g(X)=0$, and the coefficient $\Cov(X,g(X))/\Var X$ is zero.
+\end{proof}
+
+By \cref{prop9:straddle} the payoff of the linear trend rule is an even function of the total move less
+the realised variance, and sign rules like the programme's are convex in sustained moves without
+having exactly that payoff. The
+result rules out a static linear exposure to the total move as a replica of its symmetric, convex
+part; it does not by itself measure the replication error of a dynamic trend strategy across many
+markets. Capturing the programme's nonlinear exposure needs dynamic trading rules, such as positions
+in other trend rules, or instruments with nonlinear payoffs.
+
+\paragraph{A test on a hypothetical manager}
+To see both results at work, take a hypothetical manager who runs the programme of
+\cref{sec9:programme} with an equal blend of six and twelve month lookbacks and adds returns of its
+own, independent normal with a volatility of \rpIdio\% a year. The manager's rules are unknown to the
+clone. The first clone regresses the manager on the seven market returns; the second on three trend
+factors, the programmes of \cref{sec9:programme} with lookbacks of one, three and twelve months. Both
+are refitted every month on the last \rpWin{} months, which leaves \rpMonths{} months out of sample
+(\cref{fig9:clone}).
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{ch09/fig07_clone}
+  \caption{Growth of one unit in the excess return of a hypothetical trend manager and of two clones
+  refitted monthly on the last \rpWin{} months, out of sample, log scale. The manager is simulated from
+  the programme of \cref{sec9:programme} as described in the text.}
+  \label{fig9:clone}
+\end{figure}
+
+
+Over the full sample the seven markets explain only \rpFullA{} of the manager's variance in a single
+regression, as \cref{prop9:linear} leads one to expect. Within each window the market clone fits
+better, with an average $R^2$ of \rpInA, but out of sample its $R^2$ is \rpOutA: it does worse than
+holding nothing. Its correlation with the manager is \rpCorrA, its tracking error \rpTeA\% a year, and
+its Sharpe ratio \rpSRa{} against the manager's \rpSRt. The clone on trend factors has an average window
+$R^2$ of \rpInB{} and an out of sample $R^2$ of \rpOutB, a correlation of \rpCorrB, a tracking error of
+\rpTeB\%, and a Sharpe ratio of \rpSRb; it trails the manager by \rpMeanGapB\% a year, against
+\rpMeanGapA\% for the market clone.
+\Cref{fig9:clonecoef} shows why the market clone fails. Its coefficients swing from one refit to the
+next, by \cfChangeA{} a month on average against \cfChangeB{} for the clone on trend factors, and the
+median market coefficient changes sign \cfFlipsMed{} times in \cfMonths{} months. That is the noise of
+\cref{prop9:clone}: seven coefficients estimated from \rpWin{} months. The factor clone's weight on the
+twelve month factor stays between \cfTwelveMin{} and \cfTwelveMax.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.96\textwidth]{ch09/fig18_clonecoef}
+  \caption{Coefficients of each monthly refit of the two clones over the previous \rpWin{} months, on the
+  seven market returns (left) and on the three trend factors (right).}
+  \label{fig9:clonecoef}
+\end{figure}
+
+
+The second clone succeeds partly because the factors were built with the same seven markets and the
+same kind of rule as the manager, which is a generous setting. For a real fund the factors have to be
+guessed, and \cref{prop9:clone} charges for every factor added. The practical conclusion is narrow.
+Where a strategy is a known family of rules on liquid markets, its return can be largely bought
+without the manager. Where the return comes from illiquid positions or from selling insurance, a
+clone built only from linear exposures to liquid markets can match the calm months and miss the
+nonlinear losses of liquidity stress or of insurance claims, which is where the fund's risk lies.
+
+\FloatBarrier
+% =====================================================================================
+\section{Fee mechanics}
+\label{sec9:fees}
+
+A hedge fund charges a management fee, a fixed share of assets each year, and an incentive fee, a share
+$f$ of gains. The details of the incentive fee decide how much of a fund's return the investor keeps.
+\begin{itemize}
+  \item A \emph{high-water mark} is the highest value per unit on which a fee has been charged; the
+        incentive fee is charged only on value above it, so a fund that loses must recover the loss
+        before it is paid again.
+  \item A \emph{hurdle} $h$ is a return the fund must earn before the incentive fee applies. Under a
+        \emph{hard} hurdle the fee is charged only on the return above $h$. Under a \emph{soft} hurdle with
+        full \emph{catch-up}, once the return exceeds $h$ the manager takes all of the excess until the
+        fee equals $f$ of the whole return, and $f$ of the return after that.
+  \item \emph{Crystallisation} is the date at which an accrued incentive fee becomes payable, usually
+        the end of each year.
+\end{itemize}
+
+\begin{proposition}[Hurdles]\label{prop9:hurdle}
+For a period return $R$, a rate $f\in(0,1)$ and a hurdle $h\ge0$, the incentive fees with no hurdle, a
+hard hurdle and a soft hurdle with full catch-up are $fR^+$, $f(R-h)^+$ and
+\begin{equation}\label{eq9:soft}
+  \min\bigl((R-h)^+,\,fR^+\bigr)=(R-h)^+-(1-f)\bigl(R-h/(1-f)\bigr)^+,
+\end{equation}
+so the catch-up ends at a return of $h/(1-f)$ and the three fees are ordered hard $\le$ soft $\le$ none. If
+$R\sim\N(\mu,s^2)$ their means are $fG(\mu,s)$, $fG(\mu-h,s)$ and $G(\mu-h,s)-(1-f)\,G\bigl(\mu-h/(1-f),s\bigr)$, with
+$G(\mu,s)=\E[(\mu+sZ)^+]=\mu\Phi(\mu/s)+s\varphi(\mu/s)$ for a standard normal $Z$, the function of
+\cref{eq9:callmean}.
+\end{proposition}
+
+\begin{proof}
+For $R\le h$ both sides of \cref{eq9:soft} are zero. For $h<R\le h/(1-f)$, $R-h\le fR$, so the minimum is $R-h$, and
+the second term on the right vanishes. For $R>h/(1-f)$ the minimum is $fR$, and the right side is
+$R-h-(1-f)R+h=fR$. The ordering follows from $(R-h)^+\le R^+$ and from \cref{eq9:soft}: the soft fee is at
+least $f(R-h)^+$, since $R-h\ge f(R-h)$ and $fR\ge f(R-h)$ when $R\ge h$, and at most $fR^+$. The means follow from
+$\E(R-c)^+=G(\mu-c,s)$.
+\end{proof}
+
+With $f=\feF\%$, $h=\feH\%$ and a gross return with mean \feMu\% and volatility \feSig\%, the expected fee is
+\feNone\% of assets with no hurdle, \feSoft\% with a soft hurdle and \feHard\% with a hard one; a simulation of a
+million years gives the same figures to two decimals. The soft hurdle sounds like protection and costs
+the manager little, because the catch-up ends at \feCatch\%, below the mean return. The hard hurdle takes
+a third off the fee (\cref{fig9:fees}, panel (a)).
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig11_fees}
+  \caption{(a) Incentive fee at \feF\% on a year's gross return with no hurdle, a hard hurdle of \feH\% and a
+  soft hurdle of \feH\% with full catch-up, from \cref{prop9:hurdle}. (b) Value at the start of
+  \feYears{} years of annual incentive fees at \feF\%, as a share of the starting assets, when the assets grow at
+  the bill rate of \feRf\% under the pricing measure: charged on each year's gain, by simulation and by
+  \cref{prop9:hwm}, and with a high-water mark, by simulation.}
+  \label{fig9:fees}
+\end{figure}
+
+\paragraph{The fee as an option}
+Seen from the start of the year, the incentive fee is a call option that the investor writes to the
+manager on the fund's assets. \textcite{goetzmann2003} value the fees of a fund with a high-water mark
+as claims on its assets in this spirit. For one year the value follows from the Black-Scholes
+formula of Chapter~5.
+
+\begin{proposition}[The value of one year's incentive fee]\label{prop9:feecall}
+Let the fund's assets before the incentive fee grow at the rate $r$ under the pricing measure with
+volatility $s$, from a value of one. The value at the start of a fee of $f$ on the gain above $K$ at time
+$T$ is
+\begin{equation}\label{eq9:feecall}
+  c=f\bigl[\Phi(d_1)-Ke^{-rT}\Phi(d_1-s\sqrt T)\bigr],\qquad d_1=\frac{-\log K+rT}{s\sqrt T}+\frac{s\sqrt T}2 .
+\end{equation}
+With a hurdle at the bill rate, $K=e^{rT}$, this is $c=f\bigl(2\Phi(s\sqrt T/2)-1\bigr)\approx fs\sqrt{T}/\sqrt{2\pi}$.
+This is a value under the pricing measure of a lognormal model; the expected fee under the fund's own
+distribution of returns is a different number.
+\end{proposition}
+
+\begin{proof}
+The fee is $f(V_T-K)^+$, and $f$ times the price of a call on $V$ with strike $K$ is \cref{eq9:feecall}. With
+$K=e^{rT}$, $d_1=s\sqrt T/2$ and $d_1-s\sqrt T=-s\sqrt T/2$, so $c=f(\Phi(s\sqrt T/2)-\Phi(-s\sqrt T/2))$. Near zero
+$2\Phi(x)-1\approx2x\varphi(0)=2x/\sqrt{2\pi}$, and $x=s\sqrt T/2$.
+\end{proof}
+
+For a fund with a volatility of \feOptVol\% and a bill rate of \feRf\%, a \feF\% fee on the whole gain is worth
+\feOptAtm\% of assets a year, and with a hurdle at the bill rate \feOptFwd\%, which the approximation gives to the
+same two decimals. With the hurdle at the bill rate the value is close to proportional to the fund's
+volatility, and without it the value still rises with volatility. A manager paid this way gains
+from taking more risk, whatever that risk does for the investor.
+
+\paragraph{The high-water mark}
+Over several years the fee depends on the path. A high-water mark has a simple accounting identity.
+
+\begin{proposition}[Fees and the high-water mark]\label{prop9:hwm}
+Let a fund's value per unit be $N_0=1$ and, at the end of each period, $P_t=N_{t-1}(1+R_t)$ before the
+incentive fee, $F_t=f(P_t-H_{t-1})^+$ and $N_t=P_t-F_t$, where $H_t=\max(H_{t-1},N_t)$ and $H_0=1$. Then
+for every $T$,
+\begin{equation}\label{eq9:hwm}
+  \sum_{t=1}^TF_t=\frac f{1-f}\,(H_T-H_0).
+\end{equation}
+The left side is the undiscounted sum of the fees, each in units of the starting value per unit,
+and not their present value.
+If instead the fee is charged each period on that period's gain, $F'_t=f(P'_t-N'_{t-1})^+$, and the
+returns $R_t$ are independent with the assets growing at $r$ under the pricing measure, the value of
+the fees over $T$ periods is $1-(1-c)^T$, with $c$ the value of one period's fee from \cref{eq9:feecall}
+with $K=1$ and $T$ one period.
+\end{proposition}
+
+\begin{proof}
+If $P_t\le H_{t-1}$ then $F_t=0$ and $N_t=P_t\le H_{t-1}$, so $H_t=H_{t-1}$. If $P_t>H_{t-1}$ then
+$N_t-H_{t-1}=(1-f)(P_t-H_{t-1})>0$, so $H_t=N_t$ and $F_t=\frac f{1-f}(H_t-H_{t-1})$. In both cases
+$F_t=\frac f{1-f}(H_t-H_{t-1})$, and the sum telescopes. For the second part, a period's fee is
+$N'_{t-1}f(R_t)^+$, and by independence its value at the start of the period is $N'_{t-1}c$, so the
+discounted value of what remains in the fund falls by the factor $1-c$ each period. The value of all
+fees is the starting value less the value of what the investor is left with, $1-(1-c)^T$.
+\end{proof}
+
+\Cref{eq9:hwm} says that over any horizon the fees are fixed by how far the high-water mark has risen,
+whatever the path; the code checks it on every simulated path to within \feIdGap. A fund that gains 20\%,
+loses 25\% and gains 30\%, with $f=\feF\%$, ends with a high-water mark \feExMark\% above its start and pays
+\feExFeeH\% in incentive fees in all, summed without discounting as a share of the starting value;
+charged on each year's gain the same returns cost \feExFeeR\% on the same basis. These are accounting
+totals. The second part of the proposition values the difference under the pricing measure. Over \feYears{} years at a volatility of \feTenVol\%,
+annual fees on each year's gain are worth \feTenClosed\% of the starting assets by the formula and \feTenReset\%
+in a simulation of \feSims{} paths (standard error \feTenResetSe{} points); with a high-water mark they are worth
+\feTenHwm\%, \feTenRatio\% as much (\cref{fig9:fees}, panel (b)). The value of the high-water mark to the investor
+grows with the fund's volatility, since a volatile fund more often has losses to recover.
+
+
+\FloatBarrier
+% =====================================================================================
+\section{Funds of funds}
+\label{sec9:fof}
+
+A fund of funds holds a portfolio of hedge funds and charges a fee of its own, typically a management
+fee of about 1\% and an incentive fee of about 10\% of gains. It offers diversification across
+managers, due diligence and access to funds that are closed to small investors. Diversification
+across managers works like diversification across markets: with $n$ funds of volatility $\sigma$ and
+pairwise correlation $\varrho$, the equally weighted pool has volatility $\sigma\sqrt{\varrho+(1-\varrho)/n}$,
+which falls quickly at first and then levels off at $\sigma\sqrt\varrho$. The fees behave differently.
+Each underlying fund charges its incentive fee on its own gain, whether or not the pool as a whole
+gained, a point made by \textcite{brown2003}.
+
+\begin{proposition}[Incentive fees that do not net]\label{prop9:netting}
+For any gains $x_1,\dots,x_n$ and weights $v_i\ge0$, $\sum_iv_ix_i^+\ge\bigl(\sum_iv_ix_i\bigr)^+$. If the gains are
+jointly normal, each $\N(\mu,\sigma^2)$ with pairwise correlation $\varrho\ge-1/(n-1)$, and the weights are $1/n$, the
+expected incentive fee at rate $f$ is $f\,G(\mu,\sigma)$ per unit of assets when each fund charges on its own
+gain, and $f\,G(\mu,\sigma_n)$ when gains are netted, with $\sigma_n=\sigma\sqrt{\varrho+(1-\varrho)/n}$ and
+\begin{equation}\label{eq9:callmean}
+  G(\mu,s)=\E\bigl[(\mu+sZ)^+\bigr]=\mu\,\Phi(\mu/s)+s\,\varphi(\mu/s),
+\end{equation}
+with $G(\mu,0)=\max(\mu,0)$ by continuity, the value at the boundary $\varrho=-1/(n-1)$, where $\sigma_n=0$.
+$G$ increases with $s$, and $\sigma_n$ falls with $n$ when $\varrho<1$, so the gap between the two fees grows with $n$.
+\end{proposition}
+
+\begin{proof}
+The positive part is convex and positively homogeneous, hence subadditive:
+$(a+b)^+\le a^++b^+$ and $(va)^+=va^+$ for $v\ge0$; induction gives the inequality. Each fund's fee has
+mean $f\E[x_i^+]=fG(\mu,\sigma)$, and the weighted mean of these is the same. The pooled gain is normal with
+mean $\mu$ and variance $\sigma_n^2$. For \cref{eq9:callmean}, $\E[(\mu+sZ)^+]=\int_{-\mu/s}^\infty(\mu+sz)\varphi(z)\dd z
+=\mu\Phi(\mu/s)+s\varphi(\mu/s)$, and differentiating in $s$ gives $\partial G/\partial s=\varphi(\mu/s)>0$.
+\end{proof}
+
+Take funds with expected annual gains of \ffMu\% before incentive fees, a volatility of \ffSig\% and
+pairwise correlation \ffRho, each charging \ffPerf\% of its gain. To isolate the incentive fee, the
+example leaves out the funds' management fees. Charged fund by fund, the expected incentive fee is
+\ffSepOne\% of assets for any number of funds, \ffRateSep\% of the expected gain. If gains were netted
+across the pool it would be \ffPoolFive\% with five funds, \ffPoolTen\% with ten and \ffPoolLimit\% in
+the limit, \ffRateLimit\% of the gain. A simulation of ten funds gives \ffSimSep\% and \ffSimPool\% for
+the two (\cref{fig9:fof}). In the years when the pool as a whole lost money, \ffLossYears\% of them, it
+paid incentive fees in almost every case (\ffLossYearsPaid\% of all years), because some fund in the pool
+had gained.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig08_fof}
+  \caption{(a) Volatility of an equally weighted pool of $n$ funds with volatility \ffSig\% and pairwise
+  correlation \ffRho, levelling off towards the limit $\sigma\sqrt\varrho$, the dashed line. (b) Expected incentive fees at
+  \ffPerf\% when each fund charges on its own gain and when gains are netted, from \cref{eq9:callmean}.}
+  \label{fig9:fof}
+\end{figure}
+
+
+The second layer adds to this. With a fund of funds fee of \ffFmg\% of assets and \ffFpf\% of its own
+net gain, charged after the funds' incentive fees and with the funds' own management fees left out,
+the investor's expected return in this one year simulation of ten funds falls from \ffMu\% before
+incentive fees to \ffNetFof\%: fees take
+\ffAllFees\% a year, \ffFeeShare\% of the expected gain. Ten funds cut the volatility from \ffVolOne\% to
+\ffVolTen\%, and most of that cut is available with five (\ffVolFive\%). A fund of funds therefore
+sells diversification that the arithmetic says levels off early, at a price that does not.
+
+\FloatBarrier
+% =====================================================================================
+\section{Digital assets}
+\label{sec9:crypto}
+
+Bitcoin, proposed by \textcite{nakamoto2008}, is a digital token whose ownership is recorded on a
+public ledger maintained by a network of computers, with a supply fixed by its protocol. Ether is the
+token of a network that also runs programs. Neither gives its holder a contractual claim on cash
+flows, so neither has a value that follows from discounting promised income; staking rewards and the
+use of the network are benefits of another kind and need separate treatment. Their prices are set by what buyers will pay, and the questions for
+an allocator are statistical: how risky they are, how they move with other assets, and how much a
+short history can say.
+
+\paragraph{How the ledger works}
+A few facts about the protocol matter for an investor, and they can be stated without technical
+detail. Transactions are grouped into blocks, and each block contains a cryptographic hash of the one
+before, so the blocks form a chain in which changing an old transaction would change every later
+block. A new block is accepted only with a \emph{proof of work}: a number that makes the block's hash
+fall below a target, which can be found only by trial. Whoever finds it is paid in new coins, the
+\emph{block subsidy}, plus the fees of the transactions in the block. The protocol adjusts the target
+every 2016 blocks to keep the average time between blocks near ten minutes, and halves the subsidy
+every 210,000 blocks, about every \ocEpochYears{} years at that spacing. In the reference software,
+Bitcoin Core \parencite{bitcoincore}, the subsidy starts at 50 coins and is halved by a binary shift
+of its value in the smallest unit, $10^{-8}$ of a coin.
+
+\begin{proposition}[The supply limit]\label{prop9:supply}
+With a subsidy of $\lfloor5\cdot10^9/2^j\rfloor$ units for each of the 210,000 blocks of period
+$j=0,1,\dots$, the total number of coins ever issued is less than 21 million, and the first $J$ periods
+issue $21\cdot10^6(1-2^{-J})$ coins up to the rounding of the subsidy.
+\end{proposition}
+
+\begin{proof}
+Without rounding, period $j$ issues $210{,}000\times50\times2^{-j}=10.5\cdot10^6\cdot2^{-j}$ coins, and the
+geometric series gives $21\cdot10^6(1-2^{-J})$ for the first $J$ periods and $21\cdot10^6$ in the limit.
+Rounding down only removes units, and from $j=33$ on the subsidy is $\lfloor5\cdot10^9/2^{j}\rfloor=0$, so the total
+is a finite sum strictly below the limit.
+\end{proof}
+
+The code sums the schedule exactly: \ocSupply{} coins, \ocShortfall{} short of 21 million, with the subsidy
+reaching zero after \ocHalvings{} halvings. Half of all coins are issued in the first period and
+\ocShareFour\% by the end of the fourth (\cref{fig9:onchain}, panel (a)). The supply is therefore known in
+advance, and the subsidy that pays for the network's security falls by half every four years or so;
+neither fact says anything about the price.
+An Octave cross-check in \texttt{code/ch09/snippets/issuance.m} repeats the sum in floating point;
+every partial sum is an integer below $2^{53}$, so it agrees exactly.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig14_onchain}
+  \caption{(a) Bitcoins issued under the subsidy schedule of \cref{prop9:supply}, by period of 210,000
+  blocks; the dashed line is 21 million. (b) Annualised volatility of daily log returns within each
+  calendar year: bitcoin and ether from Coinbase prices, every day of the week, and US equities from the
+  French daily market return, trading days only; 2026 runs to the end of September for the coins and
+  August for equities.}
+  \label{fig9:onchain}
+\end{figure}
+
+
+The second fact is how hard it is to rewrite the chain. \textcite{nakamoto2008} models an attacker
+who controls a share $q$ of the computing power and tries to build a longer chain in secret, starting
+$z$ blocks behind the honest one, whose share is $p=1-q$.
+
+\begin{proposition}[Catching up]\label{prop9:ruin}
+Let each new block be found by the honest miners with probability $p$ and by the attacker with
+probability $q=1-p<p$, independently. The probability that the attacker, $z$ blocks behind, ever draws
+level is $(q/p)^z$.
+\end{proposition}
+
+\begin{proof}
+Let $D_n$ be the deficit after $n$ blocks, a random walk that rises by one with probability $p$ and
+falls by one with probability $q$, from $D_0=z$. Then $(q/p)^{D_n}$ is a martingale, since
+$p(q/p)^{d+1}+q(q/p)^{d-1}=(q/p)^d(q+p)$. Stop it when $D$ first reaches $0$ or some $M>z$. The stopped
+martingale is bounded, so optional stopping gives
+$(q/p)^z=\Pr(\text{0 first})+(q/p)^M(1-\Pr(\text{0 first}))$, and
+$\Pr(\text{0 first})=\bigl((q/p)^z-(q/p)^M\bigr)/\bigl(1-(q/p)^M\bigr)$. Let $M\to\infty$; since $q/p<1$ the
+limit is $(q/p)^z$.
+\end{proof}
+
+Nakamoto's own calculation allows for the blocks the attacker has already found while the honest chain
+built its $z$, treating that number as Poisson with mean $zq/p$ and weighting the ruin probability by
+it. The code reproduces the paper's table for $q=0.1$ to all seven decimals given there, and the number
+of blocks needed to bring the probability below 0.1\% for all \ocZCount{} values of $q$ in the paper's
+second table, from 5 blocks for $q=0.1$ to \ocZLast{} for $q=\ocQLast$. With $q=0.1$ and six blocks the ruin probability is \ocRuinSix{}
+and Nakamoto's \ocNakSix. The arithmetic assumes the attacker's share is below a half and fixed; it says
+nothing about other risks to the holder, such as the loss of keys or the failure of an exchange.
+
+\paragraph{The record}
+From \btFirst{} to \btLast, \btMonths{} months, the Coinbase price of bitcoin rose from \btPriceStart{} to
+\btPriceEnd{} US dollars, a compound return of \btGeo\% a year. Its monthly returns had an annualised
+volatility of \btVol\%, a worst month of \btWorst\% and a best of \btBest\%, with skewness \btSkew{} and
+excess kurtosis \btKurt. On daily prices its worst fall from a peak was \btMddDaily\%, and its longest
+spell below a previous peak lasted \btUnderYears{} years. Ether, from \ceFirst{} (\ceMonths{} months),
+compounded at \ceGeo\% a year with a volatility of \ceVol\%, a worst month of \ceWorst\%, a best of
+\ceBest\% and an excess kurtosis of \ceKurt; its worst fall was \ceMddDaily\% and its longest spell
+under water \ceUnderYears{} years. The two had a monthly correlation of \btCorrEth{}
+(\cref{fig9:crypto}, panel (a)).
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig09_crypto}
+  \caption{(a) Drawdowns of bitcoin and ether from their previous peaks, daily Coinbase prices,
+  December 2014 (ether May 2016) to September 2026. (b) Correlation of monthly bitcoin returns with US
+  equity excess returns over trailing 24 month windows, to \tfLast.}
+  \label{fig9:crypto}
+\end{figure}
+
+
+\paragraph{What the record cannot say}
+The average monthly return of bitcoin, annualised, was \btArith\% with a standard error of \btMeanSe\%.
+The interval is wide, but the larger problem is that bitcoin is studied because it survived and grew.
+At the start of the sample it was one of many tokens, and many of the others have since lost most of
+their value or stopped trading; choosing the one that did best after the fact adds winner selection to
+the survivorship bias of \cref{sec9:biases}, its strongest form. \Cref{exr9:ten} puts a number on it: among twenty tokens with no expected return and a
+volatility of 100\% a year, the best ten year average is expected to be about \exJBest\% a year. A record
+like bitcoin's says that the asset was very volatile and that its holders were rewarded after the
+fact; it says little about the expected return of the next decade. \textcite{liu2021} find that
+cryptocurrency returns are explained by factors specific to the market, momentum among them, and not by
+exposures to stocks, currencies or commodities, in a sample that ends before the period of higher
+correlation below.
+
+\paragraph{Correlation}
+From 2015 to 2019 the monthly correlation of bitcoin with US equity excess returns was \btCorrEarly. From
+2020 to \tfLast{} it was \btCorrLate, with a beta of \btBetaLate{} on the equity market
+(\cref{fig9:crypto}, panel (b)). Over the second period bitcoin had a large positive exposure to equities,
+which cut its value as a diversifier, though its large risk unrelated to equities kept it far from a
+leveraged equity position, and an allocator who relied on the early correlation would have
+underestimated its contribution to portfolio risk.
+
+\paragraph{Has the correlation changed?}
+A change in correlation estimated from a few years of monthly data needs a test. The usual one uses
+Fisher's transformation $z(\hat\varrho)=\operatorname{artanh}\hat\varrho=\tfrac12\log\bigl((1+\hat\varrho)/(1-\hat\varrho)\bigr)$.
+
+\begin{proposition}[A test for a change in correlation]\label{prop9:fisher}
+Let $\hat\varrho_n$ be the sample correlation of $n$ independent draws from a bivariate normal law with
+correlation $\varrho\in(-1,1)$. Then $\sqrt n\bigl(\operatorname{artanh}\hat\varrho_n-\operatorname{artanh}\varrho\bigr)$ converges
+in law to $\N(0,1)$. For two independent samples of sizes $n_1$ and $n_2$ with the same correlation,
+\begin{equation}\label{eq9:fisher}
+  Z=\frac{\operatorname{artanh}\hat\varrho_2-\operatorname{artanh}\hat\varrho_1}{\sqrt{1/(n_1-3)+1/(n_2-3)}}
+\end{equation}
+is therefore approximately standard normal.
+\end{proposition}
+
+\begin{proof}
+For bivariate normal data $\sqrt n(\hat\varrho_n-\varrho)$ converges in law to $\N\bigl(0,(1-\varrho^2)^2\bigr)$, a standard
+consequence of the central limit theorem for the sample moments. The derivative of $\operatorname{artanh}$ is
+$1/(1-\varrho^2)$, so by the delta method the transformed estimate has asymptotic variance $1/n$, whatever
+$\varrho$ is. The two estimates are independent, so their difference has variance close to $1/n_1+1/n_2$;
+Fisher's refinement $1/(n-3)$ improves the approximation in small samples and has the same limit.
+\end{proof}
+
+With \ocNEarly{} months from 2015 to 2019 and \ocNLate{} from 2020 to \tfLast, \cref{eq9:fisher} gives $Z=\ocFisherZ$
+and a two-sided $p$-value of \ocFisherP. The 95\% interval for the correlation is \ocEarlyLo{} to \ocEarlyHi{}
+in the first period and \ocLateLo{} to \ocLateHi{} in the second. The rise is larger than sampling error
+would explain on the test's terms, but the $p$-value is nominal: it assumes independent, bivariate
+normal months and a break date fixed in advance, and it ignores how much bitcoin's own volatility
+changed over the sample (next paragraph). A test chosen after looking at a chart also overstates its own significance,
+since the break date was picked where the change looked largest.
+
+The volatility has moved too. On daily prices, annualised, bitcoin's volatility within a calendar year
+fell nearly threefold over the sample, from \btVolFirstYear\% in \btVolFirstYearName{} to \btVolLastYear\% in
+\btVolLastYearName{}~(\cref{fig9:onchain}, panel (b)). Against US equities in the same year it
+ranged from \ocRatioMin{} to \ocRatioMax{} times, and from 2022 to 2025 from \ocRatioRecentMin{} to
+\ocRatioRecentMax{} times, the \ocRatioRecentMax{} in \ocRatioRecentMaxYear. A risk budget set
+on one year's estimate could have been wrong by close to a factor of two a year later, as from 2016
+to 2017.
+
+
+\paragraph{How much risk a small position carries}
+The \emph{risk contribution} of a holding is its weight times the covariance of its return with the
+portfolio's, and the risk contributions add up to the portfolio's variance (Chapter~7). For a sleeve of
+weight $w$ in a portfolio otherwise invested in $P$, the share of risk has a closed form.
+
+\begin{proposition}[Weight for a given risk share]\label{prop9:share}
+Let a portfolio hold $1-w$ in $P$ and $w$ in $B$, with $\Var P=a>0$, $\Var B=b>0$, $\Cov(P,B)=c$ and
+$c^2<ab$. The share of the portfolio's variance due to $B$ is
+\begin{equation}\label{eq9:share}
+  s(w) = \frac{w^2b+w(1-w)c}{(1-w)^2a+2w(1-w)c+w^2b}.
+\end{equation}
+For each $s\in(0,1)$ there is exactly one $w\in(0,1)$ with $s(w)=s$, namely $w=u/(1+u)$ with $u$ the
+positive root of $(1-s)b\,u^2+(1-2s)c\,u-s\,a=0$. If $c\ge0$, $s(w)$ increases with $w$.
+\end{proposition}
+
+\begin{proof}
+The contribution of $B$ is $w\Cov(B,(1-w)P+wB)=w^2b+w(1-w)c$, and the denominator of \cref{eq9:share} is
+the portfolio variance, positive since $c^2<ab$. Put $u=w/(1-w)$, a bijection from $(0,1)$ to
+$(0,\infty)$, and divide numerator and denominator by $(1-w)^2$: $s=(u^2b+uc)/(a+2uc+u^2b)$. Clearing the
+denominator gives the quadratic, whose leading coefficient $(1-s)b$ is positive and whose constant
+$-sa$ is negative, so it has exactly one positive root. The derivative of $(u^2b+uc)/(a+2uc+u^2b)$ in $u$
+has the sign of $2uab+ac+u^2bc$, which is positive when $c\ge0$.
+\end{proof}
+
+Over January 2015 to \tfLast{} a 60/40 portfolio of US equities and the US 10 year bond had a volatility
+of \btVolSixty\%, and its correlation with bitcoin's excess return was \btCovSign. A weight of 1\% in
+bitcoin would have carried \btShareOne\% of the portfolio's risk, 2\% would have carried \btShareTwo\% and 5\%
+would have carried \btShareFive\%. By \cref{prop9:share}, bitcoin carries a tenth of the risk at a weight of
+\btWTen\%, a quarter at \btWQuarter\% and half at \btWHalf\%. These are estimates from one volatile decade,
+and they move with the estimates. \Cref{fig9:riskshare} redraws the risk share with each half of the
+period on its own. Over 2015 to 2019 the correlation was \rsCorrEarly, and a tenth of the risk came at a
+weight of \rsWTenEarly\% and half at \rsWHalfEarly\%; from 2020 the correlation was \rsCorrLate, and the
+same shares needed \rsWTenLate\% and \rsWHalfLate\%. Above a weight of \rsCross\% the later estimates
+give bitcoin the smaller share despite the higher correlation, because bitcoin's volatility fell from
+\rsVolBtcEarly\% to \rsVolBtcLate\% a year while that of the 60/40 portfolio rose from
+\rsVolSixtyEarly\% to \rsVolSixtyLate\%. A risk budget set on one period's estimates can be off by a
+factor of two in the weight.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.74\textwidth]{ch09/fig19_riskshare}
+  \caption{Bitcoin's share of the variance of a 60/40 portfolio against its weight, by \cref{prop9:share},
+  with the variances and covariance estimated over the whole period and over each half. The dotted lines
+  mark shares of 10\%, 25\% and 50\%.}
+  \label{fig9:riskshare}
+\end{figure}
+
+
+\FloatBarrier
+% =====================================================================================
+\section{Case study: a trend fund and a bitcoin sleeve in a 60/40 portfolio}
+\label{sec9:case}
+
+The case study asks what the two additions of this chapter did to a portfolio that holds 60\% in US
+equities and 40\% in the US 10 year bond, rebalanced monthly. The first addition is the trend programme
+of \cref{sec9:programme} after the 2 and 20 fee, held as a fund at 10\% of the portfolio, from
+\tfFirst{} to \tfLast. The second is a bitcoin position of 2\% or 5\%, from \btFirst, the first month
+with a return from the Coinbase series, which starts on \btSeriesStart, to \tfLast. Each addition is funded pro rata from the 60/40 holdings. Both
+are frictionless backtests at month-end prices, and the trend fund is a constructed programme, so the
+results describe what these rules and weights would have done, not what an investor in any actual fund
+received. \Cref{tab9:case} gives the results, and \cref{fig9:case} the trend case.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch09/fig10_case}
+  \caption{(a) Growth of one unit in the 60/40 portfolio and in the portfolio with 10\% in the trend
+  fund after fees, \tfFirst{} to \tfLast, log scale. (b) Their drawdowns.}
+  \label{fig9:case}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Annual excess return over bills, volatility, Sharpe ratio, worst drawdown and worst month of
+  the 60/40 portfolio and of the portfolios with each addition, all from monthly excess returns over
+  bills; drawdowns compound them. Returns are in percent, a year for the mean. The change in the
+  Sharpe ratio against the 60/40 portfolio of the same period is followed by a 95\% circular block
+  bootstrap interval, blocks of \csBlock{} months and \csReps{} samples; changes are computed before
+  rounding.}
+  \label{tab9:case}
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{tabular}{@{}lrrrrrl@{}}
+    \toprule
+    & Excess & Volatility & Sharpe & Drawdown & Worst month & Change in Sharpe\\
+    \midrule
+    \multicolumn{7}{@{}l}{\tfFirst{} to \tfLast}\\
+    60/40 & \csAMean & \csAVol & \csASR & \csAMdd & \csAWorst & \\
+    with 10\% trend fund, net & \csBMean & \csBVol & \csBSR & \csBMdd & \csBWorst & \csDiffTab{} [\csDiffLo, \csDiffHi]\\
+    with 10\% trend, before fees & \csGMean & \csGVol & \csGSR & \csGMdd & \csGWorst & \csDiffG{} [\csDiffGLo, \csDiffGHi]\\
+    \addlinespace
+    \multicolumn{7}{@{}l}{\btFirst{} to \tfLast}\\
+    60/40 & \ccAMean & \ccAVol & \ccASR & \ccAMdd & \ccAWorst & \\
+    with 2\% bitcoin & \ccTwoMean & \ccTwoVol & \ccTwoSR & \ccTwoMdd & \ccTwoWorst & \ccTwoDiff{} [\ccTwoLo, \ccTwoHi]\\
+    with 5\% bitcoin & \ccFiveMean & \ccFiveVol & \ccFiveSR & \ccFiveMdd & \ccFiveWorst & \ccFiveDiff{} [\ccFiveLo, \ccFiveHi]\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\paragraph{The trend fund}
+The trend fund's correlation with the 60/40 portfolio was \csCorrAT. Adding it at 10\% lowered the
+volatility from \csAVol\% to \csBVol\%, the worst drawdown from \csAMdd\% to \csBMdd\% and the worst month from
+\csAWorst\% to \csBWorst\%. From November 2007 to February 2009 the portfolio with the fund lost \csBGfcAbs\%
+against \csAGfcAbs\%, and in 2022 \csBTwoAbs\% against \csATwoAbs\%, both in total return, as in \cref{sec9:programme}, while
+the drawdowns above are of excess returns. The cost was in the return: \csBMean\% a year
+over bills against \csAMean\%, because the fund's net return was low. The Sharpe ratio rose by
+\csDiff, from \csASR{} to \csBSR, and the bootstrap interval for the change, from \csDiffLo{} to
+\csDiffHi, includes zero; in \csDiffP\% of the bootstrap samples the change was zero or negative. Before
+fees the same allocation would have raised the Sharpe ratio to \csGSR. The trend fund bought a
+smaller drawdown in the two worst episodes for this portfolio, and the fee took most of what it would
+otherwise have added to the return.
+\Cref{fig9:wealthgap} shows when the fund paid. The log wealth of the portfolio with the fund gained
+\cwGfc{} points on 60/40 from the end of October 2007 to the end of February 2009, reaching a lead of
+\cwPeak{} points in \cwPeakWhen, then gave back almost \cwFromPeakUp{} points to end \cwEndAbs{} points behind.
+Before fees it would have ended \cwEndGrossAbs{} points behind, so the fee accounts for \cwFeeWedge{}
+points. The Sharpe ratio still rose, because the volatility fell proportionally more than the return.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.86\textwidth]{ch09/fig20_wealthgap}
+  \caption{Log wealth of the 60/40 portfolio with 10\% in the trend fund less that of 60/40, in percentage
+  points, net of the 2 and 20 fee and before fees, \tfFirst{} to \tfLast.}
+  \label{fig9:wealthgap}
+\end{figure}
+
+
+\paragraph{The bitcoin sleeve}
+From January 2015 the 60/40 portfolio earned \ccAMean\% a year over bills with a Sharpe ratio of \ccASR.
+With 2\% in bitcoin the figures are \ccTwoMean\% and \ccTwoSR, and with 5\% they are \ccFiveMean\% and
+\ccFiveSR, with worst drawdowns of \ccTwoMdd\% and \ccFiveMdd\% against \ccAMdd\%. Both bootstrap intervals
+for the change in the Sharpe ratio lie above zero. In 2022, when bitcoin fell \ccBtcTwoAbs\%, the portfolio
+with 2\% lost \ccTwoTwoAbs\% against \ccATwoAbs\% without it. That gain cannot be taken at face value. The bootstrap resamples months of the one asset that, among many candidates, rose from
+\btPriceStart{} to \btPriceEnd{} dollars, so it measures the sampling error of this history and not the
+selection that chose it, nor the choice of model, and \cref{exr9:ten} shows how large that selection can be. A more defensible
+reading is the risk budget of \cref{prop9:share}: at 2\% bitcoin carried about \btShareTwo\% of the
+portfolio's risk, an amount an investor can decide to accept or not without a forecast of its return.
+
+\begin{figure}[!tbp]
+  \centering
+  \includegraphics[width=0.66\textwidth]{ch09/fig21_selection}
+  \caption{Change in the Sharpe ratio of 60/40 from adding at 2\% the best ex post of \sxTokens{}
+  simulated tokens with no expected excess return, in \sxReps{} simulations, January 2015 to \tfLast.
+  The red line is the change from bitcoin, \sxActualFine{} before rounding.}
+  \label{fig9:selection}
+\end{figure}
+
+\Cref{fig9:selection} puts selection in the units of the table. Draw \sxTokens{} tokens with bitcoin's
+volatility and correlation with 60/40 but no expected excess return, conditional on the actual 60/40
+months, add the best of them ex post at 2\%, and repeat \sxReps{} times. The best of twenty raises the
+Sharpe ratio by \sxMedian{} in the median simulation and by \sxQ{} at the 95th percentile, and a gain as
+large as bitcoin's \ccTwoDiff{} came up in \sxCount{} of the \sxReps{} simulations. In this particular
+zero-mean Gaussian experiment, selection among twenty candidates rarely generates a gain as large as
+bitcoin's; the result does not establish how much selection contributed in the actual, larger and
+non-Gaussian cryptocurrency universe. From a separate run of \sxSingle{} single tokens, it would take
+about \sxNeeded{} candidates for the median best to match it. Whether that is many depends on how many
+candidates an investor in 2015 would really have weighed, which no backtest can say.
+
+
+
+\FloatBarrier
+% =====================================================================================
+\section{Limitations}
+\label{sec9:limits}
+
+The trend programme is a sketch of a professional one. It trades seven markets where commercial
+programmes trade many more, builds bond returns from the 10 year yield alone, without the roll-down
+of \cref{sec9:carry}, omits the carry of currencies and the roll of oil, and pays a flat cost per unit
+traded. Its signal and its risk target were chosen in line
+with the published literature, which saw some of the same data, so even the gross record is not free of
+hindsight.
+
+The database and replication sections use simulated funds. The simulation shows how biases and
+clone errors arise and how large they can be under stated rules; real databases have their own rules
+for entry and exit, and the size of each bias there has to be measured from the database itself. The
+fund of funds example assumes normal gains and a single year; over several years, with high-water
+marks, each fund's fee also depends on its own path, as \cref{prop9:hwm} shows. The closure model has
+one loss limit for every fund and no skill, and the fee values assume that the fund's volatility is
+constant and known. The carry results rest on one currency pair and one bond market.
+
+The digital asset record is short, comes from one exchange's prices, and covers an asset chosen after
+the fact. The protocol arithmetic describes the rules as written in the reference software and
+assumes an attacker's share is fixed. The correlations, the volatility and therefore the risk shares are estimates from a decade in
+which the market's structure changed, and the next decade's figures may differ.
+
+\FloatBarrier
+% =====================================================================================
+\section{Summary}
+\label{sec9:summary}
+
+\begin{itemize}
+  \item Hedge fund strategies are best described by the risk they carry and the shape of their payoff.
+        Many sell insurance against crashes or illiquidity; trend followers buy convexity.
+  \item A trend rule on a martingale earns nothing before costs. What it earns splits into a reward
+        for the drift and a timing part, and the linear trend rule has an exact payoff identity, one half of
+        the squared total move less one half of the realised sum of squared returns, which gives it
+        straddle-like convexity without making it a purchased straddle; the sign rules used in practice share its convexity only
+        approximately.
+  \item A seven market programme from 2001 earned a Sharpe ratio of \tfSR{} before fees, with a
+        negative correlation to equities and gains in the long equity falls of 2008 and 2022. A 2 and
+        20 fee cut the ratio to \tfSRnet.
+  \item The Sharpe ratio of an equal mix of $n$ strategies with common correlation $\varrho$ is that
+        of one strategy times $\sqrt{n/(1+(n-1)\varrho)}$.
+  \item The simple return of a futures position is the carry plus the spot return times one plus the
+        carry; in logs, under the cost of carry, it is the spot return plus carry. Carry was small beside
+        the monthly risk of the Canadian dollar and the Canada 10 year bond. Over twenty five years carry
+        alone gave about \gcCarryShare\% of the bond's excess return, and carry and roll-down \gcExpShare\%.
+  \item Survivorship and backfill biases have closed forms under normal returns, and simple reporting
+        rules produce biases of the order of a percent a year. Closure at a loss limit gives a bias
+        that grows with the horizon, with a closed form from the reflection principle.
+  \item A regression splits a fund's mean return exactly into alpha and factor parts, but the split
+        depends on the factors chosen.
+  \item A regression clone pays $1+k/(T-k-1)$ in squared error out of sample, and under a symmetric
+        distribution the least squares slope of a payoff that is even in the move is zero, so no static
+        linear clone can reproduce it.
+  \item Incentive fees summed over any horizon, without discounting, are $f/(1-f)$ times the rise in the
+        high-water mark. One year's fee is valued as a call on the fund's assets under the pricing
+        measure, worth about $fs\sqrt T/\sqrt{2\pi}$ with a hurdle at the bill rate,
+        and a high-water mark cuts the value of ten years of fees by about a third at a volatility of
+        15\%.
+  \item Incentive fees charged fund by fund exceed fees on the pooled gain, by more as the pool grows.
+  \item Bitcoin's supply is fixed in advance below 21 million coins, and with fixed shares of computing power
+        the chance that an attacker $z$ blocks behind catches up falls geometrically in $z$. Its record is volatile, short and selected. Its correlation with
+        equities rose after 2019 by more than sampling error would explain on the nominal Fisher test,
+        though the break date was chosen after the fact, and a 2\% position carried about
+        \btShareTwo\% of a 60/40 portfolio's risk.
+\end{itemize}
+
+\FloatBarrier
+% =====================================================================================
+\section{Exercises}
+\label{sec9:exercises}
+
+\begin{enumerate}[label=\textbf{9.\arabic*}, leftmargin=*, ref=9.\arabic*]
+  \item\label{exr9:one} A market returns 2\%, $-1$\%, 3\%, $-2$\% and 4\% in five periods. Compute the profit of
+  the linear trend rule of \cref{prop9:straddle} period by period, and check it against
+  \cref{eq9:straddle}.
+  \item\label{exr9:two} The correlation between a market's past year return and its next month return
+  is 0.05, and its monthly volatility is 4\%. Under the assumptions of \cref{prop9:sign}, what does the
+  sign rule earn per month, and what is its annual Sharpe ratio?
+  \item\label{exr9:three} Twenty trend sleeves each have a Sharpe ratio of 0.2 and pairwise correlation
+  0.1. Find the Sharpe ratio of their equal mix and its limit as the number of sleeves grows.
+  \item\label{exr9:four} Funds have independent normal monthly returns with mean 0.5\% and volatility 4\%.
+  A database keeps only funds whose two year average return is positive. What share survives, and by
+  how much does the survivors' average overstate the true mean, in percent a year?
+  \item\label{exr9:five} Funds with monthly returns of mean 0.5\% and volatility 3\% join a database after
+  a twelve month incubation with a positive average, bringing that history, and then report for four
+  years. Find the mean of the incubation months and the bias of the full record, in percent a year.
+  \item\label{exr9:six} A clone on ten factors is fitted to 36 months. By \cref{prop9:clone}, by what factor
+  does its expected squared error out of sample exceed the irreducible variance? How long must the
+  window be for the excess to fall to 10\%?
+  \item\label{exr9:seven} A fund of funds holds two funds in equal amounts. In one year the first gains 30\%
+  and the second loses 10\%, before fees, and each charges 20\% of its gain. What incentive fee does the
+  fund of funds pay, as a share of its assets, what would it pay on the pooled gain, and what share of
+  the pooled gain does it pay in fact?
+  \item\label{exr9:eight} A portfolio has a volatility of 10\%. An asset with a volatility of 75\% has a
+  correlation of 0.3 with it. At what weight does the asset carry a quarter of the risk of the
+  combination, and what share does it carry at a weight of 3\%?
+  \item\label{exr9:nine} A trend fund earns 9\% before fees in a year when bills pay 3\%. It charges 2\% of
+  its starting assets and then 20\% of the remaining gain, with no hurdle and a high-water mark at the
+  starting value. Find the
+  investor's return and excess return, and the share of the gross excess return the investor keeps.
+  \item\label{exr9:ten} Twenty tokens have independent normal returns with no expected return and a
+  volatility of 100\% a year, independent from year to year. Ignore delisting and any selection before
+  the end of the ten years. After ten years an analyst studies the one with the highest average
+  return. What is its expected annual average? Use $\E\max(Z_1,\dots,Z_{20})$ for twenty independent
+  standard normals, computed numerically.
+  \item\label{exr9:eleven} A fund with a high-water mark charges 20\% of gains at the end of each year and
+  has gross returns of 25\%, $-20$\% and 30\% in three years. Find the fee each year and the total, check
+  the total against \cref{eq9:hwm}, and compare it with the fees charged on each year's gain.
+  \item\label{exr9:twelve} With $f=20\%$ and $h=5\%$, find the incentive fee with no hurdle, a hard hurdle and a soft
+  hurdle with full catch-up when the gross return is 10\%, and again when it is 6\%. Where does the
+  catch-up end?
+  \item\label{exr9:thirteen} Over one year a Canadian bill pays 3\% and a US bill 4.5\%, and the price of a US dollar falls
+  from 1.35 to 1.33 Canadian dollars. Split the US dollar excess return of Canadian bills funded at the
+  US rate into its spot, carry and cross parts, using \cref{eq9:fxcarry} with the annual rates as
+  simple rates for the year in place of $i/12$.
+  \item\label{exr9:fourteen} An attacker controls 20\% of the computing power and the honest chain is six blocks
+  ahead. Find the probability of \cref{prop9:ruin} that the attacker ever draws level, and explain why
+  Nakamoto's figure, \exNNak, is larger.
+\end{enumerate}
+
+\subsection*{Answers}
+\begin{enumerate}[label=\textbf{9.\arabic*}, leftmargin=*]
+  \item The cumulative moves before each period are 0, 2, 1, 4 and 2\%, so the profits are $0$, $-2$, $3$,
+  $-8$ and $8$ in units of $10^{-4}$, a total of \exAPnl. The total move is \exAS\% and the sum of squared
+  returns is \exAQ{} in the same units, so \cref{eq9:straddle} gives $(36-34)/2=\exAPnl$.
+  \item $\sqrt{2/\pi}\times0.05\times4\%=\exBMonth\%$ a month. The position is one unit long or short, so the
+  monthly volatility is 4\% and the annual Sharpe ratio is $\sqrt{12}\times0.16/4=\exBSR$.
+  \item $0.2\sqrt{20/(1+19\times0.1)}=\exCSR$, and the limit is $0.2/\sqrt{0.1}=\exCLim$.
+  \item The two year average has standard deviation $4\%/\sqrt{24}$, so $a=-0.5\sqrt{24}/4$ and
+  $1-\Phi(a)=\exDShare\%$ survive. By \cref{eq9:survivor} the survivors average \exDMean\% a year against the
+  true 6\%, a bias of \exDBias\%.
+  \item By \cref{eq9:survivor} with $T=12$ the incubation months average \exEInc\% a year. By
+  \cref{eq9:backfill} with $K=12$ and $M=48$ the full record overstates the mean by \exEBias\% a year.
+  \item $1+10/25=\exFInf$. The excess $k/(T-k-1)$ is 0.1 when $T-11=100$, so $T=\exFT$ months.
+  \item The first fund pays 20\% of 30\% on half the assets, \exGFee\% in all; the second pays nothing.
+  On the pooled gain of 10\% the fee would be \exGNet\%. The fund of funds pays $3/10=\exGRate\%$ of its gain.
+  \item With $a=0.01$, $b=0.5625$ and $c=0.3\times0.1\times0.75$, \cref{prop9:share} with $s=0.25$ gives a weight
+  of \exHWx\%, about \exHW\%, and \cref{eq9:share} at $w=0.03$ gives a share of \exHSharex\%, about \exHShare\%.
+  \item After the management fee of 2\% of the starting assets the gain is 7\%, and the incentive fee,
+  with no hurdle and the high-water mark at the starting value, takes a fifth of it, leaving \exINet\%.
+  The excess return is \exINetEx\%, \exIRatio\% of the gross excess return of 6\%.
+  \item The ten year average of each token is normal with mean zero and standard deviation
+  $100\%/\sqrt{10}$. $\E\max$ of twenty standard normals is \exJMax, so the best token's expected average
+  is $\exJMax\times100/\sqrt{10}=\exJBest\%$ a year, though none of the twenty has any expected return.
+  \item In the first year the value before the fee is 1.25, the fee \exKOne\% and the value 1.20, the new
+  high-water mark. The second year ends at 0.96 with no fee. The third ends at 1.248 before the fee, which
+  is \exKThree\% on the gain above 1.20. The sum of the three fees, undiscounted and as a share of the starting value, is \exKTot\%, and $0.2/0.8$ times the rise of the high-water
+  mark, \exKRise\%, is the same. Charged on each year's gain the third year's fee is \exKResetThree\% and the total
+  \exKReset\%.
+  \item At 10\%: \exLNTen\%, \exLHTen\% and \exLSTen\%, since the catch-up has ended. At 6\%: \exLNSix\%, \exLHSix\% and
+  \exLSSix\%, the whole return above the hurdle. The catch-up ends at $5/0.8=6.25\%$.
+  \item The spot part is $1.35/1.33-1=\exMSpot\%$, the carry $3-4.5=\exMCarry\%$ and the cross term
+  $0.03\times\exMSpot\%=\exMCross\%$, a total of \exMEx\%: the fall in the US dollar paid for the lower
+  Canadian rate, with a little to spare.
+  \item $(0.2/0.8)^6=\exNRuin$. The ruin probability assumes the attacker starts exactly six blocks behind.
+  While the honest chain found its six blocks the attacker was mining too, and on average found
+  $6\times0.25=1.5$ of its own, so it is usually fewer than six behind; averaging over that number raises the
+  probability.
+\end{enumerate}
+
+\FloatBarrier
+% =====================================================================================
+\section{Notes, sources and credits}
+\label{sec9:credits}
+
+\paragraph{Sources}
+Time series momentum is from \textcite{moskowitz2012}, and the century of evidence is in
+\textcite{hurst2017}. The option-like returns of trend followers are from \textcite{fung2001}, those of
+merger arbitrage from \textcite{mitchell2001} and those of hedge fund indices from
+\textcite{agarwal2004}; the hidden market exposure of stale prices is from \textcite{asness2001}, with the
+smoothing model of \textcite{getmansky2004}. The database biases were documented by
+\textcite{brown1992} for mutual funds and by \textcite{fung2000}, \textcite{liang2000},
+\textcite{ackermann1999} and \textcite{aiken2013} for hedge funds; the competition and survival of
+hedge funds and commodity trading advisers are studied by \textcite{brown2001}. The reflection
+principle behind \cref{prop9:closure} is in \textcite{shreve2004}, and the continuity correction for
+monthly monitoring is from \textcite{broadie1997}. Carry across asset classes is from
+\textcite{koijen2018}, roll returns in commodity futures from \textcite{erb2006}, and the deviations from
+covered interest parity from \textcite{du2018}. Linear replication is
+from \textcite{hasanhodzic2007}, and the mean of the inverse Wishart matrix used in \cref{prop9:clone}
+is in \textcite{muirhead1982}. The fees of funds with high-water marks are valued as claims on the
+fund by \textcite{goetzmann2003}, and the fees of funds of funds are analysed by \textcite{brown2003}.
+Bitcoin was proposed by \textcite{nakamoto2008}, whose Section 11 gives the attacker calculation
+reproduced in \cref{sec9:crypto}; the subsidy schedule and the supply limit are those of the reference
+software, Bitcoin Core \parencite{bitcoincore}. The factor structure of cryptocurrency returns is
+from \textcite{liu2021}. The sign rule, straddle identity, survivor, backfill and closure formulas, the hurdle formulas, the
+high-water mark identity, the netting inequality, the supply limit and the risk share weight are short
+derivations given here for completeness.
+
+\paragraph{Software used}
+The scripts call NumPy \parencite{numpy} for arrays and random numbers, SciPy \parencite{scipy}
+for the normal law and numerical integration, pandas \parencite{pandas} to read and sample the daily
+files, and Matplotlib \parencite{matplotlib} for the figures. The cross-checks run in R
+\parencite{rcore} and GNU Octave \parencite{octave}. \texttt{code/requirements-lock.txt} records the full
+environment.
+
+\paragraph{Projects for comparison}
+The QuantStats package \parencite{quantstats} computes the Sharpe ratios, drawdowns and annual returns
+of \cref{sec9:programme,sec9:case} from a return series and is a useful check on the code here. The full
+list, with links, is in \texttt{CREDITS.md}.
+
+\paragraph{Data}
+US equity excess returns and the bill rate are from the data library of \textcite{frenchlib}, in the
+release built from the CRSP database of August 2026 and retrieved on 19 October 2026; these files are
+not redistributed, and \texttt{scripts/build\_french.py --download} rebuilds them. The US 10 year
+yield, the WTI price and the exchange rates are FRED series \parencite{fredch9}, and the Canadian yields
+are from the Bank of Canada \parencite{bocvalet}; \texttt{scripts/pull\_fred.py} downloads the FRED
+series and cuts them at 30 September 2026. The bitcoin and ether prices are Coinbase series published on
+FRED \parencite{coinbasefred} (\texttt{CBBTCUSD} and \texttt{CBETHUSD}); they are not redistributed with
+the code, and the same script rebuilds them. The bitcoin series starts on \btSeriesStart{} and has gaps in its first weeks and no values from the day after \btStartDay{} until \btNextDay, so
+its December 2014 price is that of \btStartDay; every month is sampled at its last
+available daily value. The FRED market series are \texttt{DGS10}, \texttt{DCOILWTICO}, \texttt{DEXUSEU},
+\texttt{DEXJPUS} and \texttt{DEXCAUS}, and the Bank of Canada series are \texttt{BD.CDN.10YR.DQ.YLD},
+\texttt{BD.CDN.7YR.DQ.YLD} and \texttt{TB.CDN.90D.MID}. The carry section uses the Chapter 5 file of the USD/CAD rate and the Canadian and US one month
+bill yields, built from Bank of Canada series and the FRED series \texttt{DGS1MO}, through September 2026,
+and the 7 and 10 year Canadian benchmark yields. The yearly equity volatility of \cref{fig9:onchain} uses
+the daily market return of the French library. The funds of
+\cref{sec9:biases,sec9:replication,sec9:fees,sec9:fof}, the oil curve and the exercise inputs are
+illustrations.
+
+\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
+\end{refsection}

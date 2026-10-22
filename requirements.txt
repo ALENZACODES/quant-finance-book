@@ -1,3 +1,4 @@
+arch==8.0.0
 cycler==0.12.1
 matplotlib==3.11.2
 numpy-financial==1.1.0
@@ -6,5 +7,6 @@ pandas==3.0.6
 pikepdf==10.17.0
 pytest==9.1.1
 pyxirr==0.10.8
+scikit-learn==1.9.1
 scipy==1.18.1
 statsmodels==0.15.0

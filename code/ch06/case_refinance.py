@@ -106,8 +106,10 @@ def main():
     save(fig, "fig11_refinance")
     fig, ax = plt.subplots(figsize=(5.8, 3.0))
     k = np.arange(LOANS + 1)
-    ax.bar(k[:71], emp[:71], width=0.85, color=PALE, edgecolor=SKY, lw=0.4, label=f"simulation, {scen:,} scenarios")
-    ax.plot(k[:71], pmf[:71], color=RED, lw=1.2, label=r"one-factor formula, $\rho=%.3f$" % (SIG_M ** 2 / SIG ** 2))
+    ax.bar(k, emp, width=0.85, color=PALE, edgecolor=SKY, lw=0.4, label=f"simulation, {scen:,} scenarios")
+    pct("csAboveSeventy", pmf[71:].sum(), 1)   # the mass the earlier cut at 70 hid; every count is drawn now
+    ax.plot(k, pmf, color=RED, lw=1.2, label=r"one-factor formula, $\rho=%.3f$" % (SIG_M ** 2 / SIG ** 2))
+    ax.set_xlim(-1, LOANS + 1)
     ax.set_xlabel(f"loans out of {LOANS} that cannot refinance"); ax.set_ylabel("probability")
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=7.5)   # above the axes, clear of the bars
     save(fig, "fig12_pool")

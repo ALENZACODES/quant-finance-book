@@ -1,0 +1,1325 @@
+% Chapter 11. All quoted numbers come from chapters/ch11-numbers.tex, written by code/ch11/run_all.py.
+\input{chapters/ch11-numbers}
+\raggedbottom % this chapter only: short pages stay short; \flushbottom is restored at the end
+\begin{refsection}
+\setcounter{chapter}{10}
+\chapter{Private Equity and Business Valuation}
+\label{ch:pe}
+
+A buyout fund raises money from pension plans, endowments and insurers, buys companies with that money
+and with debt the companies themselves take on, runs them for a few years and sells them. Three questions follow,
+and this chapter takes them in turn. How is the cash that comes back split between the investors and
+the managers? How should an investor read the numbers a fund reports while it is still alive, and how
+should it compare them with what the stock market would have paid? And what is a private company worth,
+on the day the fund buys it, on the day it sells it, and on every reporting date between?
+
+Chapters 1 and 2 have already done part of the work. Chapter~1 defined the IRR, the modified IRR, the
+multiples DPI and TVPI, the Kaplan and Schoar public market equivalent and the J-curve of a single
+fund. Chapter~2 took the fee contract apart: the management fee, the hurdle balance, the size of the
+catch-up, carry as an option on a single exit, deal by deal carry and the clawback, and the
+Takahashi and Alexander model of a fund's cash flows. This chapter builds on those results without
+repeating them. It follows the waterfall of a whole fund through time, measures what deal by deal
+carry is worth to the managers, puts a population of simulated funds and the \cvFunds{} partnerships in the
+private equity portfolio of the California Public Employees' Retirement System (CalPERS) through the
+performance measures, works out when debt raises a buyout's return, and then values a company: free
+cash flow, the cost of capital, the terminal value, the market multiple, and the discounts that apply
+to a stake that neither controls the company nor can be sold.
+
+\begin{keybox}[How to read this chapter]
+The numbers in the text are computed by six scripts in \texttt{code/ch11/} (\texttt{waterfall},
+\texttt{performance}, \texttt{lbo}, \texttt{valuation}, \texttt{discounts} and \texttt{exercises}), and
+the tests in \texttt{code/ch11/test\_*.py} check the library against simulation, finite differences and
+identities that must hold exactly. An independent R script recomputes the waterfall tier by tier, the
+IRRs with \texttt{uniroot}, the PME and direct alpha of the listing in \cref{sec11:perf}, the CalPERS
+multiples and implied durations from the raw columns, the buyout model with its own loop, the cost of
+capital and the DCF, and the two discounts by numerical integration. GNU Octave recomputes the
+leverage proposition, the value driver, the Miles and Ezzell cost of capital and the adjusted present
+value by its own recursion, the lookback value by quadrature of the law of the maximum, and the
+exercise answers.
+
+The CalPERS fund list is the Private Equity Program Fund Performance Review as of 31 March 2026
+\parencite{calpers2026}. Industry multiples, betas, costs of capital and returns on capital for 96 US
+industries, and the implied equity risk premium from 1961 to 2025 (the file starts in 1960 with a Treasury
+yield and no premium), are from the data sets of
+Aswath Damodaran \parencite{damodaran2026}. The ten year Treasury yield is the September 2026 monthly
+average from FRED \parencite{fredch11}. Neither the CalPERS nor the Damodaran files are redistributed
+with the code; \texttt{scripts/pull\_ch11.py} downloads and rebuilds them. The fund, the deals, the
+company and the exercise inputs are illustrations and are labelled as such where they appear.
+
+Random draws come from NumPy's default generator with base seed \texttt{5279} and a stream number fixed
+in each script. The seed is arbitrary; fixing it makes every run repeatable.
+
+Notation. $C_t$ and $D_t$ are a fund's contributions and distributions at time $t$, $h$ the hurdle
+rate, $c$ the carry and $k$ the catch-up rate. $I_t$ is the level of a public index, and $Z$ is a standard Brownian motion wherever it appears. In
+\cref{sec11:lbo}, $\mathit{EV}$ is enterprise value, $\lambda$ debt as a share of what the
+buyer pays, $i$ the interest rate, $\tau$ the tax rate and $\kappa$ the after-tax cost of debt compounded
+over the holding period, and implied duration is written $\mathcal D$. In \cref{sec11:value}, $D$
+and $E$ are the values of debt and equity, $\mathit{NOPAT}$ is
+operating profit after tax, $\mathit{ROC}$ the return on new capital, $g$ a growth rate, $W$ the
+weighted average cost of capital, $r_U$ the cost of capital of the unlevered firm, $r_D$ the cost of
+debt and $L$ the ratio of debt to value. The letter $E$ has four uses: $\E$ is an expectation,
+$E(t)$ in \cref{prop11:timing} is whole fund carry, $E$ in \cref{lem11:bridge} is EBITDA, and $E$ in
+\cref{sec11:value} is the value of equity. Rates are annual and compounded once a year unless they are
+marked as continuous.
+\end{keybox}
+
+\FloatBarrier
+% =====================================================================================
+\section{How does a fund pay its managers?}
+\label{sec11:fees}
+
+A limited partnership commits capital at the start, and the general partner (GP) calls it as deals
+are found, usually over an investment period of about five years. The limited partners (LPs) also fund a
+management fee through capital calls, commonly a percentage of commitments during the investment
+period and afterwards a percentage of the cost of the deals still held; the precise base varies by
+fund. When a company
+is sold, the proceeds pass through a \emph{distribution waterfall}. Chapter~2 worked out each tier
+for a fund with a single contribution and a single exit. A real fund calls and returns money many
+times, and the tiers are tested again on each distribution date against everything that has happened
+so far. That cumulative test is what the waterfall below formalises.
+
+\begin{definition}[Whole fund waterfall]\label{def11:waterfall}
+Let contributions $C_t\ge0$ and gross distributable proceeds $X_t\ge0$ occur at dates $t_0<t_1<\dots$.
+The \emph{hurdle balance} accrues at the hurdle rate and rises with each contribution,
+$B_{t_j}=B_{t_{j-1}}(1+h)^{t_j-t_{j-1}}+C_{t_j}$, and falls by whatever is paid to the LPs in the first two
+tiers. On each date the proceeds $X_{t_j}$ are paid in order:
+\begin{enumerate}[label=(\roman*)]
+  \item to the LPs until all contributed capital has been returned;
+  \item to the LPs until the hurdle balance, already reduced by the capital returned in (i), is zero,
+        the \emph{preferred return};
+  \item a \emph{catch-up}, in which a share $k>c$ of each dollar goes to the GP until the GP holds a share
+        $c$ of the cumulative profit, $G=c\,(\text{LP distributions}+G-\text{contributions})$, with
+        profit measured after fees and expenses, the convention of this chapter; agreements differ in
+        how they treat fees, earlier carry and unrealised gains;
+  \item the rest split $1-c$ to the LPs and $c$ to the GP.
+\end{enumerate}
+\end{definition}
+
+The catch-up of tier (iii) has a closed size at each date. If the GP holds $G$ and the LPs have made
+a cumulative profit $P$ when the tier opens, a payment of $y$ in the tier raises the GP's holding to
+$G+ky$ and the profit to $P+(1-k)y$, and the tier closes when $G+ky=c\,(P+G+y)$, that is at
+\begin{equation}\label{eq11:catchup}
+  y^*=\frac{c\,(P+G)-G}{k-c}.
+\end{equation}
+This is the amount needed to reach the target; the tier pays $\min\bigl((y^*)^+,X\bigr)$ out of the
+proceeds $X$ left for it. With a single exit, $G=0$ and \cref{eq11:catchup} is the catch-up size of
+Chapter~2.
+
+The listing below runs \cref{def11:waterfall} as a loop over distribution dates on the cash flows of
+a fund that calls 100 at year 0 and distributes 50 at year 3 and 140 at year 6. At each
+date the hurdle balance accrues, the tiers are tested again on the cumulative amounts, and the catch-up
+takes the size that \cref{eq11:catchup} gives. It prints the payments by tier and the totals,
+\wlGp{} to the GP and \wlLp{} to the LPs, so that the GP ends with a fifth of the profit of \wlProfit, as
+\cref{prop11:share} below says.
+\Needspace*{20\baselineskip}
+\lstinputlisting[language=Python]{code/ch11/snippets/waterfall.py}
+
+\begin{proposition}[What a full catch-up delivers]\label{prop11:share}
+Suppose that, in the waterfall of \cref{def11:waterfall}, the catch-up tier has been completed on
+some date and that no contribution is made after that date. Then from that date on the GP's
+cumulative carry is exactly $c$ times the cumulative profit of the fund, distributions to both parties
+less all contributions.
+\end{proposition}
+
+\begin{proof}
+Assume, as the proposition does, that no later contribution, adjustment or clawback reopens tiers (i)
+and (ii). When the catch-up tier closes, $G=c\,(P+G)$, where $P+G$ is the profit so far. On any later date
+tiers (i) and (ii) pay nothing, because capital and hurdle were already cleared and no new
+contribution has raised the hurdle balance, and the catch-up target is already met, so
+\cref{eq11:catchup} gives $y^*=0$. Each later dollar is split by tier (iv) and raises $G$ by $c$ and
+$P+G$ by one, so the equality $G=c\,(P+G)$ is preserved.
+\end{proof}
+
+The condition about contributions matters in practice. Management fees are called after the first
+exits, and each such call lowers the fund's profit after the GP has already been paid a share of it.
+The waterfall in the code tracks this and reports the excess the GP would owe back at the end; in the
+fund below it is \wfClaw{}. Fees are called at the start of each year, the last of them in year eight on
+the same date as the first carry payment and ahead of it in the waterfall, and none is called after it.
+
+\paragraph{A stylised fund.}
+Take a fund with commitments of \wfCommit{} that buys \wfDeals{} companies for \wfCost{} each over
+its first five years and sells them between years three and nine at gross multiples of cost from 0 to
+3.2. It charges \wfFeeInv\% of commitments a year for its first \wfInvYears{} years and \wfFeePost\% of
+the cost of the deals still held after that, has a hurdle of \wfH\% and a carry of \wfCarry\% with a full
+catch-up. All of this is an illustration. The LPs pay in \wfPaidIn, of which \wfFees{} is fees, and the
+deals return \wfGross, a gross multiple of \wfGrossMoic{} on the capital invested. \Cref{fig11:waterfall}
+shows where each year's distributions go. The exits of years three and five only return capital. The
+preferred return is paid from year six to year eight, the catch-up of \wfCatch{} falls in year eight,
+and the 80/20 split begins in the same year. Over the fund's life the LPs receive \wfLpTotal{} and the GP
+\wfGpTotal, which is \wfGpShare\% of the profit of \wfProfit{} as \cref{prop11:share} requires. The
+deals earn a gross IRR of \wfGrossIrr\%; the LPs earn \wfNetIrrFee\% after fees alone and \wfNetIrr\%
+after fees and carry, with a TVPI of \wfNetTvpi.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.94\textwidth]{ch11/fig01_waterfall}
+  \caption{The stylised fund of \cref{sec11:fees}: contributions by year, including fees, below the
+  axis, and each year's distributions split by the tier of \cref{def11:waterfall} that pays them.}
+  \label{fig11:waterfall}
+\end{figure}
+
+\paragraph{From gross to net.}
+Scaling every deal's multiple up and down traces the map from the gross IRR of the deals to the LPs'
+net IRR (\cref{fig11:grossnet}). Fees cost the LPs a few points at every level of performance. For this
+fund's cash flows and a full catch-up, carry costs nothing below the hurdle, then opens a nearly flat
+stretch where the LPs' IRR stays at \wfH\% while the
+gross IRR rises, which is the catch-up taking every marginal dollar, and then grows in proportion. At
+a gross multiple of \wfGmLow{} the spread between gross and net IRR is \wfSpreadLow{} points, at
+\wfGmMid{} it is \wfSpreadMid{} and at \wfGmHigh{} it is \wfSpreadHigh. The LPs clear the hurdle once
+the deals return \wfMoicAtHurdle{} times their cost, a gross IRR of \wfGrossAtHurdle\%. The spread
+between gross and net returns is therefore not a fixed cost: it rises with performance, and a spread
+quoted for one fund says little about another, and other contracts give the map other shapes.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig02_gross_net}
+  \caption{IRR to the LPs against the gross IRR of the deals, when every deal multiple of the stylised
+  fund is scaled by a common factor. The flat stretch at the hurdle is the catch-up.}
+  \label{fig11:grossnet}
+\end{figure}
+
+\Cref{fig11:catchup} redraws the stretch around the hurdle for catch-up rates $k$ of 1, 0.8 and 0.5 and
+with no catch-up. A slower catch-up shares the proceeds above the hurdle with the LPs, so the flat
+stretch tilts upward and lengthens. The GP holds its full \wfCarry\% of the profit once the deals return
+\ckFullOne{} times their cost with a full catch-up, \ckFullEight{} times at 0.8 and \ckFullHalf{} times at
+0.5, and above those multiples the three contracts pay the same. With no catch-up the GP never reaches
+its share: for this fund it ends with \ckShareZero\% of the profit, and at a gross multiple of
+\wfGmMid{} the LPs earn \ckZeroMid\% instead of \wfNiMid\%.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig15_catchup}
+  \caption{IRR to the LPs against the gross IRR of the deals for the stylised fund of
+  \cref{fig11:grossnet}, around the hurdle of \wfH\%, with catch-up rates $k$ of 1 (the contract of the
+  text), 0.8 and 0.5 and with no catch-up.}
+  \label{fig11:catchup}
+\end{figure}
+
+\subsection{What deal by deal carry is worth to the managers}
+
+Under deal by deal (often called American) terms, carry is paid on each profitable exit as it happens,
+without waiting for the fund to return all the capital it has called. A clawback at the end reconciles
+the total with what whole fund (European) terms would have paid. Chapter~2 compared the two totals
+when the clawback cannot be collected in full. Here the clawback is assumed to be paid in full, and
+the question is what the earlier payments are worth.
+
+\begin{proposition}[Deal by deal carry is an interest-free loan]\label{prop11:timing}
+Let deal $i$ cost $K_i$, paid at $u_i$, and return $P_i$ at $s_i>u_i$, with no hurdle and carry $c$.
+Write $E(t)=c\,\bigl(\sum_{s_i\le t}P_i-\sum_{u_i\le t}K_i\bigr)^+$ for a benchmark path of cumulative whole
+fund carry by date $t$, an entitlement that need not match what a real whole fund agreement pays in the
+interim, and $A(t)=c\sum_{s_i\le t}(P_i-K_i)^+$ for the carry paid deal by deal, until the last exit $T$,
+where a full clawback sets $A(T)=E(T)$. Then $A(t)\ge E(t)$ for every $t$, and at any continuously compounded discount
+rate $r\ge0$ the present value of the deal by deal payments exceeds that of the whole fund payments by
+\begin{equation}\label{eq11:timing}
+  \sum_j\bigl(A(t_j)-E(t_j)\bigr)\bigl(e^{-rt_j}-e^{-rt_{j+1}}\bigr)\;\ge\;0,
+\end{equation}
+where $t_1<t_2<\dots<t_n$ are the dates on which either path changes and $t_{n+1}=T$.
+\end{proposition}
+
+\begin{proof}
+For $t<T$, the realised deals contribute $\sum_{s_i\le t}(P_i-K_i)$ to the bracket in $E(t)$, and every
+deal called but not yet sold subtracts its cost, so the bracket is at most
+$\sum_{s_i\le t}(P_i-K_i)\le\sum_{s_i\le t}(P_i-K_i)^+$. Both sides are then multiplied by $c\ge0$, and
+$x\mapsto x^+$ is increasing, so $E(t)\le A(t)$. For the present values, write $\Delta_j$ for the
+change in $A-E$ at $t_j$. The difference in present value is $\sum_j\Delta_je^{-rt_j}$, and summing by
+parts with $A-E$ equal to zero before $t_1$ and at $T$ gives \cref{eq11:timing}. Each term is a
+nonnegative difference $A-E$ times a nonnegative difference of discount factors. The argument compares
+two cumulative paths that end at the same amount, clawback included; it does not show that every
+interim value of $E$ is carry actually paid.
+\end{proof}
+
+\Cref{fig11:carrypaths} draws the two paths for a toy fund of three deals of 10 each, all bought at year 0, with no hurdle.
+The first deal is sold for \ctPOne{} in year \ctSOne, the second for \ctPTwo{} in year \ctSTwo, and the
+third, a loser, for \ctPThree{} in year \ctSThree. Deal by deal, the GP takes a fifth of each gain as it is
+realised, \ctAPeak{} by year \ctSTwo; the whole fund rule pays only once the realised proceeds exceed the
+capital called. The loser is sold last, so the GP returns \ctClaw{} at the clawback and both rules end at
+\ctFinal. The shaded area is the carry held early, and discounted at a continuously compounded \ctR\% it is worth \ctPvGap{} to the
+GP, the sum in \cref{eq11:timing}.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{ch11/fig16_carrypaths}
+  \caption{Cumulative carry of a toy fund of three deals, the loser sold last, under deal by deal carry
+  with a full clawback, $A(t)$, and under whole fund carry, $E(t)$, with no hurdle. The shaded gap is
+  carry paid early.}
+  \label{fig11:carrypaths}
+\end{figure}
+
+The proof shows what the GP gains: on every interval it holds carry it may later have to return, and
+it holds it free of interest. A simulation puts a size on the gain. Each of \wfTmFunds{} funds buys
+\wfTmDeals{} deals of equal cost at dates spread evenly over its first four years, holds each for a
+random time with a mean of four years, and sells it at a lognormal multiple with drift \wfTmMu\% and
+volatility \wfTmSig\% a year. The deal by deal path is worth \wfTmExMed\% of the capital invested more
+than the whole fund path at a continuously compounded discount rate of \wfTmR\% in the median fund, and \wfTmExNine\% in the
+ninetieth percentile (\cref{fig11:timing}); across all funds the average gain is \wfTmRatio\% of the average present
+value of the whole fund carry. The clawback is no formality: \wfTmClawFreq\% of the funds end with
+the GP owing some carry back, and in the median such fund the amount is \wfTmClawMed\% of the carry
+it finally keeps. Whether that money comes back depends on the clawback's terms, the taxes the GP has
+already paid on it and the GP's solvency, which is the subject of the clawback section in Chapter~2.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig03_timing}
+  \caption{Present value at a continuously compounded \wfTmR\% of the deal by deal carry less the whole fund carry, in percent of
+  the capital invested, across \wfTmFunds{} simulated funds with a full clawback and no hurdle.}
+  \label{fig11:timing}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{What do a fund's numbers measure?}
+\label{sec11:perf}
+
+An LP sees a fund through its quarterly report: cash paid in, cash paid out, and the GP's estimate of
+the value of what is left, the net asset value (NAV). Chapter~1 turned these into an interim IRR, the
+multiples DPI and TVPI, and the Kaplan and Schoar PME. This section asks how those numbers behave
+across many funds, what an IRR and a multiple reported together imply about timing, and what the PME
+does and does not adjust for.
+
+\subsection{A population of simulated funds}
+
+Each simulated fund lives \jcLife{} years and buys \jcDealsPer{} companies at quarters drawn evenly
+over its first five years, investing 90\% of its commitments; the management fees of the first five
+years use the other 10\%, and the fees after that are called on top of the commitments. A deal is held for at least a year and
+then exits with probability 1/14 a quarter, so its mean holding period would be four and a half years
+without the end of the fund; any deal still held at the end is sold then, which shortens the actual
+holdings. The fund has its own path of a public index $I_t$, a geometric Brownian motion with drift
+$\mu_I=\jcMuM\%$, its expected return, and volatility $\sigma_I=\jcSigM\%$ a year. A deal bought at $u$ for
+$K$ is worth at $t$
+\begin{equation}\label{eq11:deal}
+  V_t=K\exp\Bigl(\bigl(\alpha-\tfrac12\sigma_e^2\bigr)(t-u)+\beta\ln\frac{I_t}{I_u}
+  -\tfrac12\beta(\beta-1)\sigma_I^2(t-u)+\sigma_e\,(Z_t-Z_u)\Bigr),
+\end{equation}
+with $Z$ a Brownian motion of its own, $\alpha=\jcAlpha\%$, $\beta=\jcBeta$ and $\sigma_e=\jcSigE\%$. The
+correction term makes the expected growth rate of $V$ exactly $\alpha+\beta\mu_I$, so $\alpha$ is the
+return above what an unfinanced position of $\beta$ in the index would earn; the simulation has no
+risk-free rate, so the cost of financing such a position does not enter. Fees are those of the stylised fund.
+The GP marks each deal at cost for its first year and at $V_t$ afterwards, and the reported NAV is
+net of a carry of 20\% of any profit to date, distributions plus NAV less contributions. There are
+\jcFunds{} funds.
+
+\Cref{fig11:jcurve} shows the J-curve of Chapter~1 as a distribution. After one year the median
+interim IRR is \jcIrrOne\%, driven mainly by fees while most deals are still marked at cost in their first year. After two years
+it is \jcIrrTwo\%, with a tenth of funds below \jcIrrLoTwo\% and a tenth above \jcIrrHiTwo\%, and the
+median turns positive after \jcCross{} years. The median fund ends with an IRR of \jcIrrEnd\% and a
+TVPI of \jcTvpiEnd. DPI lags TVPI by years: after four years the median fund has returned \jcDpiFour{}
+of its paid in capital in cash while reporting a TVPI of \jcTvpiFour.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.94\textwidth]{ch11/fig04_jcurve}
+  \caption{(a) Interim net IRR of \jcFunds{} simulated funds by age: median and the band from the
+  tenth to the ninetieth percentile. (b) Median TVPI and DPI by age.}
+  \label{fig11:jcurve}
+\end{figure}
+
+How much does an early IRR say about the final one? The rank correlation between the interim IRR
+and the final IRR is \jcRankThree{} after three years, \jcRankFive{} after five and \jcRankEight{} after
+eight. Of the funds that end in the top quartile, \jcTopThree\% were in the top quartile at three
+years, \jcTopFive\% at five and \jcTopEight\% at eight. In this model the record of a fund three years old, about the
+age at which a successor fund is often marketed, predicts the final ranking only loosely: fewer than
+half of the eventual top quartile is in the top quartile at that age.
+
+\Cref{fig11:transition} gives the whole picture at three and five years. Each row is a quartile of the
+final IRR and shows where those funds stood at the earlier age; the top right cells are the \jcTopThree\%
+and \jcTopFive\% above. Of the funds that end in the top quartile, \trTopBottomThree\% were in the bottom
+quartile at three years and \trTopBottomFive\% at five, and of those that end in the bottom quartile,
+\trBottomTopThree\% and \trBottomTopFive\% were in the top quartile. At three years a fund can still end
+almost anywhere; by five, large moves are rare.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.92\textwidth]{ch11/fig17_transition}
+  \caption{Simulated funds: the share of the funds in each quartile of the final IRR that were in each
+  quartile of the interim IRR at three and five years, in percent, rounded so that each row adds to 100. The
+  funds are those of \cref{fig11:jcurve}.}
+  \label{fig11:transition}
+\end{figure}
+
+\subsection{An IRR and a multiple together}
+
+A fund reports an IRR and a TVPI side by side, and the pair carries information that neither number
+has alone. If a single payment of 1 grew into a single payment of $M$ after $\mathcal D$ years at the rate $r$,
+then $M=(1+r)^{\mathcal D}$. For a real fund, define the \emph{implied duration} by the same relation,
+$\mathcal D=\ln\mathrm{TVPI}/\ln(1+r)$, with the NAV counted as a distribution on the reporting date.
+
+\begin{proposition}[Implied duration]\label{prop11:duration}
+Let a fund make contributions $C_i>0$ at times $t_i$ and distributions $D_j>0$ at times $s_j$, the last
+of which may be the NAV, and let its IRR $r$ be positive. Then
+\begin{equation}\label{eq11:duration}
+  \min_js_j-\max_it_i\;\le\;\frac{\ln\mathrm{TVPI}}{\ln(1+r)}\;\le\;\max_js_j-\min_it_i .
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Write $\rho=\ln(1+r)>0$. The IRR equates the present values, $\sum_jD_je^{-\rho s_j}=\sum_iC_ie^{-\rho t_i}$.
+Each discount factor on the left is at least $e^{-\rho\max s_j}$ and each on the right at most
+$e^{-\rho\min t_i}$, so $e^{-\rho\max s_j}\sum_jD_j\le e^{-\rho\min t_i}\sum_iC_i$, that is
+$\mathrm{TVPI}\le e^{\rho(\max s_j-\min t_i)}$. Taking logarithms and dividing by $\rho$ gives the upper
+bound. Bounding the left side above by $e^{-\rho\min s_j}\sum_jD_j$ and the right side below by
+$e^{-\rho\max t_i}\sum_iC_i$ gives the lower bound in the same way.
+\end{proof}
+
+The upper bound is the useful one. A fund with an IRR of 25\% and a TVPI of 1.2 has an implied
+duration of $\ln1.2/\ln1.25=0.82$ years, a single period equivalent that is not the measured
+average holding period of the fund's dollars; the high IRR is earned over an equivalent period of less
+than a year. The bound is also a check on
+data. A fund of vintage $v$ that reports as of the start of the second quarter of 2026 cannot have an
+implied duration above $2026.25-v$ unless it called capital before 1 January of its vintage year or
+the IRR and the multiple are inconsistent.
+
+\Cref{fig11:duration} draws lines of equal implied duration in the plane of IRR and TVPI, from
+$\mathrm{TVPI}=(1+r)^{\mathcal D}$. The example sits below the line of one year, at \duEx. The same reading
+works the other way: a TVPI of 2 earned at an IRR of 10\% implies a duration of \duTen{} years, so at a
+given multiple a lower IRR means the money was out for longer.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{ch11/fig18_duration}
+  \caption{Lines of equal implied duration $\mathcal D=\ln\mathrm{TVPI}/\ln(1+r)$, with the example of the
+  text marked. The lines are analytic and carry no fund data.}
+  \label{fig11:duration}
+\end{figure}
+
+\paragraph{The CalPERS portfolio.}
+The CalPERS review lists \cvFunds{} active partnerships, from vintage \cvFirstVintage{} onwards, with
+commitments of \cvCommitted{} billion dollars and a remaining value of \cvNav{} billion. For each it gives
+cash contributed and distributed, total value and the net IRR, and it
+flags the IRR as not meaningful for the \cvNm{} funds of vintage \cvNmFrom{} and later. The multiple it prints is total value over
+cash contributed, which the code checks against the raw columns. Pooled by vintage, the TVPI is
+\cvTvpiSeven{} for 2007, \cvTvpiFifteen{} for 2015, \cvTvpiNineteen{} for 2019 and \cvTvpiTwentyThree{}
+for 2023, and the DPI \cvDpiSeven, \cvDpiFifteen, \cvDpiNineteen{} and \cvDpiTwentyThree{}
+(\cref{fig11:calpers}a). The 2019 vintage has returned half its paid in capital in cash and the 2023
+vintage almost none; their TVPIs are mostly the GPs' marks. The list holds active partnerships only,
+so a fund of an early vintage that has been wound up is missing, and the \cvOldN{} funds of vintage
+2012 or earlier that remain have a pooled TVPI of \cvOldTvpi{} with \cvOldRvpi\% of their total value
+still unrealised.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.94\textwidth]{ch11/fig06_calpers}
+  \caption{The CalPERS private equity partnerships as of 31 March 2026. (a) TVPI and DPI pooled by
+  vintage, for vintages with at least five funds. (b) Implied duration of each fund with a meaningful
+  IRR above zero, against the bound of \cref{prop11:duration} measured from 1 January of the vintage.}
+  \label{fig11:calpers}
+\end{figure}
+
+For the \cvDurN{} funds with a meaningful positive IRR, the median implied duration is \cvDurMed{}
+years (\cref{fig11:calpers}b). No fund lies above the bound measured from 1 January of its vintage, and
+the largest implied duration is \cvDurRatioMax\% of the time since its vintage began, so the reported
+IRRs and multiples are consistent in the sense of \cref{prop11:duration}. The median fund's implied duration is \cvDurShareMax\% of the time since its
+vintage began, which is consistent with contributions and distributions spread over a shorter
+effective interval than the fund's age; the implied duration alone does not identify their timing. The funds of 2005 to 2008 have a median implied duration of \cvDurPre{} years, those
+of 2015 to 2018 \cvDurMid.
+
+\subsection{Comparing with the index}
+
+The PME of \textcite{kaplan2005}, defined in Chapter~1, carries every cash flow to the end date with
+the index and divides compounded distributions by compounded contributions. \textcite{gredil2023}
+proposed the rate that goes with it.
+
+\begin{definition}[Direct alpha]\label{def11:alpha}
+Carry each contribution and distribution of a fund to the end date $T$ with the index,
+$\tilde C_t=C_tI_T/I_t$ and $\tilde D_t=D_tI_T/I_t$, and count the NAV at $T$ once, as a final distribution
+that is not also part of $\tilde D_T$. With time measured from the first cash flow, $t=0$, the
+\emph{direct alpha} $a$ is the continuously compounded IRR of the carried flows, the root of
+$\sum_t(\tilde D_t-\tilde C_t)e^{-at}+\mathrm{NAV}_Te^{-aT}=0$.
+\end{definition}
+
+\begin{proposition}[PME and direct alpha agree on the sign]\label{prop11:pme}
+Suppose that there is a date $t^*$ such that every carried net flow $\tilde D_t-\tilde C_t$ before
+$t^*$ is negative or zero and every one after $t^*$, including the NAV, is positive or zero, with at
+least one nonzero flow strictly before $t^*$ and one strictly after it. Then the direct alpha exists and is unique, and $\mathrm{KS\text{-}PME}>1$ if and
+only if $a>0$.
+\end{proposition}
+
+\begin{proof}
+Let $f(a)=\sum_t(\tilde D_t-\tilde C_t)e^{-at}$, with the NAV included, and $\psi(a)=e^{at^*}f(a)$, which has
+the same roots as $f$. In $\psi$, a flow at $t<t^*$ is multiplied by $e^{a(t^*-t)}$, which increases with
+$a$, and the flow is negative; a flow at $t>t^*$ is multiplied by $e^{-a(t-t^*)}$, which decreases
+with $a$, and the flow is positive. So $\psi$ is strictly decreasing, it tends to $-\infty$ as
+$a\to\infty$ and to $+\infty$ as $a\to-\infty$, and it has exactly one root. Since $\psi$ decreases,
+the root is positive if and only if $\psi(0)>0$. And $\psi(0)=f(0)=\sum\tilde D-\sum\tilde C$, which is
+positive exactly when the KS-PME, $\sum\tilde D/\sum\tilde C$, exceeds one.
+\end{proof}
+
+The condition is sufficient and not necessary. In the simulated funds, fees are called after the
+first distributions, so the condition fails for many of them, yet the PME and the direct alpha agree
+on the sign for every one of the \jcFunds{} funds, and their rank correlation is \pkCorr. The listing
+below computes both for a fund of five cash flows, short enough to retype.
+\Needspace*{16\baselineskip}
+\lstinputlisting[language=Python]{code/ch11/snippets/pme_alpha.py}
+The fund has a TVPI of \pkSnipTvpi{} and an IRR of \pkSnipIrr\%, and the listing prints a KS-PME of
+\pkSnipPme{} and a direct alpha of \pkSnipAlpha\% a year. Across the simulated funds the median PME is
+\pkMed, only \pkAbove\% of funds beat the index, and the median direct alpha is \pkDaMed\% a year, even
+though every deal's value is given an alpha of \jcAlpha\% a year in the model, before fees and carry: fees and carry take more than the alpha, and the
+dispersion of outcomes leaves most funds below the index. The comparison is not beta-neutral either: the
+simulation has no risk-free rate, so by \cref{prop11:beta} with $r=0$ a beta of \jcBeta{} adds
+$(\beta-1)(\mu_I-\sigma_I^2)=\pkBetaBoost\%$ a year to each deal's expected PME exponent. Run on the same
+draws with a beta of one, the funds have a median PME of \pkMedBetaOne{} and \pkAboveBetaOne\% of them beat the index.
+
+\subsection{What the PME assumes about risk}
+
+The PME prices a fund's cash flows as if they had the risk of the index. \textcite{sorensen2015} showed
+that it is the valuation an investor with logarithmic utility who holds the index as wealth would put
+on the flows, with stochastic discount factor $I_t/I_T$ between $t$ and $T$. Under that model the index's
+expected return over the risk-free rate equals its variance, $\mu-r=\sigma^2$, and every fund with no
+alpha has an expected PME of one, whatever its beta. When the market's premium differs from $\sigma^2$, a
+fund whose beta is not one shows a PME away from one with no skill, and the bias has a closed form in
+the simplest case.
+
+\begin{proposition}[Beta and the PME]\label{prop11:beta}
+Let the index be a geometric Brownian motion with drift $\mu$ and volatility $\sigma$, so that
+$\ln(I_T/I_0)$ is normal with mean $m=(\mu-\frac12\sigma^2)T$ and variance $v=\sigma^2T$, and let $r$ be a
+constant, continuously compounded risk-free rate. A fund makes one contribution of 1 at time 0 and one distribution at $T$ of
+\[
+  e^{\alpha T}\,e^{(1-\beta)rT-\frac12\beta(\beta-1)v}\,(I_T/I_0)^\beta,
+\]
+which is $e^{\alpha T}$ times the value of a position of $\beta$ in the index, rebalanced continuously and
+financed at $r$. Then
+\begin{equation}\label{eq11:betapme}
+  \E\,\mathrm{KS\text{-}PME}=\exp\bigl(\alpha T+(\beta-1)(\mu-r-\sigma^2)T\bigr).
+\end{equation}
+With $\alpha=0$ the expected PME exceeds one if and only if $(\beta-1)(\mu-r-\sigma^2)>0$.
+\end{proposition}
+
+\begin{proof}
+A position of $\beta$ in the index financed at $r$ has $dV/V=\beta\,dI/I+(1-\beta)r\,dt$, so by Itô's formula
+$\ln(V_T/V_0)=\beta\ln(I_T/I_0)+(1-\beta)rT-\frac12\beta(\beta-1)\sigma^2T$, the stated distribution. The PME
+is the distribution divided by the index return,
+$e^{\alpha T+(1-\beta)rT-\frac12\beta(\beta-1)v}(I_T/I_0)^{\beta-1}$, which is lognormal with log mean
+$\alpha T+(1-\beta)rT-\frac12\beta(\beta-1)v+(\beta-1)m$ and log variance $(\beta-1)^2v$. The mean of a
+lognormal variable is the exponential of its log mean plus half its log variance, and with
+$m=(\mu-\frac12\sigma^2)T$ the terms in $\sigma^2$ collect to $-(\beta-1)\sigma^2T$, which gives
+\cref{eq11:betapme}. The last statement reads off the sign of the exponent.
+\end{proof}
+
+With the simulation's index parameters, $\mu=\pkMu\%$ and $\sigma=\pkSig\%$, but leverage financed at the Treasury yield of \wkRf\%, used here as a continuously
+compounded rate, and $T=\pkT$ years, the premium $\mu-r=\pkPrem\%$ is below $\sigma^2=\pkVar\%$, and a fund with no alpha has
+an expected PME of \pkBetaHalf{} at a beta of 0.5, \pkBetaOneHalf{} at 1.5 and \pkBetaTwo{} at 2; a
+simulation at a beta of 2 gives \pkBetaSimTwo{} with standard error \pkBetaSimTwoSE{} (\cref{fig11:beta}).
+The sign is the reverse of the simulation's in \cref{sec11:perf}, where the deals are unfinanced,
+$r=0$, and $\mu_I-\sigma_I^2=\jcMuLessVar\%$ is positive.
+Here high beta lowers the PME: the log of the expected PME at a beta of 1.5, divided by five, is
+\pkFakeAlpha\% a year, a model quantity and not an estimate of alpha. With a premium of \pkErp\%, the
+implied premium used for the cost of capital below, the same fund at a beta of 2 has an expected PME of
+\pkBetaTwoErp. Buyout equity is levered, and many published estimates of its beta exceed one, so a PME
+above one can be partly a reward for leverage, but only when the market pays more per unit of risk
+than the logarithmic utility benchmark assumes.
+\textcite{korteweg2016} generalise the PME to a discount factor that is exponentially affine in the
+log index return, with parameters chosen so that it prices public assets, which corrects the bias when a
+fund's risk loads on the index in that way.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig05_beta}
+  \caption{Expected KS-PME of a fund with no alpha, one contribution and one distribution five years
+  later, against its beta on the index, from \cref{eq11:betapme}, with leverage financed at the
+  Treasury yield of \wkRf\%, and simulated means with two standard errors.}
+  \label{fig11:beta}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{When does debt raise a buyout's return?}
+\label{sec11:lbo}
+
+In a leveraged buyout the fund pays for a company partly with equity and partly with debt raised
+against the company's own cash flows, and the company repays the debt from those cash flows. Without
+taxes and frictions, \textcite{modigliani1958} showed that the mix of debt and equity does not change
+the value of the firm; with tax deductible interest the debt adds the value of its tax shields
+\parencite{modigliani1963}. Leverage does change the return on the equity, in a way that has a short
+exact form.
+
+\begin{proposition}[Leverage and the equity multiple]\label{prop11:lbo}
+A buyer pays $P_0$ for a company, fees included. Without debt, the company would at $T$ be worth
+$\mathit{EV}_T$ plus its free cash flows $F_t$, each held to $T$ at the rate $j=i(1-\tau)$, and its
+\emph{asset multiple} is $U=\bigl(\mathit{EV}_T+\sum_tF_t(1+j)^{T-t}\bigr)/P_0$. Suppose instead that debt
+$\lambda P_0$ is borrowed at the rate $i$, that interest is deductible at the tax rate $\tau$ against
+taxable income that stays positive, and that all cash after interest either repays debt or earns $j$.
+If the equity is worth something at $T$, its multiple is
+\begin{equation}\label{eq11:lbo}
+  M_E=\frac{U-\lambda \kappa }{1-\lambda},\qquad \kappa=(1+j)^T,\qquad\text{so}\qquad
+  M_E-U=\frac{\lambda}{1-\lambda}\,(U-\kappa).
+\end{equation}
+Debt raises the equity multiple if and only if $U>\kappa$, and for a fixed $U>\kappa$ the gain grows without bound
+as $\lambda$ rises to one; solvency and the limits a lender would set are outside the model.
+\end{proposition}
+
+\begin{proof}
+Let $N_t$ denote debt less cash, which may turn negative. In this simplified model, borrowing and
+cash balances carry the same pretax rate $i$, and interest expense and interest income receive symmetric
+tax treatment at the rate $\tau$. Consequently net debt accrues at $j=i(1-\tau)$, before the free cash
+flow $F_t$ the company would have generated without debt is applied. So $N_t=N_{t-1}(1+j)-F_t$ with $N_0=\lambda P_0$, and by induction
+$N_T=\lambda P_0\kappa-\sum_tF_t(1+j)^{T-t}$. The equity is worth $\mathit{EV}_T-N_T=P_0U-\lambda P_0\kappa$ and cost
+$(1-\lambda)P_0$, which gives \cref{eq11:lbo}; the difference $M_E-U$ follows by subtraction.
+\end{proof}
+
+The factor $\kappa$ is the debt's cost after tax, compounded over the holding period. At $i=\lxI\%$,
+$\tau=\lxTau\%$ and $T=\lxT$ years it is \lxK, so leverage helps exactly when the company would have
+grown its value at more than 6\% a year on its own. \Cref{fig11:leverage} draws the equity multiple
+against $\lambda$. At $\lambda=\lxLamEx\%$, an asset multiple of \lxUHi{} becomes an equity multiple of
+\lxMHi, and an asset multiple of \lxULo{} becomes \lxMLo: the same debt that turns a good deal into a
+very good one turns a mediocre deal into a loss. The proposition holds deal by deal, so it also says
+that leverage cannot be judged by its average effect: a fund's leverage decision is a bet that its
+deals will clear $\kappa$.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig07_leverage}
+  \caption{Equity multiple against debt as a share of the price, from \cref{eq11:lbo}, for four asset
+  multiples $U$, with $i=\lxI\%$, $\tau=\lxTau\%$ and $T=\lxT$ years.}
+  \label{fig11:leverage}
+\end{figure}
+
+\subsection{A five year model}
+
+\Cref{tab11:lbo} sets out a buyout of a stylised company with revenue of \lxRev{} million and EBITDA of
+\lxEz{} million, bought at \lxMz{} times EBITDA, an enterprise value of \lxEvz{} million, with fees of
+\lxFees\% of that value. The debt is \lxLev{} times EBITDA, \lxDz{} million at \lxRate\%, and every dollar of
+cash after interest, tax, capital spending of \lxCapex\% of revenue and working capital of \lxNwc\% of the
+growth in revenue repays it. Revenue grows by 6\%, 6\%, 5\%, 5\% and 4\%, the
+EBITDA margin rises by half a point a year from 20\% to 22\% in the fourth year and stays there, and tax
+is 25\% of EBITDA less depreciation of 3\% of revenue and less interest. The equity cheque is \lxEqz{} million. After five years EBITDA is
+\lxEt{} million; sold at \lxMt{} times, the company is worth \lxEvt{} million, the debt has fallen to
+\lxNdt{} million, \lxLevExit{} times EBITDA, and the equity is worth \lxEqt{} million, a multiple of
+\lxMoic{} and an IRR of \lxIrr\%. The same deal without debt returns \lxMoicU{} times, an IRR of
+\lxIrrU\%. The code checks that \cref{eq11:lbo}, with $U=\lxUb$ and $\lambda=\lxLamB\%$ of the price
+including fees, gives the levered multiple of the model to rounding error.
+
+\begin{table}[!tb]
+  \centering
+  \small
+  \caption{The stylised buyout, in millions of dollars. Free cash flow is after interest, tax,
+  capital spending and working capital, and all of it repays debt.}
+  \label{tab11:lbo}
+  \begin{tabular}{@{}lrrrrr@{}}
+    \toprule
+    Year & 1 & 2 & 3 & 4 & 5\\
+    \midrule
+    Revenue & \lxTRevOne & \lxTRevTwo & \lxTRevThree & \lxTRevFour & \lxTRevFive\\
+    EBITDA & \lxTEbitdaOne & \lxTEbitdaTwo & \lxTEbitdaThree & \lxTEbitdaFour & \lxTEbitdaFive\\
+    Interest & \lxTInterestOne & \lxTInterestTwo & \lxTInterestThree & \lxTInterestFour & \lxTInterestFive\\
+    Tax & \lxTTaxOne & \lxTTaxTwo & \lxTTaxThree & \lxTTaxFour & \lxTTaxFive\\
+    Capital spending & \lxTCapexOne & \lxTCapexTwo & \lxTCapexThree & \lxTCapexFour & \lxTCapexFive\\
+    Working capital & \lxTDnwcOne & \lxTDnwcTwo & \lxTDnwcThree & \lxTDnwcFour & \lxTDnwcFive\\
+    Free cash flow & \lxTFcfOne & \lxTFcfTwo & \lxTFcfThree & \lxTFcfFour & \lxTFcfFive\\
+    Debt at year end & \lxTDebtOne & \lxTDebtTwo & \lxTDebtThree & \lxTDebtFour & \lxTDebtFive\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The listing below is the model of \cref{tab11:lbo} in about twenty lines. It prints the exit EBITDA,
+value, net debt and equity, the multiple of \lxMoic{} and the IRR of \lxIrr\%, and the same deal without
+debt, \lxMoicU{} times and \lxIrrU\%. Changing the debt multiple in the call, or the exit multiple inside
+the function, is a quick way to check \cref{eq11:lbo} by hand.
+\Needspace*{24\baselineskip}
+\lstinputlisting[language=Python]{code/ch11/snippets/lbo.py}
+
+\subsection{Where the gain came from}
+
+Sponsors explain a deal's gain as EBITDA growth, a higher multiple at exit and debt repaid. The first
+two interact, because value is their product, and a split that credits growth at the entry multiple
+gives a different answer from one that credits it at the exit multiple. The symmetric split resolves
+this.
+
+\begin{lemma}[Splitting a product]\label{lem11:bridge}
+For $V=mE$, with $\bar m=\frac12(m_0+m_T)$ and $\bar E=\frac12(E_0+E_T)$,
+\[
+  m_TE_T-m_0E_0=\bar m\,(E_T-E_0)+\bar E\,(m_T-m_0),
+\]
+and each term is the average of the two contributions that factor makes when it is changed first and
+when it is changed second, which is its Shapley value in the two player game.
+\end{lemma}
+
+\begin{proof}
+Expanding the right side gives $\frac12(m_0E_T-m_0E_0+m_TE_T-m_TE_0+E_0m_T-E_0m_0+E_Tm_T-E_Tm_0)$, in which
+the cross terms cancel and $m_TE_T-m_0E_0$ remains. Changing $E$ first contributes $m_0(E_T-E_0)$ and
+changing it second $m_T(E_T-E_0)$; their average is $\bar m(E_T-E_0)$, and likewise for $m$.
+\end{proof}
+
+The equity gain of the stylised deal, \lxGain{} million, splits into \lxBrG{} from EBITDA growth,
+\lxBrM{} from the higher multiple and \lxBrD{} from debt repaid, less \lxBrF{} of fees
+(\cref{fig11:bridge}). Crediting growth at the entry multiple would give it \lxGfirst{} and at the exit
+multiple \lxMfirst. The debt term is \lxBrDs\% of the gain in the bridge, an accounting contribution and not a
+separate source of value: the cash that repaid the debt came from the same operations that grew EBITDA, and an unlevered
+owner would have held it as cash. What the bridge does show is how much the deal depended on the exit
+multiple, which no operating plan controls; here it is \lxBrMs\%.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig08_bridge}
+  \caption{Bridge of the stylised deal's equity from entry to exit, in millions, with the interaction of
+  EBITDA and the multiple split by \cref{lem11:bridge}.}
+  \label{fig11:bridge}
+\end{figure}
+
+\Cref{fig11:grid} varies the entry and exit multiples between \lxGridMin{} and \lxGridMax, keeping the
+debt at \lxLev{} times EBITDA. Buying at \lxGridMin{} and selling at \lxGridMin{} returns \lxGridLoLo\% a
+year, and buying and selling at \lxGridMax{} only \lxGridHiHi\%: at the same multiple a cheaper entry
+means that the fixed debt pays a larger share of the price. Buying at \lxGridMax{} and selling at
+\lxGridMin{} still returns \lxGridHiLo\%, because EBITDA growth and repayment carry the deal, and the
+reverse returns \lxGridLoHi\%. \textcite{axelson2013} found that buyout leverage follows the cost of debt
+in the credit markets more closely than the characteristics of the companies bought, and that more
+leverage goes with higher prices paid; in this grid, which holds the debt fixed, the high entry multiples of
+the top rows are where returns at any given exit multiple are lowest.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.78\textwidth]{ch11/fig09_grid}
+  \caption{Equity IRR of the stylised buyout, in percent, by entry and exit EV/EBITDA, with debt of
+  \lxLev{} times EBITDA at entry.}
+  \label{fig11:grid}
+\end{figure}
+
+\paragraph{Uncertain outcomes.}
+A simulation of \lxMcN{} deals draws revenue growth each year from a normal law with mean 5\% and
+standard deviation 6\%, sets the margin
+each year to 21\% plus 1.5 points times an independent normal draw plus a third of a point times the sum
+of the standardised growth shocks so far, held between 5\% and 40\%, and draws the
+exit multiple from a lognormal law with mean \lxMz{} and log standard deviation 18\%. With debt of
+\lxLev{} times EBITDA the median IRR rises from \lxMcMedU\% to \lxMcMedL\% and its standard deviation
+from \lxMcSdU{} to \lxMcSdL{} points (\cref{fig11:lbomc}). The share of deals that lose money rises from
+\lxMcLossU\% to \lxMcLossL\%, and the fifth percentile of the IRR falls from \lxMcQU\% to \lxMcQL\%. Debt
+raised the multiple in \lxMcBeat\% of the deals, which are exactly the \lxMcUAbove\% in which the asset
+multiple exceeded $\kappa$, as \cref{prop11:lbo} says. The simulation has no default: a revolver absorbs any
+shortfall, with no covenant, lender intervention or credit limit, so its downside figures understate
+the risks that come with financial distress. \textcite{kaplan1989} documented large increases in operating
+cash flow after the management buyouts of the 1980s, the operating side of the bridge, and
+\textcite{harris2014} found that US buyout funds beat the S\&P 500 on a PME basis in most vintages they
+studied. That result is consistent with strong buyout performance relative to public markets, although
+\cref{prop11:beta} shows that a PME can also reflect systematic market exposure; the direction and
+magnitude of any beta effect must be estimated for the actual funds and periods.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig10_lbo_mc}
+  \caption{Equity IRR over five years of \lxMcN{} simulated deals, without debt and with debt of
+  \lxLev{} times EBITDA at entry.}
+  \label{fig11:lbomc}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{What is a private company worth?}
+\label{sec11:value}
+
+A buyout fund values a company when it bids, every quarter while it owns it, and when it sells. The
+company has no market price, so the value is built from its cash flows, its cost of capital and the
+prices paid for comparable companies. The standard approach is the discounted free cash flow to the
+firm, and the cash flow it discounts is defined first.
+
+\begin{definition}[Free cash flow to the firm]\label{def11:fcff}
+The \emph{free cash flow to the firm} in year $t$ is $F_t=\mathit{NOPAT}_t-R_t$, where
+$\mathit{NOPAT}_t=\mathit{EBIT}_t(1-\tau)$ is operating profit after tax at the marginal rate, as if the firm
+had no debt, and the \emph{reinvestment} $R_t$ is capital spending less depreciation plus the increase in
+working capital. The \emph{reinvestment rate} is $R_t/\mathit{NOPAT}_t$, and the \emph{return on new capital}
+is the extra NOPAT that a dollar of reinvestment produces a year later.
+\end{definition}
+
+\subsection{The terminal value and the value driver}
+
+A forecast runs for a few years and ends in a terminal value for everything after it. The growing
+perpetuity of \textcite{gordon1956} is the usual choice, and it is usually applied to the last cash
+flow of the forecast. That cash flow depends on how much the company reinvests, and the growth it
+assumes has to be paid for by reinvestment. The value driver formula makes the link explicit.
+
+\begin{proposition}[Value driver]\label{prop11:driver}
+Suppose that from year $T+1$ on a firm has positive NOPAT, earns a stable return $\mathit{ROC}>0$ on new
+capital, reinvests a constant share of NOPAT, and grows at $g<W$ forever. Then the reinvestment rate is $g/\mathit{ROC}$ and
+\begin{equation}\label{eq11:driver}
+  \mathit{TV}_T=\frac{\mathit{NOPAT}_{T+1}\,(1-g/\mathit{ROC})}{W-g},\qquad
+  \frac{\partial}{\partial g}\,\frac{1-g/\mathit{ROC}}{W-g}=\frac{1-W/\mathit{ROC}}{(W-g)^2}.
+\end{equation}
+The derivative holds $\mathit{NOPAT}_{T+1}$ fixed. Growth adds value if and only if $\mathit{ROC}>W$; at $\mathit{ROC}=W$ the terminal value is
+$\mathit{NOPAT}_{T+1}/W$ whatever the growth.
+\end{proposition}
+
+\begin{proof}
+If a share $b$ of NOPAT is reinvested each year at the return $\mathit{ROC}$, next year's NOPAT exceeds
+this year's by $b\,\mathit{ROC}\,\mathit{NOPAT}$, so $g=b\,\mathit{ROC}$ and $b=g/\mathit{ROC}$. The free cash flow is
+$(1-b)\mathit{NOPAT}$ and grows at $g$, and the growing perpetuity gives the first formula. Differentiating
+the quotient, the numerator of the derivative is $-(W-g)/\mathit{ROC}+(1-g/\mathit{ROC})=1-W/\mathit{ROC}$, which is
+positive exactly when $\mathit{ROC}>W$. At $\mathit{ROC}=W$ the quotient is $(1-g/W)/(W-g)=1/W$.
+\end{proof}
+
+\Cref{fig11:driver} draws the multiple against $g$ at the manufacturer's cost of capital of \wkWme\%,
+found below. Every curve starts at $1/W=\drZero$ when nothing is reinvested. At 5\% growth the multiple
+is \drFiveTwenty{} with a return on new capital of 20\%, \drFiveTwelve{} at 12\% and only \drFiveSix{} at
+6\%, below the multiple with no growth at all; with a return equal to $W$ the line is flat.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.82\textwidth]{ch11/fig19_driver}
+  \caption{Terminal value over next year's NOPAT from \cref{eq11:driver} against growth, at
+  $W=\wkWme\%$, for four returns on new capital; the dot is the manufacturer's terminal value.}
+  \label{fig11:driver}
+\end{figure}
+
+The proposition is a discipline on the inputs. A terminal growth rate chosen alone, without a return
+on capital, leaves the reinvestment free. Letting $\mathit{ROC}$ grow without bound gives
+$\mathit{NOPAT}_{T+1}/(W-g)$, growth that costs nothing; the usual perpetuity $F_{T+1}/(W-g)$ agrees with
+the value driver only if $F_{T+1}$ already deducts the reinvestment $(g/\mathit{ROC})\,\mathit{NOPAT}_{T+1}$
+that the growth requires.
+
+\subsection{Normalising earnings}
+
+The earnings of a private company reflect its owner's choices as well as its business. Before any
+model is fitted, the reported figures are restated to what the company would earn under a buyer who
+pays market rates and expects no unusual items. \Cref{tab11:norm} shows the restatement for a stylised
+manufacturer of industrial components with revenue of \nmRev{} million. The owner draws pay above what
+a hired manager would cost, a legal settlement will not recur, the company rents its plant from the
+owner below the market rent, an inventory write-down was a one-off, and a gain on selling equipment
+is not operating income. Normalised EBITDA is \nmNorm{} million, \nmChange\% above the reported figure,
+a margin of \nmMargin\%. Every one of these adjustments is a judgment, and each should be documented
+with the evidence for the market rate it uses; the pay and rent adjustments in particular are ones that
+only an owner with control could make, which matters for the discounts of \cref{sec11:discounts}. A buyer should also
+separate adjustments any owner could make from those that need control or specific operating changes,
+and leave out changes already in the forecast.
+
+\begin{table}[!tb]
+  \centering
+  \small
+  \caption{Normalisation of the stylised manufacturer's EBITDA, in millions of dollars. The company and
+  the adjustments are illustrations.}
+  \label{tab11:norm}
+  \begin{tabular}{@{}lr@{}}
+    \toprule
+    Reported EBITDA & \nmRep\\
+    add the owner's pay above a market salary & \nmPay\\
+    add a one-off legal settlement & \nmLegal\\
+    less the market rent above the rent paid to the owner & \nmRent\\
+    add an inventory write-down not expected to recur & \nmStock\\
+    less a gain on the sale of equipment & \nmGain\\
+    \midrule
+    Normalised EBITDA & \nmNorm\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{The cost of capital}
+
+The discount rate is built from market inputs. The risk-free rate is the ten year Treasury yield of
+September 2026, \wkRf\% \parencite{fredch11}. The equity risk premium is the implied premium of \textcite{damodaran2026}
+at the start of 2026, \wkErp\%, computed from the level of the S\&P 500 and its expected cash flows;
+\cref{fig11:erp} shows its history since \wkErpFirst, with a mean of \wkErpMean\%, a low of
+\wkErpMin\% at the end of \wkErpMinYear{} and a high of \wkErpMax\% at the end of \wkErpMaxYear. That
+premium was computed against a Treasury yield of \wkTbond\%, and pairing it with the September yield is
+an assumption: the inputs are of different dates, so the cost of capital is a mixed-date illustration
+and not one calibrated to a single market day. A private company has no beta of its own, so it borrows one from an industry, here the
+\wkFirms{} US machinery companies, with an average levered beta of \wkBetaL{} and debt of \wkDvInd\% of
+value. The beta has to be unlevered at the industry's leverage and relevered at the company's target of
+\wkTarget\% debt to value, and the two common rules give different answers.
+
+\Textcite{hamada1972} assumes a constant amount of debt, so the tax shields are as safe as the debt:
+$\beta_E=\beta_U\bigl(1+(1-\tau)D/E\bigr)$. \Textcite{harris1985} assume that debt is kept at a
+constant share of value, so the tax shields have the risk of the assets: $\beta_E=\beta_U(1+D/E)$.
+With a marginal tax rate of \wkTax\%, the unlevered beta is \wkBuHam{} by the first rule and \wkBuHp{}
+by the second, and the relevered betas are \wkBrHam{} and \wkBrHp. With debt at \wkRd\%, \wkSpread{}
+points over the Treasury yield, the usual formula
+$W=\frac EV r_E+\frac DV r_D(1-\tau)$ gives \wkWHam\% and \wkWHp\%. The difference is not a matter of
+taste. For a company that keeps its leverage at a target, the assumptions of Harris and Pringle are
+closer to its financing policy, and the constant debt rule mixes into the beta a policy the company
+does not follow; with the target reset once a year rather than continuously, the Miles and Ezzell
+treatment below is the more precise one.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig12_erp}
+  \caption{The implied equity risk premium of the S\&P 500 at the end of each year, from
+  \textcite{damodaran2026}, and the ten year Treasury yield it is measured against.}
+  \label{fig11:erp}
+\end{figure}
+
+With a target leverage the right weighted average cost of capital also depends on how often the debt
+is reset. \textcite{miles1980} worked it out for a reset once a year.
+
+\begin{proposition}[Miles and Ezzell]\label{prop11:me}
+Let a firm's free cash flows have cost of capital $r_U$, and let its debt be reset at the end of each
+year, after that year's cash flow, to a share $L$ of its value, at the rate $r_D$, with interest
+deductible at $\tau$ and always usable, so that the interest of year $t$ is fixed at $t-1$. Then the value
+satisfies $V_{t-1}=(F_t+V_t)/(1+W)$ with
+\begin{equation}\label{eq11:me}
+  W=r_U-L\,r_D\,\tau\,\frac{1+r_U}{1+r_D}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The tax shield paid at $t$ is $\tau r_DLV_{t-1}$. It is known at $t-1$, so it is discounted for its last
+year at $r_D$, while the firm's own cash flow and its value at $t$ have the risk of the assets and are
+discounted at $r_U$. The adjusted present value of \textcite{myers1974} over one year is therefore
+$V_{t-1}=(F_t+V_t)/(1+r_U)+\tau r_DLV_{t-1}/(1+r_D)$. Collecting $V_{t-1}$,
+$V_{t-1}\bigl(1-\tau r_DL/(1+r_D)\bigr)(1+r_U)=F_t+V_t$, and the factor on the left is $1+W$ with $W$ as
+in \cref{eq11:me}. The recursion is a valuation relation under these discount rates; it need not
+hold path by path.
+\end{proof}
+
+For the manufacturer, the Harris and Pringle unlevered beta gives $r_U=\wkRu\%$, and
+\cref{eq11:me} gives $W=\wkWme\%$. The usual formula gives the same number when the cost of equity is
+relevered consistently with the annual reset, $r_E=r_U+(r_U-r_D)\frac DE\bigl(1-\tau r_D/(1+r_D)\bigr)$,
+which is \wkReMe\%; the code checks the equality. The figure of \wkWHp\% computed above came from a
+beta relevered with a debt beta of zero, as if the debt carried no risk premium, while it is charged
+\wkRd\%, and with the tax shields given the risk of the assets as under continuous rebalancing. Building the
+cost of equity from $r_U$ and $r_D$ directly, with the target reset once a year, removes both
+inconsistencies and gives \cref{eq11:me}.
+
+\Cref{fig11:wacc} sets the three treatments of this section against the target leverage. The two textbook rules differ
+even with no debt, \wrHamZero\% and \wrHpZero\%, because they unlever the industry beta differently.
+With a riskless debt beta, the rule of Harris and Pringle gives $W=r_U+\frac DV\,(r_D-r_f-\tau r_D)$,
+which rises slightly with leverage here because the spread of \wkSpread{} points is larger than the tax
+saving $\tau r_D$; the rule of Hamada falls, and Miles and Ezzell falls fastest. At the \wkTarget\% target
+the three are \wrSpreadTarget{} points apart and at 60\% they are \wrSpreadSixty{} points apart, so the
+choice matters more the more the company borrows.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{ch11/fig20_wacc}
+  \caption{Cost of capital against target debt to value for the machinery inputs of the text: betas
+  unlevered and relevered by Hamada and by Harris and Pringle with the usual formula, and the Miles and
+  Ezzell cost for a target reset once a year. The dotted line marks the \wkTarget\% target.}
+  \label{fig11:wacc}
+\end{figure}
+
+\subsection{The discounted cash flow}
+
+The manufacturer's revenue grows by 5\%, 5\%, 4\%, 4\% and 3\% over five years, at the normalised margin,
+with depreciation of 3\% of revenue, capital spending of 3.5\% and working capital of 12\% of the increase
+in revenue, and tax at \wkTax\%. The free cash flows are \vlFcfOne, \vlFcfTwo, \vlFcfThree, \vlFcfFour{}
+and \vlFcfFive{} million. After year five the company grows at \vlG\% and earns \vlRoc\% on new capital, so
+it reinvests \vlReinv\% of NOPAT, and with NOPAT of \vlNopatSix{} million in year six the terminal value
+of \cref{eq11:driver} is \vlTv{} million. Discounted at \wkWme\%, the enterprise value is \vlEv{} million,
+of which \vlTvShare\% comes from the terminal value, and the equity, after today's net debt of \vlNetDebt{}
+million, is worth \vlEq{} million; the cost of capital assumes the target leverage that a buyer would
+put in place, whatever the owner borrows today. The enterprise value is \vlEvEbitda{} times normalised EBITDA.
+
+\Cref{tab11:dcf} sets out the forecast line by line, so that the enterprise value can be traced from
+revenue to present value.
+
+\begin{table}[!tb]
+  \centering
+  \small
+  \caption{The manufacturer's five year DCF, in millions of dollars, discounted at \wkWme\%. The terminal
+  value is that of \cref{eq11:driver} at the end of year five.}
+  \label{tab11:dcf}
+  \begin{tabular}{@{}lrrrrr@{}}
+    \toprule
+    Year & 1 & 2 & 3 & 4 & 5\\
+    \midrule
+    Revenue & \vdRevOne & \vdRevTwo & \vdRevThree & \vdRevFour & \vdRevFive\\
+    EBITDA & \vdEbitdaOne & \vdEbitdaTwo & \vdEbitdaThree & \vdEbitdaFour & \vdEbitdaFive\\
+    Depreciation & \vdDaOne & \vdDaTwo & \vdDaThree & \vdDaFour & \vdDaFive\\
+    EBIT & \vdEbitOne & \vdEbitTwo & \vdEbitThree & \vdEbitFour & \vdEbitFive\\
+    NOPAT & \vdNopatOne & \vdNopatTwo & \vdNopatThree & \vdNopatFour & \vdNopatFive\\
+    Capital spending & \vdCapexOne & \vdCapexTwo & \vdCapexThree & \vdCapexFour & \vdCapexFive\\
+    Working capital & \vdDwcOne & \vdDwcTwo & \vdDwcThree & \vdDwcFour & \vdDwcFive\\
+    Free cash flow & \vdFcfOne & \vdFcfTwo & \vdFcfThree & \vdFcfFour & \vdFcfFive\\
+    Discount factor & \vdDfOne & \vdDfTwo & \vdDfThree & \vdDfFour & \vdDfFive\\
+    Present value & \vdPvOne & \vdPvTwo & \vdPvThree & \vdPvFour & \vdPvFive\\
+    \midrule
+    \multicolumn{5}{@{}l}{Present value of the five cash flows} & \vdPvSum\\
+    \multicolumn{5}{@{}l}{Terminal value \vlTv, discounted} & \vdPvTv\\
+    \multicolumn{5}{@{}l}{Enterprise value} & \vlEv\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The same value follows from the adjusted present value: discounting the free cash flows and the
+terminal value at $r_U$ gives an unlevered value of \vlVu{} million, and the tax shields of the
+rebalanced debt, valued by the recursion in the proof of \cref{prop11:me}, add \vlShield{} million, or
+\vlShieldShare\% of the total. The code checks that the two routes agree to rounding error. The shortcut
+$\tau D$, which treats a debt of \wkTarget\% of today's value as permanent, would give \vlTauD{} million.
+In this illustration that is less than the rebalanced shields are worth, because the debt here grows
+with the firm; each year's shield is riskier than a fixed one, which pulls the other way but by less.
+The ordering comes from these assumptions about debt growth, shield risk and discounting, and need not
+hold elsewhere.
+
+A one stage capitalisation of the first year's free cash flow, $F_1/(W-g)$, gives \vlCapEarn{}
+million, more than the DCF. It treats the first year's free cash flow as the numerator, one period ahead, of
+a perpetuity growing at \vlG\% from then on. The two disagree because the one stage formula applies the terminal growth to the first year's
+cash flow, whose reinvestment is lower than the \vlReinv\% of NOPAT that \cref{prop11:driver} requires
+for growth of \vlG\% at a return of \vlRoc\%, and so carries that year's reinvestment and profitability
+into every later year. Capitalised earnings are
+a valid shortcut only for a company whose current cash flow already reflects the reinvestment its
+growth needs.
+
+\Cref{fig11:tornado} shows how the value moves when one input changes, as percentage changes in
+enterprise value. A point less and a point more on the cost of capital move it by \vlToWaccUp\% and \vlToWaccDn\%; two points of growth in each forecast year by \vlToNearUp\%
+and \vlToNearDn\%; a point of margin by \vlToMarginUp\% and \vlToMarginDn\%; a return on new capital of
+15\% or 9\% by \vlToRocUp\% and \vlToRocDn\%; half a point of terminal growth only by \vlToGrowthUp\% and
+\vlToGrowthDn\%, because with a return on new capital of \vlRoc\% against a cost of capital of
+\wkWme\% growth creates little value (\cref{prop11:driver}); and half a point less or more of capital spending by \vlToCapexUp\% and \vlToCapexDn\%.
+A DCF of a private company is sensitive to at least these input changes, and an honest report gives
+the range alongside the point estimate.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig13_tornado}
+  \caption{Change in the manufacturer's enterprise value when one input of the DCF is moved, the
+  others held at their base values.}
+  \label{fig11:tornado}
+\end{figure}
+
+\subsection{Multiples}
+
+The market approach applies a multiple paid for comparable companies to the company's own earnings.
+The US machinery industry trades at \vlIndMult{} times EBITDA, which on the manufacturer's normalised
+EBITDA would give an enterprise value of \vlMktEv{} million, \vlMktGap\% above the DCF. The industry's companies are public,
+larger and more diversified than the manufacturer, and they differ from it in liquidity, control and the
+date of the data, so a buyer who applies their multiple must either show that growth and risk are
+comparable or adjust the multiple for the difference. A multiple is a summary of a DCF that someone else has done, and it is only as
+comparable as the forecasts behind it.
+
+\Cref{prop11:driver} turns a multiple into the inputs it implies. With next year's NOPAT in the
+denominator, the forward multiple is $\mathit{EV}/\mathit{NOPAT}_{1}=(1-g/\mathit{ROC})/(W-g)$; with this
+year's NOPAT, the trailing multiple is $(1+g)(1-g/\mathit{ROC})/(W-g)$, the form used below because the
+data report trailing earnings. Either way a multiple fixes a relation between growth, the return on
+capital and the cost of capital. For the \mkN{} US industries in the Damodaran data with a return on
+capital above 4\% and a cost of capital more than a point above 2.5\%, the multiple of trailing after-tax EBIT implied by each
+industry's own cost of capital and return on capital, with growth of 2.5\%, has a median of \mkImpMed,
+against an observed median of \mkObsMed; the observed multiple is above the implied one in \mkAbove\%
+of industries (\cref{fig11:multiples}). Across industries the two are negatively related, with a rank
+correlation of \mkRho, which a five year stage of growth at each industry's own fundamental growth rate
+before the terminal value weakens to \mkRhoTwo{} but leaves negative. The observed multiples rise with
+the industry's cost of capital, rank correlation \mkRhoW; expected growth, profitability and
+differences in composition and measurement may help explain that, though the correlation does not
+establish a cause. At the medians, taken one at a time and
+unrounded, of a cost of capital of
+\mkWmed\% and a return on capital of \mkRocMed\%, the observed trailing multiple implies, under stable-state assumptions, perpetual growth of
+\mkGstar\%; the three medians need not belong to any one industry. Reading a market multiple through the value driver is a way of finding the growth that
+the price assumes, and judging whether it is plausible for the company being valued.
+
+The R listing below does this for any multiple. It solves the trailing value driver for $g$ with
+\texttt{uniroot} and checks the answer against the root of the quadratic that the equation reduces to;
+at the medians, typed in to the digits shown, it prints \mkGstar\% both ways.
+\Needspace*{16\baselineskip}
+\lstinputlisting[language=R]{code/ch11/snippets/implied_growth.R}
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.78\textwidth]{ch11/fig11_multiples}
+  \caption{Observed EV/EBIT$(1-\tau)$ of US industries in January 2026 against the trailing multiple implied by
+  \cref{eq11:driver}, $(1+g)(1-g/\mathit{ROC})/(W-g)$, with each industry's cost of capital and return on capital and growth of 2.5\%.
+  Data from \textcite{damodaran2026}.}
+  \label{fig11:multiples}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{Discounts for control and marketability}
+\label{sec11:discounts}
+
+The DCF of \cref{sec11:value} values the whole company as a buyer with control would run it, with the
+pay and rent restated. A minority stake in the same company is worth less for two reasons. Its owner
+cannot set the pay, the dividends or the date of sale, and there is no market in which to sell it.
+The first is the \emph{discount for lack of control} (DLOC) and the second the \emph{discount for
+lack of marketability} (DLOM). Because the two discounts multiply, their order does not change the
+result; what matters is that the DLOC is taken from a control value and the DLOM from a marketable
+minority value, without counting either twice.
+
+If buyers of control pay a premium $p$ over the minority value, the minority value is $1/(1+p)$ of
+the control value and $\mathrm{DLOC}=1-1/(1+p)$: a premium of \dmCp\% is a discount of \dmDloc\%. A
+premium observed in acquisitions is not automatically the right DLOC for a given minority stake,
+because it can include synergies particular to the buyer. The
+DLOM is then a discount on the marketable minority value, so the two combine as
+$1-(1-\mathrm{DLOC})(1-\mathrm{DLOM})$, which is less than their sum by their product. The size of the DLOM
+is the harder question, and two option arguments give benchmarks for it.
+
+\paragraph{The protective put.}
+\textcite{chaffe1993} observed that the owner of a share that cannot be sold for $T$ years could
+set a minimum on the share's value at the end of that period, while keeping the upside, by buying a
+European put at the current price, though
+the put does not restore the right to sell at an earlier date. The price of that put, as a share of the
+share price, is a model-based proxy for what the restriction costs. It is neither an exact DLOM nor a
+discount observed in transactions. In the model of
+\textcite{black1973} and \textcite{merton1973} with no dividends, an at the money put on a share of
+price one is $e^{-rT}N(-d_2)-N(-d_1)$ with $d_{1,2}=(r\pm\sigma^2/2)\sqrt T/\sigma$. For a volatility of
+\dmSig\% and a restriction of \dmT{} years it is \dmChaffe\% at the Treasury yield of \wkRf\%, used as a continuous rate, and
+\dmChaffeZero\% at a zero rate. The put cannot cost more than the share, so this measure stays below
+100\%, and it treats the holder as if the only loss were the inability to avoid a fall.
+
+\paragraph{The lookback value.}
+\textcite{longstaff1995} asked instead what an owner would give up against an investor who could sell
+at the best moment during the restriction. Longstaff presented this as an upper bound on the discount, but it is a bound only inside his
+frictionless model with perfect timing; read here, it is the value of an idealised right and sets no ceiling
+on a DLOM measured in transactions.
+
+\begin{proposition}[Longstaff's lookback value]\label{prop11:longstaff}
+Let $Z$ be a standard Brownian motion, let the discounted share price be
+$S_t=\exp(\sigma Z_t-\sigma^2t/2)$, and let $v=\sigma^2T$. Then
+\begin{equation}\label{eq11:longstaff}
+  \E\Bigl[\max_{0\le t\le T}S_t\Bigr]-1=\Bigl(2+\frac v2\Bigr)N\Bigl(\frac{\sqrt v}2\Bigr)
+  +\sqrt{\frac v{2\pi}}\,e^{-v/8}-1,
+\end{equation}
+which depends on $\sigma$ and $T$ only through $v$ and grows without bound in $v$. It is measured against
+the initial price and can exceed one.
+\end{proposition}
+
+\begin{proof}
+Write $X_t=\sigma Z_t-\sigma^2t/2$, a Brownian motion with drift $\nu=-\sigma^2/2$ and variance $\sigma^2$,
+and $M=\max_{t\le T}X_t\ge0$. With $s=\sqrt v$, the law of the maximum of a Brownian motion with drift gives
+\[
+  \Pr(M>m)=N\Bigl(\frac{-m+\nu T}{s}\Bigr)+e^{2\nu m/\sigma^2}N\Bigl(\frac{-m-\nu T}{s}\Bigr)
+  =N\Bigl(-\frac ms-\frac s2\Bigr)+e^{-m}N\Bigl(-\frac ms+\frac s2\Bigr)
+\]
+for $m\ge0$. Since $\E[e^M]-1=\int_0^\infty e^m\Pr(M>m)\,dm$, there are two integrals. The second term
+gives $I_2=\int_0^\infty N(s/2-m/s)\,dm=s\int_{-\infty}^{s/2}N(u)\,du=s\bigl(\tfrac s2N(\tfrac s2)+\varphi(\tfrac s2)\bigr)$.
+For the first, integration by parts gives
+$I_1=-N(-\tfrac s2)+\tfrac1s\int_0^\infty e^m\varphi(\tfrac ms+\tfrac s2)\,dm$, and since
+$e^m\varphi(\tfrac ms+\tfrac s2)=\varphi(\tfrac ms-\tfrac s2)$, the integral is $sN(\tfrac s2)$ and
+$I_1=2N(\tfrac s2)-1$. Adding, $I_1+I_2=(2+\tfrac{s^2}2)N(\tfrac s2)+s\varphi(\tfrac s2)-1$, which is
+\cref{eq11:longstaff}. As $v\to\infty$ the right side grows like $v/2$.
+\end{proof}
+
+For \dmSig\% volatility over \dmT{} years the lookback value is \dmLong\%, \dmLongOverPut{} times the put. The code checks
+\cref{eq11:longstaff} by simulating \dmMcPaths{} paths with \dmMcSteps{} steps, drawing the maximum within
+each step exactly from its Brownian bridge law; at three horizons and two volatilities the simulated
+means lie within \dmMcMaxZ{} standard errors of the formula. \Cref{fig11:dlom} draws both measures. At
+30\% volatility the put rises from \dmChThirtyOne\% for a year to \dmChThirtyFour\% for four years and the
+lookback value from \dmLsThirtyOne\% to \dmLsThirtyFour\%; at 60\% the lookback value for four years is
+\dmLsSixtyFour\%, more than the share itself. The value for 30\% over four years equals that for 60\% over
+one, since only $v$ matters. The two models value different idealised rights, so they are not a
+calibrated interval for a DLOM: at \dmSig\% over \dmT{} years they give \dmChaffe\% and \dmLong\%. The
+choice of measure and of volatility moves the answer more than any other input of the minority valuation below.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.84\textwidth]{ch11/fig14_dlom}
+  \caption{Two measures of the discount for lack of marketability against the length of the
+  restriction: the price of an at the money European put at the Treasury yield of \wkRf\% and the
+  lookback value of \cref{eq11:longstaff}, with simulated values of the lookback.}
+  \label{fig11:dlom}
+\end{figure}
+
+\paragraph{A minority stake.}
+Take a \dmStakeShare\% stake in the manufacturer of \cref{sec11:value}. Its share of the equity at the
+control value is \dmStakeCtl{} million. A control premium of \dmCp\% gives a DLOC of \dmDloc\%, and the put
+for \dmT{} years at \dmSig\% volatility a DLOM of \dmChaffe\%, so the combined discount is \dmComb\%, not
+the \dmSum\% of their sum, and the stake is worth \dmStake{} million. The DLOM here is a
+modelling choice taken from the put benchmark, so the value is an illustration and not an observed
+fair market value; the control adjustments enter through the DLOC alone. Had the earnings not been normalised
+for the owner's pay and rent, part of the DLOC would already have been taken in the cash flows; the
+discount should be applied to a control value only if the cash flows are those of a controlling owner.
+
+\Cref{tab11:minority} shows how far the answer moves with the measure, the volatility and the
+restriction period, with the DLOC held at \dmDloc\%. With the put, the stake is worth between
+\mgPutSixtyFour{} and \mgPutThirtyOne{} million across the grid. With the lookback value it falls to
+\mgLbFortyFiveFour{} million at 45\% volatility over four years, and at 60\% over four years the lookback
+value is more than the share price, so it cannot serve as a discount at all. The Octave script
+\texttt{code/ch11/snippets/minority.m}, kept in the repository and not printed, computes the grid from the
+same formulas.
+
+\begin{table}[!tb]
+  \centering
+  \small
+  \caption{Value of the \dmStakeShare\% stake, in millions of dollars, with a DLOC of \dmDloc\% and a DLOM
+  from the protective put or from the lookback value. One cell is missing (n.a.): there the lookback value
+  is above the share price and gives no usable discount.}
+  \label{tab11:minority}
+  \begin{tabular}{@{}lrrrrrr@{}}
+    \toprule
+    & \multicolumn{3}{c}{Protective put} & \multicolumn{3}{c}{Lookback value}\\
+    \cmidrule(lr){2-4}\cmidrule(l){5-7}
+    Volatility & 1 year & 2 years & 4 years & 1 year & 2 years & 4 years\\
+    \midrule
+    30\% & \mgPutThirtyOne & \mgPutThirtyTwo & \mgPutThirtyFour & \mgLbThirtyOne & \mgLbThirtyTwo & \mgLbThirtyFour\\
+    45\% & \mgPutFortyFiveOne & \mgPutFortyFiveTwo & \mgPutFortyFiveFour & \mgLbFortyFiveOne & \mgLbFortyFiveTwo & \mgLbFortyFiveFour\\
+    60\% & \mgPutSixtyOne & \mgPutSixtyTwo & \mgPutSixtyFour & \mgLbSixtyOne & \mgLbSixtyTwo & \mgLbSixtyFour\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\FloatBarrier
+% =====================================================================================
+\section{Limitations}
+\label{sec11:limits}
+
+The stylised fund, the buyout and the manufacturer are illustrations with round inputs, and the
+simulations draw deal returns from lognormal laws with one beta and no link between the timing of
+exits and the market. Real funds sell more when markets are high, which moves both the J-curve and
+the gap between IRR and PME. The NAV of the simulated funds is marked at cost for a year and then at
+fair value without smoothing; reported NAVs lag the market, and a PME computed on an interim NAV
+inherits the lag.
+
+The CalPERS data cover only the partnerships active at the end of March 2026. A fund that was wound
+up before then is missing, so the older vintages are a selection of those that still held assets, and
+their multiples may differ from the multiples of every fund of the same vintage. The data give totals
+at one date and no timing of the cash flows, so the PME of a CalPERS fund cannot be computed from
+them, and the implied duration of \cref{prop11:duration} expresses the reported IRR and TVPI as an
+equivalent single period investment, without assuming that the fund had one contribution and one
+distribution.
+
+The cost of capital pairs an implied equity premium measured at the start of 2026 with a Treasury
+yield of September 2026 and with industry averages of January 2026. The industry data are averages
+over companies far larger than the manufacturer, and the market multiples are those of public
+companies. The DCF has no size premium and no specific risk premium, which practitioners often add
+for small private companies; adding them would lower the model value with everything else unchanged,
+and whether they are justified depends on whether those risks are already in the forecasts or the
+beta. The DLOM measures are model benchmarks, not estimates fitted to transactions in restricted shares.
+
+\FloatBarrier
+% =====================================================================================
+\section{Summary}
+\label{sec11:summary}
+
+\begin{itemize}
+  \item In a whole fund waterfall the LPs get their capital back and a preferred return before the GP
+        takes carry; with a full catch-up the GP ends with exactly the carry share of the profit once
+        the catch-up is complete, provided no capital is called afterwards. For the stylised fund the gross IRR of \wfGrossIrr\% becomes a net
+        IRR of \wfNetIrr\%.
+  \item Deal by deal carry is worth more to the GP than whole fund carry with the same terms even when
+        the clawback returns every excess dollar, because the GP holds the excess in between. In
+        simulated funds the clawback was triggered in \wfTmClawFreq\% of funds.
+  \item The J-curve comes from fees and from marking deals at cost while capital is called. Interim
+        IRRs rank funds poorly in the first years: the rank correlation with the final IRR is
+        \jcRankThree{} after three years and \jcRankEight{} after eight.
+  \item The KS-PME divides the index-discounted distributions by the index-discounted contributions,
+        and direct alpha is the IRR of the flows carried with the index. For flows that change sign
+        once the two agree on whether the fund beat the index. When the market's premium over the risk-free rate
+        exceeds its variance, a fund with beta above one shows an expected PME above one with no skill;
+        with the simulation's index but leverage financed at the Treasury yield of \wkRf\%, the premium is
+        smaller than the variance and the bias runs the other way, an expected PME of \pkBetaTwo{} at a beta of two over \pkT{} years.
+  \item In a buyout the equity multiple is $(U-\lambda \kappa)/(1-\lambda)$, so debt helps exactly when the
+        asset multiple beats the compounded after-tax cost of debt. The stylised deal returned \lxIrr\%
+        with debt against \lxIrrU\% without.
+  \item The value driver formula ties terminal growth to reinvestment: growth adds value only when
+        the return on new capital exceeds the cost of capital.
+  \item With debt reset once a year to a target share of value, the Miles and Ezzell cost of capital
+        and the adjusted present value give the same value; the manufacturer is worth \vlEv{} million as
+        a whole, with \vlTvShare\% in the terminal value.
+  \item Discounts for control and marketability combine multiplicatively. The protective put and
+        the lookback value of \cref{prop11:longstaff} give \dmChaffe\% and \dmLong\% for a restriction of
+        \dmT{} years at \dmSig\% volatility, outputs of two different models and not lower and upper
+        estimates of the discount.
+\end{itemize}
+
+\FloatBarrier
+% =====================================================================================
+\section{Exercises}
+\label{sec11:exercises}
+
+\begin{enumerate}[label=\textbf{11.\arabic*}, ref=11.\arabic*, leftmargin=*]
+  \item\label{exr11:one} A fund calls 100 at time zero and distributes 60 after three years and 120 after
+  six. The terms are a preferred return of 8\% compounded annually, carry of 20\% and a full catch-up, in a
+  whole fund waterfall. Split each distribution into return of capital, preferred return, catch-up and
+  the 80/20 split. What do the GP and the LPs receive in total, and what is the LPs' IRR?
+  \item\label{exr11:two} Under deal by deal carry a GP takes carry of 10 on a deal sold after two years.
+  When the fund ends after five years the whole fund carry is 4, and the clawback returns the rest. With
+  a continuously compounded rate of 8\%, what is the present value to the GP of the deal by deal terms
+  over the whole fund terms, if the clawback is paid in full?
+  \item\label{exr11:three} A fund reports a TVPI of 1.8 and a net IRR of 15\%. What is its implied
+  duration?
+  \item\label{exr11:four} A fund calls 100 when an index stands at 100 and returns 160 four years later,
+  when the index stands at 130. Find the KS-PME, the direct alpha and the IRR.
+  \item\label{exr11:five} The index has a continuous drift of 7\% and a volatility of 16\%, and the
+  continuously compounded risk-free rate is 4\%. A fund with no alpha calls one dollar and holds a position of $\beta$ in the
+  index, rebalanced continuously and financed at the risk-free rate, for five years. What is its
+  expected PME at $\beta=1.5$ and at $\beta=0.5$?
+  \item\label{exr11:six} Debt costs 7\% before a tax of 25\% and a buyout lasts five years. Find $\kappa$. With
+  debt of 60\% of the price, what is the equity multiple if the asset multiple is 1.8, and if it is 1.2?
+  \item\label{exr11:seven} A company is bought at 9 times EBITDA of 40 with net debt of 200 and sold at 10
+  times EBITDA of 55 with net debt of 120. Split the equity gain into growth, the multiple and debt
+  repaid with \cref{lem11:bridge}.
+  \item\label{exr11:eight} Next year's NOPAT is 10, the cost of capital 8\% and the return on new capital
+  15\%. Find the value at growth of 3\% and of 5\%, and without growth.
+  \item\label{exr11:nine} Assets have a cost of capital of 9\%, debt costs 6\%, the tax rate is 25\%, and
+  debt is kept at 40\% of value. Compare the Miles and Ezzell cost of capital with
+  $r_U-L\,r_D\,\tau$, the rate for continuous rebalancing.
+  \item\label{exr11:ten} A comparable company has a levered beta of 1.3 and a ratio of debt to equity of
+  0.5, with a tax rate of 25\%. Find its unlevered beta under the rules of Hamada and of Harris and
+  Pringle.
+  \item\label{exr11:eleven} A private company reports EBITDA of 8.0 million. Its owner draws 0.9 million,
+  where a hired manager would cost 0.35 million, and the year includes a one-off gain of 0.3 million.
+  Find normalised EBITDA and the value at 7 times.
+  \item\label{exr11:twelve} The control premium is 30\% and the DLOM 25\%. Find the DLOC, the combined
+  discount and the value of a 15\% stake in a company whose equity is worth 60 million under control.
+  \item\label{exr11:thirteen} For a restriction of two years on a share with a volatility of 40\%, find
+  the protective put at a continuously compounded rate of 4\% and the lookback value of \cref{prop11:longstaff}.
+  \item\label{exr11:fourteen} A business earns 7\% on new capital and has a cost of capital of 9\%. Find
+  the value, as a multiple of next year's NOPAT, at growth of 2\% and 4\%, and without growth. Why does faster growth
+  lower the value?
+\end{enumerate}
+
+\subsection*{Answers}
+\begin{enumerate}[label=\textbf{11.\arabic*}, leftmargin=*]
+  \item The first distribution is all return of capital, \yaRocThree, and leaves a hurdle balance of
+  $100\times1.08^3-60=\yaBalThree$, which grows to \yaBalSix{} by year six. The second returns the remaining
+  \yaRocSix{} of capital, pays \yaPref{} of preferred return and \yaCatch{} of catch-up, which solves
+  $y=0.2(\yaPref+y)$, and splits the remaining $120-\yaRocSix-\yaPref-\yaCatch=\yaRest$ 80/20. The GP receives \yaGp, 20\% of the profit of 80, the LPs
+  \yaLp, and their IRR is \yaLpIrr\%.
+  \item The deal by deal terms pay 10 at year two and claw back 6 at year five, while the whole fund terms
+  pay 4 at year five. By \cref{prop11:timing}
+  the present value advantage is $10(e^{-0.16}-e^{-0.40})=\ybPv$, since the deal by deal path is worth
+  $10e^{-0.16}-6e^{-0.40}$ and the whole fund path $4e^{-0.40}$.
+  \item $\ln1.8/\ln1.15=\ycDur$ years.
+  \item The KS-PME is $(160/130)/(100/100)=\ydPme$. Carried to year four, the call is 130 and the
+  distribution 160, so the direct alpha is $\ln(160/130)/4=\ydAlpha\%$ a year, continuously compounded. The
+  IRR is $1.6^{1/4}-1=\ydIrr\%$.
+  \item By \cref{eq11:betapme}, $\exp\bigl((\beta-1)(0.07-0.04-0.0256)\times5\bigr)$, which is \yePme{} at
+  $\beta=1.5$ and \yePmeLow{} at $\beta=0.5$.
+  \item $\kappa=(1+0.07\times0.75)^5=\yfK$. By \cref{eq11:lbo} the equity multiple is
+  $(1.8-0.6\times\yfK)/0.4=\yfMoic$, and at an asset multiple of 1.2 it is \yfMoicLow, below the asset
+  multiple because $1.2<\kappa$.
+  \item Growth is $9.5\times15=\ygG$, the multiple $47.5\times1=\ygM$ and debt repaid \ygD, which add to the
+  gain of $430-160=\ygTot$.
+  \item By \cref{eq11:driver}, $10(1-0.03/0.15)/0.05=\yhV$ at 3\%, \yhVhigh{} at 5\% and $10/0.08=\yhVflat$
+  without growth.
+  \item By \cref{eq11:me}, $W=0.09-0.40\times0.06\times0.25\times1.09/1.06=\yiMe\%$, against \yiHp\% for continuous
+  rebalancing. Each year's shield is fixed a year ahead and discounted at $r_D$ for its last year, so it is a
+  little safer than under continuous rebalancing, worth a little more, and the cost of capital is lower.
+  \item Hamada gives $1.3/(1+0.75\times0.5)=\yjHam$ and Harris and Pringle $1.3/1.5=\yjHp$.
+  \item $8.0+0.55-0.3=\ykE$ million, and the value is \ykV{} million.
+  \item The DLOC is $1-1/1.3=\ylDloc\%$, the combined discount $1-(1-0.231)(0.75)=\ylComb\%$, and the stake
+  is worth $0.15\times60\times(1-0.423)=\ylStake$ million.
+  \item The put is \ymPut\% of the share price, and the lookback value, with $v=0.32$, is \ymLs\%.
+  \item By \cref{eq11:driver} the multiples of NOPAT are \ynLow{} at 2\% and \ynHigh{} at 4\%, against
+  $1/0.09=\ynFlat$ without growth. Each dollar reinvested earns 7\% and is worth $0.07/0.09$ of a dollar,
+  so the more the business grows, the more value it destroys (\cref{prop11:driver}).
+\end{enumerate}
+
+\FloatBarrier
+% =====================================================================================
+\section{Notes, sources and credits}
+\label{sec11:credits}
+
+\paragraph{Sources}
+The fund terms and the economics of fees and carry are set out in \textcite{metrick2010}, and the
+cash flow model of a fund behind the J-curve is in the spirit of \textcite{takahashi2002}. The public
+market equivalent is from \textcite{kaplan2005}, direct alpha from \textcite{gredil2023}, the effect of
+beta on the PME from \textcite{sorensen2015}, and its generalisation to a stochastic discount factor
+from \textcite{korteweg2016}. The evidence on fees and on fund performance is in
+\textcite{phalippou2009} and \textcite{harris2014}, the pitfalls of the IRR in \textcite{phalippou2008}, the operating changes after
+buyouts in \textcite{kaplan1989}, and the link of leverage to credit markets in \textcite{axelson2013}.
+The irrelevance of leverage and the value of the tax shield are from \textcite{modigliani1958,modigliani1963},
+the adjusted present value from \textcite{myers1974}, and the cost of capital with annual rebalancing from
+\textcite{miles1980}. The rules for unlevering betas are from \textcite{hamada1972} and \textcite{harris1985},
+the growing perpetuity from \textcite{gordon1956}, the protective put from \textcite{chaffe1993}, priced
+with the model of \textcite{black1973} and \textcite{merton1973}, and the lookback value from
+\textcite{longstaff1995}. The waterfall share and timing results, the duration bound, the sign agreement
+of the PME and direct alpha, the leverage identity, the bridge, the value driver and the proof of the
+lookback formula are short derivations given here for completeness.
+
+\paragraph{Software used}
+The scripts call NumPy \parencite{numpy} for arrays and random numbers, SciPy \parencite{scipy} for root
+finding and the normal law, pandas \parencite{pandas} to read the tables, xlrd \parencite{xlrd} to read the
+spreadsheets of the Damodaran data, and Matplotlib \parencite{matplotlib} for the figures. The
+cross-checks run in R \parencite{rcore} and GNU Octave \parencite{octave}.
+\texttt{code/requirements-lock.txt} records the full environment.
+
+\paragraph{Projects for comparison}
+The numpy-financial package \parencite{numpyfinancial} and pyxirr \parencite{pyxirr} compute the IRRs of
+irregular cash flows used throughout the chapter, and are a check on the code here. The full list, with
+links, is in \texttt{CREDITS.md}.
+
+\paragraph{Data}
+The partnership data are from the Private Equity Program Fund Performance Review of CalPERS, as of 31
+March 2026 \parencite{calpers2026}. The industry averages, the costs of capital and the implied equity
+risk premium are from the data sets of Aswath Damodaran, in the update of January 2026
+\parencite{damodaran2026}. Both were retrieved on 19 October 2026. They are free to read but not in the
+public domain, so they are not redistributed, and \texttt{scripts/pull\_ch11.py} downloads them and
+rebuilds the chapter's data files. The ten year Treasury yield is from the Federal Reserve, as published
+on FRED \parencite{fredch11}, and ships with the code. The fund, the buyout, the manufacturer and the
+exercise inputs are illustrations.
+
+{\emergencystretch=2em\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]}
+\end{refsection}
+\flushbottom

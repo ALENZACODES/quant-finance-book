@@ -1,0 +1,1429 @@
+% Chapter 10. All quoted numbers come from chapters/ch10-numbers.tex, written by code/ch10/run_all.py.
+\input{chapters/ch10-numbers}
+\begin{refsection}
+\setcounter{chapter}{9}
+\chapter{Real Assets and Commercial Real Estate}
+\label{ch:realassets}
+
+An office building, a warehouse, a forest, a farm, a toll road and a tank of crude oil have one thing
+in common: each is a physical asset whose value comes from what it produces or what it saves its owner,
+and the physical assets do not trade continuously like listed shares, although exchange-traded futures
+provide exposure to commodities. Their prices are found in private sales,
+appraisals and futures markets, their returns are measured by indexes that are themselves estimates,
+and many, commercial property and infrastructure above all, are bought with substantial borrowing. This chapter is about how such assets are valued, how
+their returns are measured, and what they did for an investor worried about inflation.
+
+The chapter starts with a building: how rents become net operating income, how net operating income
+becomes a value through a cap rate or a discounted cash flow, and how sensitive that value is to the
+price at which the building is sold. Leverage comes next, with the two tests a lender applies, the
+loan they allow and what the loan does to the owner's return and risk; a case study marks loans
+written in each quarter from \lcFirst{} to \lcLastStart{} to the Federal Reserve's commercial property index. The third section is about
+measurement. Appraisals smooth the true path of values, and a short model shows by how much the
+smoothing hides volatility and correlation and how to undo it; the Federal Reserve's commercial
+property index, which switched from appraisals to transaction prices in 1996, tests the model. Listed
+real estate investment trusts (REITs) are then set against private property. The last three sections
+turn to timberland, farmland and infrastructure, where time and biological growth enter the value, to
+stored commodities, where the futures curve reveals the value of holding inventory and lets the owner of
+a tank fix what it will earn, and to inflation: which of these assets kept their real value when prices
+rose, over a year and over a decade, and how much of a hedge each one gave.
+
+\begin{keybox}[How to read this chapter]
+The numbers in the text are computed by nine scripts in \texttt{code/ch10/} (\texttt{proforma},
+\texttt{leverage}, \texttt{cycle}, \texttt{smoothing}, \texttt{reits}, \texttt{timber},
+\texttt{storage}, \texttt{inflation} and \texttt{exercises}), and the tests in
+\texttt{code/ch10/test\_*.py} check the library against simulation, finite differences and numerical
+optimisation. An independent R script and a GNU Octave script recompute the main results by other
+routes, and \texttt{code/ch10/README.md} lists what each of them checks.
+
+The property, REIT and house price series are quarterly from the Financial Accounts of the United
+States and the Federal Housing Finance Agency, and the price indexes, bill and bond yields and spot
+energy prices are monthly, all published on FRED \parencite{fredch10}; they run to the second quarter
+or to September 2026. The futures curves and inventories are from the US Energy Information
+Administration \parencite{eiach10}. US equity returns are from the Kenneth R. French Data Library
+\parencite{frenchlib}. The building, the loan terms, the forest and the concession are illustrations,
+and are labelled as such where they appear.
+
+Random draws come from NumPy's default generator with base seed \texttt{3817} and a stream number fixed
+in each script. The seed is an arbitrary label that makes the runs repeatable; it carries no date or
+other meaning.
+
+Notation. $\mathit{NOI}_t$ is net operating income in year $t$, $V$ a value, $c$ a cap rate, $r$ a
+required return or discount rate, $g$ a growth rate and $\kappa$ the share of NOI spent on capital items.
+For a loan, $\lambda$ is the loan-to-value ratio, $k$ the mortgage constant and $i$ the interest rate.
+In \cref{sec10:smoothing}, $r_t$ is a true return, $r^*_t$ the reported one and $\alpha$ the smoothing
+weight. $F(t,T)$ is a futures price for delivery at $T$ and $S_t$ the spot price; $u$ is a storage cost
+and $y$ a convenience yield, both continuous rates. $\pi_t$ is inflation over a year. Returns in the smoothing model
+and the regressions are log returns; the valuation, loan and leverage formulas use simple annual rates,
+and mortgage payments compound monthly. In the forest and storage sections $r$ is continuously
+compounded. Volatilities are annual. Six short listings in the text, kept in
+\texttt{code/ch10/snippets/}, run from the repository root and print the numbers they are placed beside.
+\end{keybox}
+
+\FloatBarrier
+% =====================================================================================
+\section{From rents to value}
+\label{sec10:value}
+
+A commercial building earns rent from its tenants and pays the costs of running it. \emph{Net
+operating income} (NOI) is what is left: potential rent at full occupancy, less vacancy and rent that
+is not collected, plus other income such as parking, less the operating expenses that the leases do
+not pass on to the tenants. NOI is measured before debt service, income tax and depreciation, so it
+describes the property and not the way it is financed or owned. It is also measured before capital
+spending. Roofs, lifts and heating plants wear out, and each new lease costs a commission to the broker
+and an allowance for the tenant's fit out. Those outlays are lumpy, and a valuation spreads them as a
+reserve, a share $\kappa$ of NOI, so that the cash the property returns to its owner is $(1-\kappa)\mathit{NOI}$.
+
+\Cref{tab10:proforma} sets out a pro forma for a stylised suburban office building. The numbers are
+illustrations chosen to be of a realistic order; they are not those of any building.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Pro forma for the first year of a stylised office building, in millions of dollars. Value is
+  next year's cash flow capitalised at $r-g$, with $r=\pfR\%$ and $g=\pfG\%$.}
+  \label{tab10:proforma}
+  \begin{tabular}{@{}lr@{}}
+    \toprule
+    Gross potential rent & \pfGpr\\
+    less vacancy and credit loss (\pfVac\%) & \pfVacAmt\\
+    plus parking and other income & \pfOther\\
+    Effective gross income & \pfEgi\\
+    less operating expenses not recovered & \pfOpex\\
+    Net operating income & \pfNoi\\
+    less capital reserve (\pfCapex\% of NOI) & \pfCapexAmt\\
+    Cash flow before debt service & \pfCf\\
+    \addlinespace
+    Value at a cap rate of \pfCap\% & \pfValue\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{The cap rate}
+
+The \emph{capitalisation rate} or cap rate of a property is next year's NOI divided by its value or
+price. It is reported for most sales, and it plays the role that the earnings yield plays for a share. Its
+link to returns is the growing perpetuity of \textcite{gordon1956}, adjusted for the capital reserve.
+
+\begin{proposition}[Cap rate, required return and growth]\label{prop10:cap}
+Suppose NOI grows at a constant rate $g$, the owner spends a constant share $\kappa<1$ of NOI on capital
+items, and cash flows are discounted at $r>g$. Then the value of the property is
+\begin{equation}\label{eq10:gordon}
+  V = \frac{(1-\kappa)\,\mathit{NOI}_1}{r-g},
+  \qquad\text{so}\qquad
+  c = \frac{\mathit{NOI}_1}{V} = \frac{r-g}{1-\kappa}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The cash flow in year $t$ is $(1-\kappa)\mathit{NOI}_1(1+g)^{t-1}$, and its present value summed over
+$t\ge1$ is a geometric series with ratio $(1+g)/(1+r)<1$:
+$\sum_{t\ge1}(1-\kappa)\mathit{NOI}_1(1+g)^{t-1}(1+r)^{-t}=(1-\kappa)\mathit{NOI}_1/(r-g)$. Dividing
+$\mathit{NOI}_1$ by $V$ gives the cap rate.
+\end{proof}
+
+With a required return of \pfR\%, growth of \pfG\% and a reserve of \pfCapex\%, the cap rate is
+\pfCap\% and the building is worth \pfValue{} million dollars. Leaving the reserve out would give a cap rate of
+\pfCapNoCapex\% and a value of \pfValueNoCapex{} million, an error of more than a tenth. The comparison
+says something about quoted cap rates. Two buildings that sell at the same cap rate need not offer the
+same return: one may need a new roof, and the other may have rents below the market that will rise
+when its leases end. A cap rate is a price, and \cref{eq10:gordon} turns it into a return only once
+the growth and the capital needs are known.
+
+\subsection{Discounted cash flow and the exit cap rate}
+
+Investors who buy a building usually plan to sell it, and value it by a discounted cash flow over a
+holding period of $T$ years, with a sale at the end at a price set by an \emph{exit} cap rate $c_T$
+applied to the NOI of the year after:
+\begin{equation}\label{eq10:dcf}
+  V_{\mathrm{DCF}} = \sum_{t=1}^{T}\frac{(1-\kappa)\mathit{NOI}_t}{(1+r)^t}
+  + \frac{(1-s)\,\mathit{NOI}_{T+1}/c_T}{(1+r)^T},
+\end{equation}
+where $s$ is the cost of selling as a share of the price. The two methods should agree when their
+assumptions agree, and the next result says when they do.
+
+\begin{proposition}[Consistency of the two methods]\label{prop10:dcf}
+Let NOI grow at $g$, and let $c=(r-g)/(1-\kappa)$ as in \cref{prop10:cap}. If $c_T=c$ and $s=0$, then
+$V_{\mathrm{DCF}}=V$ for every $T$. A buyer who pays $V$ and later sells at the same cap rate earns an
+internal rate of return of exactly $r=(1-\kappa)c+g$, whatever the holding period.
+\end{proposition}
+
+\begin{proof}
+At $c_T=c$ the sale price is $\mathit{NOI}_{T+1}/c=(1-\kappa)\mathit{NOI}_{T+1}/(r-g)$, which by
+\cref{prop10:cap} applied at year $T$ is the value at $T$ of the cash flows after $T$. The sum in
+\cref{eq10:dcf} is the value of the first $T$ cash flows, so the total is the value of all of them, $V$.
+For the second statement, the price $V$ equals the present value at rate $r$ of the cash flows and the
+sale, so $r$ solves the IRR equation; the IRR is unique because the flows change sign once.
+\end{proof}
+
+The return on a property bought and sold at the same cap rate is its cash yield plus its growth, the
+real estate form of the growth identity that \textcite{gordon1956} wrote for shares. Exit cap rates are, in practice, often
+set above going-in rates, on the view that the building will be older when it is sold. With an exit
+cap of \pfExit\%, a quarter of a point above the going-in rate, and selling costs of \pfSaleCost\%,
+the DCF value is \pfValueDcf{} million, \pfDcfGapAbs\% below the value in \cref{tab10:proforma}. A buyer who
+paid the full \pfValue{} million and then sold on those terms would earn \pfIrr\% and not \pfIrrSame\%.
+
+The listing below computes these figures from the inputs of \cref{tab10:proforma}. Its DCF with the
+exit cap set equal to the going-in cap returns the Gordon value of \pfValue{} million, a check that the
+cash flows and the sale are dated consistently; the higher exit cap and the selling costs then give
+\pfValueDcf{} million, and the internal rates of return at the Gordon price are \pfIrr\% and \pfIrrSame\%.
+\Needspace*{28\baselineskip}
+\lstinputlisting[language=Python]{code/ch10/snippets/dcf.py}
+
+\begin{proposition}[Sensitivity to the exit cap rate]\label{prop10:exit}
+The elasticity of $V_{\mathrm{DCF}}$ with respect to the exit cap rate is minus the share of the value
+that comes from the sale,
+\[
+  \frac{\partial\log V_{\mathrm{DCF}}}{\partial\log c_T}
+  = -\frac{(1-s)\mathit{NOI}_{T+1}/c_T}{(1+r)^T\,V_{\mathrm{DCF}}},
+\]
+and at $c_T=c$ and $s=0$ that share is $\bigl((1+g)/(1+r)\bigr)^{T}$.
+\end{proposition}
+
+\begin{proof}
+Only the sale term of \cref{eq10:dcf} depends on $c_T$, and it is proportional to $1/c_T$, so its
+derivative with respect to $\log c_T$ is minus itself. Dividing by $V_{\mathrm{DCF}}$ gives the first
+formula. At $c_T=c$, the sale is worth the value at $T$ of all later cash flows,
+$V(1+g)^T$, and its present value is $V(1+g)^T(1+r)^{-T}$, so the share is
+$\bigl((1+g)/(1+r)\bigr)^T$.
+\end{proof}
+
+At \pfR\% and \pfG\% over \pfT{} years the sale carries \pfSaleShare\% of the value, so a rise of one
+tenth in the exit cap rate, from \pfCap\% to \pfCapTenth\%, lowers the value by about \pfTenthLog\% in logs to first
+order, $\pfSaleShare\%\times\ln1.1$, or \pfTenthLogVal\% in value, and by \pfTenthExact\% exactly. A full point higher exit cap lowers the value by \pfUpHundredAbs\%.
+The same point added to the going-in cap rate would lower it by \pfCapUpAbs\%, because it applies to every year and not only to the sale. Panel (b) of
+\cref{fig10:exitcap} shows the share falling with the holding period: at short horizons the DCF is
+mostly a forecast of the exit cap rate, which is a forecast of the market's mood years ahead.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch10/fig01_exitcap}
+  \caption{(a) DCF value of the building of \cref{tab10:proforma} against the exit cap rate, for holding
+  periods of 5, 10 and 20 years; the dotted line is the going-in cap rate, where the three agree. (b)
+  Share of the value that comes from the sale, $((1+g)/(1+r))^T$, at $r=\pfR\%$ and three growth rates.}
+  \label{fig10:exitcap}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{Leverage}
+\label{sec10:leverage}
+
+Most commercial property is bought partly with a mortgage. A commercial mortgage is usually written for
+a \emph{term} of five to ten years with payments set as if the loan were repaid over a longer
+\emph{amortisation} period, so that a balance is still owed at the end of the term and must be repaid
+or refinanced. Two numbers describe the payments.
+
+\begin{proposition}[Mortgage constant and balance]\label{prop10:loan}
+A loan of one dollar at a nominal annual rate $i>0$ compounded monthly, repaid in equal monthly payments
+over $n$ years, has the
+annual debt service, or \emph{mortgage constant},
+\begin{equation}\label{eq10:constant}
+  k(i,n) = \frac{12\,j}{1-(1+j)^{-12n}}, \qquad j=i/12,
+\end{equation}
+and after $t$ years, with $12t$ a whole number of payments, the balance is
+\begin{equation}\label{eq10:balance}
+  B_t = \frac{(1+j)^{12n}-(1+j)^{12t}}{(1+j)^{12n}-1}
+  = \frac{k(i,n)}{12}\cdot\frac{1-(1+j)^{-12(n-t)}}{j}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The monthly payment $p$ makes the present value of $12n$ payments at rate $j$ equal to one:
+$p\,(1-(1+j)^{-12n})/j=1$, and $k=12p$. The balance evolves as $B_{m+1}=(1+j)B_m-p$ from $B_0=1$, whose
+solution is $B_m=(1+j)^m-p\,((1+j)^m-1)/j$; substituting $p$ gives the first form. The second form is
+the present value of the $12(n-t)$ payments still due, which equals the balance because the loan is
+repaid exactly at $n$.
+\end{proof}
+
+A lender sizes a loan by two tests, which Chapter~6 met in a credit screen. The
+\emph{loan-to-value ratio} (LTV) is the loan divided by the appraised value, and the \emph{debt service
+coverage ratio} (DSCR) is NOI divided by the annual debt service. Chapter~6 showed how these ratios and
+the debt yield tie together; the question here is the owner's, how large a loan the two tests allow.
+
+\begin{proposition}[The two tests]\label{prop10:dscr}
+For a property with value $V$ and cap rate $c=\mathit{NOI}_1/V$, a loan of $\lambda V$ with mortgage
+constant $k$ has
+\begin{equation}\label{eq10:dscr}
+  \mathrm{DSCR} = \frac{c}{\lambda k}.
+\end{equation}
+With a highest LTV of $\bar\lambda$ and a lowest DSCR of $\underline D$, the largest loan is
+$V\min\bigl(\bar\lambda,\;c/(\underline D\,k)\bigr)$. The DSCR test binds when $c<\underline D\,\bar\lambda\,k$,
+that is, when the cap rate is low against the mortgage constant.
+\end{proposition}
+
+\begin{proof}
+Debt service is $k\lambda V$ and NOI is $cV$, so their ratio is $c/(\lambda k)$, a form of the identities of
+Chapter~6. The DSCR test
+$c/(\lambda k)\ge\underline D$ holds if and only if $\lambda\le c/(\underline Dk)$, and the largest loan
+meets the tighter of the two upper bounds on $\lambda$.
+\end{proof}
+
+At \lvRate\% over \lvAmort{} years the mortgage constant is \lvK\%, above the building's cap rate of
+\pfCap\%. A loan at \lvLtvMax\% of value would have a DSCR of only \lvDscrAtMax, so a lender who asks for
+\lvDscrMin{} lends \lvLoan{} million dollars, \lvLtv\% of value. The coverage test, not the value test,
+sets the loan, and it does so for any rate above \lvRateSwitch\%. When rates rise faster than cap rates,
+buyers can borrow less against the same building, which is one way higher rates reach property values.
+The lender's own yardstick, the \emph{debt yield} of NOI over the loan, is \lvDebtYield\%.
+
+\Cref{fig10:loanrate} draws the largest loan against the mortgage rate for this building and for
+buildings priced at cap rates of 5\% and 6.5\%. While the value test binds, the loan is \lvLtvMax\% of
+value whatever the rate; once the coverage test binds, the loan falls as the rate rises, to \lrLtvNine\%
+of value for this building at 9\%. The kink moves with the cap rate, from \lrSwitchLow\% at a cap of 5\%
+to \lrSwitchHigh\% at 6.5\%, so buildings bought at low cap rates are the first to lose borrowing
+capacity when rates rise.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{ch10/fig14_loanrate}
+  \caption{Largest loan as a share of value, against the mortgage rate, for a lender who asks for a DSCR
+  of at least \lvDscrMin{} and an LTV of at most \lvLtvMax\% on a loan amortised over \lvAmort{} years. The
+  solid line is the building of \cref{tab10:proforma}, at a cap rate of \pfCap\%; the dotted line marks
+  \lvRateSwitch\%, above which the coverage test sets its loan.}
+  \label{fig10:loanrate}
+\end{figure}
+
+\begin{proposition}[Leverage, return and risk]\label{prop10:lever}
+Over a single period, let the property return $R_A$ and let a loan of a share $\lambda<1$ of value,
+with its principal fixed at the start and repaid with certainty at the end, cost $i$, fixed in advance. The return on the owner's equity is
+\begin{equation}\label{eq10:lever}
+  R_E = R_A + \frac{\lambda}{1-\lambda}\,(R_A-i),
+  \qquad \sigma(R_E)=\frac{\sigma(R_A)}{1-\lambda}.
+\end{equation}
+Leverage raises the expected return on equity if and only if $\E R_A>i$.
+\end{proposition}
+
+\begin{proof}
+The owner puts up $(1-\lambda)$ per unit of value and receives $R_A-\lambda i$ on it, so
+$R_E=(R_A-\lambda i)/(1-\lambda)$, which rearranges to \cref{eq10:lever}. As $i$ is fixed,
+$\sigma(R_E)=\sigma(R_A)/(1-\lambda)$, and $\E R_E-\E R_A=\lambda(\E R_A-i)/(1-\lambda)$ has the sign of
+$\E R_A-i$.
+\end{proof}
+
+Whether leverage is positive depends on which return is set against the cost of debt. For the building
+the expected return is \pfR\% against a rate of \lvRate\%, so leverage at \lvLtv\% raises the expected
+equity return to \lvLevRet\% and multiplies its volatility by \lvVolMult. That is a one-period figure that sets the \pfR\% return against
+the quoted \lvRate\%; paid monthly, the loan costs \lvRateEff\% a year, which gives \lvLevRetEff\%. The first year's cash yield
+tells a different story: the cash flow over value is \lvCfYield\%, but after debt service the equity
+earns only \lvCashYield\% in cash, because the mortgage constant, which includes repayment of principal,
+is above the cap rate. The higher expected return comes from earning the property's \pfR\% on money
+borrowed for less, and almost all of it arrives through growth in value, which is uncertain, and at the
+sale, when the principal repaid along the way comes back as a smaller balance to pay off.
+
+\Cref{fig10:levered} puts numbers on that uncertainty. On each of \lvNsim{} simulated paths the
+building's NOI grows each year at \pfG\% plus a normal shock with a standard deviation of \lvGsd\%, and
+the building is sold after \lvTerm{} years at an exit cap rate drawn around \pfExit\% with a standard
+deviation of \lvCapSd{} point; the loan above is repaid from the sale at its balance of \lvBal\% of the
+original amount, and each year's twelve payments are carried to the end of the year at the loan rate,
+so the loan costs \lvRateEff\% a year. Across the paths the unlevered IRR averaged \lvIuMean\% with a standard deviation of \lvIuSd\%, and the
+levered IRR \lvIlMean\% with \lvIlSd\%, \lvSdRatio{} times as much. The 5\% quantile fell from \lvIuQ\%
+to \lvIlQ\%. Levered equity did worse than the property itself on \lvPBelow\% of the paths, exactly those
+on which the property's IRR fell below the loan's \lvRateEff\%, and it lost money on \lvPLoss\% of them;
+no unlevered path lost money. The levered mean is below the \lvLevRet\% of \cref{prop10:lever} because the
+higher exit cap pulls the unlevered mean down to \lvIuMean\%, the loan costs \lvRateEff\% and not
+\lvRate\%, and amortisation and rising value lower the leverage over the ten years.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.86\textwidth]{ch10/fig02_levered}
+  \caption{Ten year IRRs of the building of \cref{tab10:proforma}, bought at \pfValue{} million dollars,
+  on \lvNsim{} simulated paths of rent growth and the exit cap rate, without debt and with a loan of
+  \lvLtv\% of value at \lvRate\%. The dotted line is the loan's cost of \lvRateEff\% a year,
+  the quoted \lvRate\% paid monthly.}
+  \label{fig10:levered}
+\end{figure}
+
+\subsection{Case study: loan-to-value through the cycle}
+\label{sec10:cycle}
+
+Chapter~6 followed Canadian five year loans to their refinancing. The question here is a different one:
+how far can a loan written at a prudent LTV drift while it is outstanding, when the value of the building
+moves with the market? Take a stylised loan written at the start of each quarter from \lcFirst{} to
+\lcLastStart, \lcN{} vintages in all, at \lcLtvZero\% of value, at the US 10 year Treasury yield of the
+quarter's first month plus \lcSpread{} points, amortised over 25 years with a five year term. Mark the
+building each quarter with the Federal Reserve's commercial property price index, the repeat-sales index
+of \cref{sec10:smoothing}, so that the LTV after $t$ years is
+\[
+  \lambda_t = \lambda_0\,\frac{B_t}{P_t/P_0},
+\]
+with $B_t$ the balance of \cref{prop10:loan} and $P_t$ the index. The spread, the starting LTV and the
+use of a national index for a single building are assumptions; a single building can move far more
+than an index of many.
+
+The calculation needs only the index, the Treasury yield and the balance formula, and the listing
+below runs it from the data files with the chapter's own loaders. It prints the number of vintages, the
+worst vintage with its highest LTV and the share of vintages whose LTV passed 80\% at some point, the
+numbers discussed next.
+\Needspace*{21\baselineskip}
+\lstinputlisting[language=Python]{code/ch10/snippets/ltv_cycle.py}
+
+\Cref{fig10:cycle} shows the result. For the median vintage the highest LTV over the term was \lcMedPeak\%,
+no higher than at the start, because amortisation and rising prices pulled it down. But \lcShareEighty\% of
+the vintages passed 80\% at some point and \lcShareHundred\% passed 100\%. The worst was the loan of
+\lcWorst, written at \lcWorstRate\% at the peak of the index: its LTV reached \lcWorstPeak\% and was still
+\lcWorstEnd\% at maturity, when the index stood \lcWorstPxAbs\% below its level at origination. Refinancing it at
+\lcLtvZero\% would have needed new equity of \lcGapMax\% of the building's original value. In all,
+\lcShareRefi\% of the vintages ended their term above the starting LTV, and the loans written from
+\lcLateFirst{} on ended at about \lcLateEnd\% on average.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch10/fig03_cycle}
+  \caption{(a) Loan-to-value ratio over the five year term of loans written at \lcLtvZero\% in four
+  quarters, marked to the Z.1 commercial property price index. (b) Highest loan-to-value over the term
+  and loan-to-value at maturity for loans written in each quarter from \lcFirst{} to \lcLastStart.}
+  \label{fig10:cycle}
+\end{figure}
+
+The same calculation on the appraisal-era index tells a gentler story about the early 1990s, when US
+commercial property went through a deep fall. Of the loans written from 1985 to 1990, none passed 80\%,
+and the highest LTV, for the vintage of \lcApprWorst, was \lcApprPeak\%. Some of the difference is real, but
+\cref{sec10:smoothing} shows how much an appraisal index smooths, and a lender who marked its book to
+such an index would have seen a smoother path of collateral values. This comparison alone cannot say
+how much of the gap came from smoothing and how much from different markets.
+
+\FloatBarrier
+% =====================================================================================
+\section{Appraisal smoothing}
+\label{sec10:smoothing}
+
+The return on a share is measured from two prices at which the share traded. A building trades every
+ten years or so, and the return on a portfolio of buildings in a quarter is usually measured from
+appraisals: a valuer's estimate of what each building would sell for. Valuers work from the sales of
+similar buildings in recent months and from the previous valuation, and both anchor the new estimate
+to the past. An index built from appraisals therefore moves later and less than the values it
+measures. Chapter~1 introduced the model of \textcite{geltner1993} for this,
+\begin{equation}\label{eq10:smooth}
+  r^*_t = \alpha\,r^*_{t-1} + (1-\alpha)\,r_t, \qquad 0\le\alpha<1,
+\end{equation}
+where $r_t$ is the true return in period $t$ and $r^*_t$ the reported one, and promised to return to it
+here. Unrolling the recursion, $r^*_t=(1-\alpha)\sum_{j\ge0}\alpha^jr_{t-j}$: each true return enters the
+reports spread over many later periods, with weights that add to one. Three earlier results carry over.
+When the true returns are independent with variance $\sigma^2$, the reports keep the mean, have
+variance $\sigma^2(1-\alpha)/(1+\alpha)$ and autocorrelation $\alpha^k$ at lag $k$ (Chapter~1); the slope
+of the reports on the current market return is $(1-\alpha)$ times the true beta, and the sum of the slopes
+on current and lagged market returns recovers it (Chapter~7); and, under the same model, smoothing
+leaves the variance per period of long sums unchanged in the limit, though over a finite horizon the two
+variances differ, and \cref{eq10:smooth} can be inverted to unsmooth a series (Chapter~8). Two more
+consequences matter for property: what smoothing does to the return over a holding period, and what it
+does to a correlation.
+
+\begin{proposition}[Holding period returns and correlations under smoothing]\label{prop10:smooth}
+Let $r^*_t$ follow \cref{eq10:smooth}.
+\begin{enumerate}[label=(\alph*)]
+  \item For any path and any start,
+        $\sum_{t=1}^Kr^*_t=\sum_{t=1}^Kr_t-\frac{\alpha}{1-\alpha}\bigl(r^*_K-r^*_0\bigr)$.
+  \item Let $r_t=a+\beta m_t+e_t$, where the market returns $m_t$ are independent with variance
+        $\sigma_m^2$ and the $e_t$ are independent of each other and of the market, and let $r^*$ be
+        stationary. Then the correlation of $r^*_t$ with $m_t$ is $\sqrt{1-\alpha^2}$ times the
+        correlation of $r_t$ with $m_t$, and the correlation of $r^*_t$ with $m_{t-j}$ is $\alpha^j$
+        times that of $r^*_t$ with $m_t$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(a) From \cref{eq10:smooth}, $(1-\alpha)r_t=r^*_t-\alpha r^*_{t-1}$. Summing over $t=1,\dots,K$ gives
+$(1-\alpha)\sum r_t=(1-\alpha)\sum r^*_t+\alpha(r^*_K-r^*_0)$, which rearranges to the identity.
+(b) In $r^*_t=(1-\alpha)\sum_i\alpha^i(a+\beta m_{t-i}+e_{t-i})$ only the term $i=j$ is correlated with
+$m_{t-j}$, so $\Cov(r^*_t,m_{t-j})=(1-\alpha)\alpha^j\beta\sigma_m^2$, which gives the second statement.
+With $\Var r^*_t=\sigma_r^2(1-\alpha)/(1+\alpha)$, the correlation at $j=0$ is
+$(1-\alpha)\beta\sigma_m/\bigl(\sigma_r\sqrt{(1-\alpha)/(1+\alpha)}\bigr)=\sqrt{1-\alpha^2}\,\beta\sigma_m/\sigma_r$,
+and $\beta\sigma_m/\sigma_r$ is the correlation of $r_t$ with $m_t$.
+\end{proof}
+
+Part (a) says that the difference between the cumulative true and reported log returns over a holding
+period is an end-point term and not an accumulation of errors period by period: it is the change between
+the first and last reports, scaled by $\alpha/(1-\alpha)$. Its size varies with those two reports, but it
+does not build up as the period lengthens. What
+the index gets wrong is the timing, and with it every statistic that depends on timing. Part (b) gives
+the size of the error in a correlation, the input that matters most when property is mixed with shares
+and bonds. At the $\alpha=\smArPreX$ of the appraisal-era index below, the factor is
+\smCorrShrink, so a true correlation of 0.5 with the stock market would be reported as \smCorrHalf, and the asset would look like a much better diversifier than it is. The
+lagged correlations decline geometrically, which is the pattern a lead and lag regression looks for.
+\textcite{getmansky2004} apply the same reasoning to hedge funds with illiquid holdings.
+
+\Cref{fig10:smoothsim} shows part (a) on simulated returns. True quarterly log returns are
+drawn as independent normals with the mean and volatility of the repeat-sales index after 1996, and
+smoothed at $\alpha=\smArPreX$ with the first report at the mean. Over \ssQ{} quarters the reported path
+trails the true one without drifting away from it: the gap, true less reported, is never more than
+\ssGapMax{} points in absolute value, ends at \ssGapEnd{} points, and equals the end-point term of part (a)
+in every quarter. The reported returns have a volatility of \ssVolRep\% a year against \ssVolTrue\% for the
+true ones. The model's factor $\sqrt{(1-\alpha)/(1+\alpha)}=\ssVolFactor$ would give \ssVolModel\%, and a
+sample of \ssQ{} quarters of so persistent a series understates its variance, here by more than usual.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.7\textwidth]{ch10/fig15_smoothsim}
+  \caption{A simulation: cumulative true and reported log returns over \ssQ{} quarters, with true
+  returns drawn as independent normals with the mean and volatility of the repeat-sales index and
+  smoothed at $\alpha=\smArPreX$; random stream \texttt{[3817, 2]}.}
+  \label{fig10:smoothsim}
+\end{figure}
+
+\paragraph{Unsmoothing}
+If \cref{eq10:smooth} holds, the true return can be recovered from two reports, as in Chapters~1 and 8:
+\begin{equation}\label{eq10:unsmooth}
+  r_t = \frac{r^*_t-\alpha\,r^*_{t-1}}{1-\alpha},
+\end{equation}
+with $\alpha$ replaced by the estimated first autocorrelation. This is the correction of
+\textcite{geltner1993}, who also showed that it does not need the market to be informationally efficient.
+It divides the change in the reported series by $1-\alpha$, so it also amplifies any noise in the reports,
+and it is only as good as the model. A valuer may smooth more in some years than in others, and an
+index that mixes properties appraised in different quarters is smoothed by its construction as well.
+
+\paragraph{The evidence}
+The Federal Reserve's quarterly price index for commercial real estate in the Financial Accounts offers a
+natural test. From 1996 it chains a transaction-based repeat-sales index, the CoStar U.S. Composite Index
+excluding multifamily, value weighted; before 1996 it is built from appraisal-based price series for
+offices, retail and industrial property. \Cref{tab10:smooth} sets the two periods side by side with the
+FHFA all-transactions house price index, which mixes sales with appraisals made for refinancing, and with
+the price return of equity REITs from the same accounts. The REIT series starts in \smReitFirst{} because
+its revaluation in the last quarter of 1996, equal to \smReitBreak\% of the previous quarter's market
+value, is a break in the series and not a return. The two property periods differ in market conditions
+and coverage as well as in method, so their contrast is suggestive and not a controlled estimate of
+smoothing.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Quarterly log price returns, annualised: mean, volatility (twice the quarterly standard
+  deviation), first and fourth order autocorrelation, and the volatility after unsmoothing with
+  \cref{eq10:unsmooth} at the estimated $\alpha$. Through \smLast. REITs are not unsmoothed, since their
+  $\rho_1$ is not significant.}
+  \label{tab10:smooth}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrrrr@{}}
+    \toprule
+    & Quarters & Mean & Volatility & $\rho_1$ & $\rho_4$ & Unsmoothed\\
+    \midrule
+    Property, appraisals, \smPreFirst{} to \smPreLast & \smNPre & \smMeanPre & \smVolPre & \smArPre & \smAcfFourPre & \smUvolPre\\
+    Property, repeat sales, from \smPostFirst & \smNPost & \smMeanPost & \smVolPost & \smArPost & \smAcfFourPost & \smUvolPost\\
+    Houses, FHFA, from \smHpiFirst & \smNHpi & \smMeanHpi & \smVolHpi & \smArHpi & \smAcfFourHpi & \smUvolHpi\\
+    Equity REITs, price, from \smReitFirst & \smNReit & \smMeanReit & \smVolReit & \smArReit & \smAcfFourReit & --\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The appraisal-era statistics are consistent with what the model predicts. The first autocorrelation was
+\smArPre, the fourth still \smAcfFourPre, and the volatility only \smVolPre\% a year. After the switch to
+transaction prices the first autocorrelation fell to \smArPost{} and the fourth to \smAcfFourPost, and
+the volatility more than doubled to \smVolPost\%. The mean return hardly changed, \smMeanPre\% a year
+before and \smMeanPost\% after. Unsmoothing the
+appraisal-era index at $\alpha=\smArPreX$ multiplies its volatility by \smRatioPre, close to the
+$\sqrt{(1+\alpha)/(1-\alpha)}=\smTheoryPre$ that the model gives, to \smUvolPre\%, and leaves residual
+autocorrelation of \smUarPre; unsmoothed volatilities depend on the smoothing model. The transaction index still has some persistence, perhaps because sales
+close months after their prices are agreed, and unsmoothing it lifts its volatility to \smUvolPost\%. The
+house price index, with its appraisals, sits in between. REIT prices, set continuously on an exchange, show no
+reliable autocorrelation at all. \Cref{fig10:acf} draws the four autocorrelation functions.
+
+The R listing below estimates $\alpha$ for the appraisal era, unsmooths the index by
+\cref{eq10:unsmooth} and prints the reported and unsmoothed volatilities, the ratio of \smRatioPre{}
+against \smTheoryPre, and the residual autocorrelation of \smUarPre.
+\Needspace*{14\baselineskip}
+\lstinputlisting[language=R]{code/ch10/snippets/unsmooth.R}
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.92\textwidth]{ch10/fig05_acf}
+  \caption{Autocorrelations of quarterly price returns at lags of one to eight quarters, for the Z.1
+  commercial property index before 1996 (appraisals) and after (repeat sales), the FHFA house price
+  index and equity REITs. The shaded band is $\pm2/\sqrt{n}$ for the repeat-sales sample.}
+  \label{fig10:acf}
+\end{figure}
+
+\Cref{fig10:levels} shows the timing in the financial crisis. The property index peaked in \smCrePeak{}
+and fell \smCreFallAbs\% to its trough in \smCreTrough. Equity REIT prices peaked two quarters earlier, in
+\smReitPeak, and fell \smReitFallAbs\% to a trough in \smReitTrough, three quarters before the property
+index reached its own, by which time they had recovered much of the fall. The timing is consistent with faster price discovery in the
+stock market, though the two indexes do not hold the same buildings.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.92\textwidth]{ch10/fig04_levels}
+  \caption{Price levels of commercial property (Z.1 index), equity REITs (cumulative revaluation over market
+  value) and houses (FHFA all-transactions index), \smReitFirst{} = 100, log scale, through \smLast.}
+  \label{fig10:levels}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{REITs and private property}
+\label{sec10:reits}
+
+A real estate investment trust is a company that owns, and usually operates, income-producing property
+and passes most of its income to its shareholders. In the United States the tax code sets the terms
+\parencite{usc856}. A REIT must have at least 100 beneficial owners and must not be closely held; at the
+end of each quarter at least 75\% of its assets must be real estate, cash and government securities; at
+least 75\% of its gross income must come from rents, interest on mortgages and similar sources; and it
+must pay out as dividends at least 90\% of its REIT taxable income, a tax measure with statutory
+adjustments and not its cash flow. In return a qualifying REIT can deduct the dividends it pays, which
+can remove federal corporate income tax on the income it distributes. Equity REITs own buildings, mortgage REITs own loans, and the shares of most
+listed REITs trade on an exchange like any other share. An investor in an equity REIT therefore owns a
+levered, managed and liquid claim on a portfolio of buildings whose own values are set in the private
+market.
+
+REIT returns and private property returns differ for three reasons that can be measured and one that
+cannot easily be. REITs borrow, and their equity is a levered claim on the buildings. Private returns
+are smoothed, by appraisals or by the lags of a transaction index. REITs and the private indexes
+hold different mixes of property types. The fourth
+reason is that a REIT is priced in the stock market, alongside every other share, and its price moves
+with the market's appetite for risk as well as with the value of its buildings. The first is a short
+calculation.
+
+\begin{proposition}[Removing leverage]\label{prop10:unlever}
+Over a period, let a REIT's assets be financed by equity and by debt that is a share $\lambda$ of the
+market value of the assets at its start, with the three returns measured over the same period, so that the asset return is $R_A=(1-\lambda)R_E+\lambda R_D$. Then, for any return $m$,
+\[
+  \beta_A=(1-\lambda)\beta_E+\lambda\beta_D,\qquad
+  \sigma_A^2=(1-\lambda)^2\sigma_E^2+2\lambda(1-\lambda)\Cov(R_E,R_D)+\lambda^2\sigma_D^2,
+\]
+where the betas are measured against $m$. If the debt return is known in advance, $\sigma_A=(1-\lambda)\sigma_E$
+and the correlation of $R_A$ with $m$ equals that of $R_E$.
+\end{proposition}
+
+\begin{proof}
+Covariance with $m$ is linear, which gives the beta, and the variance of a weighted sum gives the second
+formula. With $R_D$ known, $\Cov(R_E,R_D)=\sigma_D^2=0$, so $\sigma_A=(1-\lambda)\sigma_E$, and
+$\Cov(R_A,m)=(1-\lambda)\Cov(R_E,m)$, so the factor $(1-\lambda)$ cancels in the correlation.
+\end{proof}
+
+The proposition is \cref{prop10:lever} read backwards, and it has a consequence that is easy to miss:
+leverage changes volatility and beta but, with safe debt, leaves the correlation with the stock market
+where it was. That holds in the model; in practice refinancing, changing leverage, the repricing of debt and distress can also
+change a REIT's sensitivity to the stock market.
+
+\paragraph{The evidence}
+Over the \rtN{} quarters from \rtFirst{} to \rtLast, the price return of equity REITs had a volatility of
+\rtVolReit\% a year against \rtVolCre\% for the transaction-based property index (\smVolPost\% in
+\cref{tab10:smooth}, whose sample starts three quarters earlier), and a correlation of
+\rtCorrReitMkt{} with the US stock market against \rtCorrCreMkt{} for the index. The contemporaneous
+correlation between REITs and the property index was \rtCorrCreReit, which would suggest two unrelated
+assets. The lagged correlations say otherwise (\cref{fig10:leadlag}). The property index this quarter
+had a correlation of \rtLeadOne{} with REIT returns one quarter earlier, \rtLeadTwo{} two quarters earlier
+and \rtLeadFour{} four quarters earlier, and \rtLagOne{} with REIT returns one quarter later. REIT returns lead
+the private index, and not the other way round. These correlations are descriptive: serial correlation,
+changes in the index's composition and common shocks stop the largest lagged correlation being read as
+a causal link or a stable forecast. A regression of the property index on current and four
+lagged REIT returns gives slopes that sum to \rtSumReit, of which the current quarter contributes \rtBzeroReit; a regression on the current quarter alone gives a slope of \rtBuniReit.
+The same lags appear against the stock market: the property index has a beta of \rtBetaCre{} on the current
+market return and a Dimson beta of \rtBetaCreDim{} with four lags, while the REIT beta rises only from
+\rtBetaReit{} to \rtBetaReitDim.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch10/fig06_leadlag}
+  \caption{(a) Correlation of the quarterly return of the Z.1 commercial property index with the equity
+  REIT price return $k$ quarters earlier, \rtFirst{} to \rtLast; positive $k$ means REITs lead. The shaded
+  band is $\pm2/\sqrt{n}$. (b) Calendar year price returns of the property index against those of equity
+  REITs, \rtYFirst{} to \rtYLast, with the least squares line.}
+  \label{fig10:leadlag}
+\end{figure}
+
+At the annual horizon the two series come closer. Over the \rtNY{} calendar years from \rtYFirst{} to
+\rtYLast{} the correlation of annual returns was \rtCorrY, and the correlation of the property index with
+REIT returns in the previous year was \rtCorrYLag. The annual volatilities were \rtVolReitY\% for REITs and
+\rtVolCreY\% for the index. Back in quarterly data, removing leverage with \cref{prop10:unlever}, whose
+debt return is known in advance, at debt shares of 30\%, 40\% or 50\% of assets, a range chosen for
+illustration, brings the REIT volatility of \rtVolReit\% down to \rtUnlevThree\%, \rtUnlevFour\% or
+\rtUnlevFive\%, and unsmoothing the property index at its estimated $\alpha$ lifts its \rtVolCre\% to
+\rtUvolCre\%. These show what the two corrections do; they are not estimates of the volatility of REIT
+assets. The gap between \rtUvolCre\% and the unlevered REIT figures is the part that
+neither correction removes. Part of it is the volatility that comes with a price set every day in the
+stock market, where a REIT share moves with the market's mood, and part may come from differences in
+property mix, operating leverage and valuation that these two corrections do not touch. \textcite{pagliari2005} restate public and private real estate indexes for property-type mix,
+leverage and appraisal smoothing, and find that the restated means and volatilities are not statistically
+different, a long-run agreement that the annual figures here also suggest.
+
+% =====================================================================================
+\section{Timberland, farmland and infrastructure}
+\label{sec10:timber}
+
+Three other real assets add something that a building does not have. A forest grows, so its owner chooses
+when to harvest, and waiting is itself an investment. A farm earns a rent tied to the price of what it
+grows. An infrastructure concession, a toll road or an airport, often comes with a fixed life, at the end
+of which the asset returns to the state.
+
+\subsection{The rotation of a forest}
+
+Let a stand of trees planted on bare land have volume $Q(T)$ per hectare at age $T$, sold at a stumpage
+price $p$ per cubic metre, net of harvesting costs, and replanted at a cost $C$. If the owner harvests and
+replants every $T$ years forever, the value of the bare land at a continuously compounded rate $r$ is the
+\emph{land expectation value} of \textcite{faustmann1995},
+\begin{equation}\label{eq10:faustmann}
+  \mathit{LEV}(T)=\frac{p\,Q(T)\,e^{-rT}-C}{1-e^{-rT}} .
+\end{equation}
+
+\begin{proposition}[The Faustmann rotation]\label{prop10:faustmann}
+If $Q$ is differentiable and the rotation $T^*>0$ maximises \cref{eq10:faustmann}, then
+\begin{equation}\label{eq10:foc}
+  p\,Q'(T^*) = r\,p\,Q(T^*) + r\,\mathit{LEV}(T^*).
+\end{equation}
+If $\mathit{LEV}(T^*)>0$, and the ratio $Q'(T)/Q(T)$ is decreasing in $T$, then $T^*$ is shorter than the rotation that maximises the value of a single harvest,
+$pQ(T)e^{-rT}$, which solves $Q'(T)=rQ(T)$.
+\end{proposition}
+
+\begin{proof}
+Write $\mathit{LEV}(T)(1-e^{-rT})=pQ(T)e^{-rT}-C$ and differentiate at an interior maximum, where
+$\mathit{LEV}'=0$: $\mathit{LEV}\cdot re^{-rT}=pQ'e^{-rT}-rpQe^{-rT}$. Dividing by $e^{-rT}$ gives
+\cref{eq10:foc}. With $\mathit{LEV}>0$, \cref{eq10:foc} gives $Q'(T^*)/Q(T^*)>r$, and the single harvest
+optimum $T_1$ has $Q'(T_1)/Q(T_1)=r$. As $Q'/Q$ is decreasing, $T^*<T_1$.
+\end{proof}
+
+\Cref{eq10:foc} is the optimal harvesting rule for a renewable asset under the model's assumptions. The owner waits one more year while the value
+added by a year's growth, $pQ'$, exceeds the return the timber would earn if cut and sold, $rpQ$, plus
+the rent on the land, $r\,\mathit{LEV}$, which the standing trees occupy. The land rent is what makes the
+forest rotation shorter than the rotation for a single harvest, and in the example below it is also
+shorter than the rotation that maximises average growth $Q(T)/T$, which ignores interest altogether.
+The single harvest rotation is shorter than that only when $r$ exceeds $1/T$ at the average-growth
+optimum, here \tbRcross\%, so at 3\% it is longer. \textcite{samuelson1976}
+gives the history of the argument and of the errors made before Faustmann.
+
+For an illustration take the growth curve of \textcite{richards1959} in the form
+$Q(T)=\tbA\,(1-e^{-\tbK\,T})^{\tbC}$ cubic metres per hectare, a stumpage price of \tbPrice{} dollars per
+cubic metre and a planting cost of \tbCost{} dollars per hectare. Average growth is greatest at
+\tbMai{} years. At $r=3\%$ the Faustmann rotation is \tbFThree{} years and the single harvest rotation
+\tbSThree, and the land is worth \tbLevThree{} dollars per hectare; at 4\% they are \tbFFour{} and \tbSFour{}
+years, with land worth \tbLevFour{}; at 6\%, \tbFSix{} and \tbSSix{} years, and the land is worth only
+\tbLevSix{} (\cref{fig10:rotation}). At the optimum the stand grows at \tbGrowthFour\% a year when $r=4\%$,
+above the discount rate, as \cref{eq10:foc} requires. A timber price that rises at 1\% a year in real terms
+works on the harvests like a fall of one point in the discount rate, while the planting cost is still
+discounted at the full rate, and lengthens the 4\% rotation to \tbFPriceGrowth{} years; it would reach the
+\tbFPriceBoth{} years of the 3\% rotation only if the planting cost rose at 1\% a year as well.
+
+The Octave listing below finds the same rotations without the first order condition, by maximising
+the land value directly with \texttt{fminbnd}. It prints the rotations and land values at the three
+rates and the rotation with a rising price, and they agree with the figures above to the digits shown.
+\Needspace*{19\baselineskip}
+\lstinputlisting[language=Octave]{code/ch10/snippets/rotation.m}
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.86\textwidth]{ch10/fig07_rotation}
+  \caption{Land expectation value \cref{eq10:faustmann} of the illustrative stand against the rotation
+  length at three discount rates; the dots mark the Faustmann rotations.}
+  \label{fig10:rotation}
+\end{figure}
+
+\Cref{fig10:marginal} draws the rule of \cref{eq10:foc} for the illustrative stand at $r=4\%$. The value
+of a year's growth crosses the interest on the standing timber alone at the single harvest rotation of
+\tbSFour{} years. Adding the land rent $r\,\mathit{LEV}$, \mgRent{} dollars a hectare a year, moves the
+crossing to the Faustmann rotation of \tbFFour{} years, where a year's growth is worth \mgGrowthValue{}
+dollars a hectare.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.86\textwidth]{ch10/fig16_marginal}
+  \caption{The marginal rule at $r=4\%$ for the illustrative stand: the value of a year's growth $pQ'(T)$
+  against the interest on the timber, $rpQ(T)$, with and without the rent on the land at its Faustmann
+  value. The crossings are the two rotations.}
+  \label{fig10:marginal}
+\end{figure}
+
+The value of the land is very sensitive to the discount rate, and that is the main lesson for an
+investor. Between 3\% and 6\% the land loses more than nine tenths of its value, because most of its value
+lies in harvests decades away. In the model timberland is a long duration asset. In practice the owner can also delay a
+harvest, and the value of that flexibility depends on prices, growth, costs and constraints: when timber
+prices are low the owner can let the trees grow, and the trees keep growing in volume and
+often in value per cubic metre as they reach sizes that sell for more. The option makes timber returns
+less tied to the current timber price than the model above, which fixes $p$, suggests.
+
+\subsection{Farmland}
+
+A farm let to a tenant is valued like a building. The rent is set by what the land produces and the prices
+of the crops, and \cref{prop10:cap} applies with $g$ the growth of the rent: a farm can give long-horizon
+exposure to crop prices, though how much passes through depends on the lease, yields, costs and how the
+rent is set. The public data here are the producer price
+indexes for farm products and for logs and timber. Measured in December of each year and deflated by the
+consumer price index, farm product prices fell by \tbRealFarmAbs\% a year in real terms from \tbFirstFarm{} to
+\tbLastYear{} and timber prices by \tbRealTimberAbs\% a year from \tbFirstTimber, with annual real volatilities of
+\tbRealVolFarm\% and \tbRealVolTimber\% (\cref{fig10:ppi}). Softwood lumber, a processed product with a more
+volatile price, rose by \tbLumberPeak\% from the end of 2019 to its peak in \tbLumberPeakDate. These are prices
+of the output and say nothing directly about returns on the land: the owner of farmland or timberland also gains from productivity,
+from the growth of the stand and from changes in the land's value, none of which a price index records.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.92\textwidth]{ch10/fig08_ppi}
+  \caption{Producer price indexes for farm products, for logs, bolts, timber, pulpwood and wood chips,
+  and for softwood lumber, each divided by the consumer price index, monthly, log scale.}
+  \label{fig10:ppi}
+\end{figure}
+
+\subsection{Infrastructure concessions}
+
+A concession gives its holder the cash flows of an asset for $N$ years. With a first year cash flow $X_1$
+growing at $g$ and a discount rate $r$, it is a growing annuity.
+
+\begin{proposition}[A concession of finite life]\label{prop10:concession}
+For $r>g$ the value of the concession and its Macaulay duration are
+\begin{equation}\label{eq10:concession}
+  V_N=\frac{X_1}{r-g}\Bigl(1-\Bigl(\frac{1+g}{1+r}\Bigr)^N\Bigr),\qquad
+  D_N=\frac{\sum_{t=1}^Nt\,w_t}{\sum_{t=1}^Nw_t},\quad w_t=\frac{(1+g)^{t-1}}{(1+r)^t},
+\end{equation}
+and as $N\to\infty$, $V_N\to X_1/(r-g)$ and $D_N\to(1+r)/(r-g)$. The share of the perpetuity's value
+that the concession captures is $1-\bigl((1+g)/(1+r)\bigr)^N$.
+\end{proposition}
+
+\begin{proof}
+$V_N=\sum_{t=1}^NX_1w_t$, a geometric sum with first term $X_1/(1+r)$ and ratio $x=(1+g)/(1+r)$, equals
+$\frac{X_1}{1+r}\cdot\frac{1-x^N}{1-x}=\frac{X_1}{r-g}(1-x^N)$. For the limit of the duration,
+$\sum_{t\ge1}t\,x^{t-1}=1/(1-x)^2$ and $\sum_{t\ge1}x^{t-1}=1/(1-x)$, so $D_\infty=1/(1-x)=(1+r)/(r-g)$.
+\end{proof}
+
+With $X_1=\tbCfOne$, $r=\tbRcon\%$ and $g=\tbGcon\%$, the perpetuity is worth \tbPerp. A 30 year concession
+is worth \tbConThirty, \tbShareThirty\% of the perpetuity, with a duration of \tbDurThirty{} years; 50 years
+gives \tbConFifty{} (\tbShareFifty\%) and 99 years \tbConNinetyNine{} (\tbShareNinetyNine\%), with durations of
+\tbDurFifty{} and \tbDurNinetyNine{} years against \tbDurPerp{} for the perpetuity. A rise of one point in the
+discount rate lowers the value of the 30 year concession by \tbShockThirtyAbs\% and of the perpetuity by \tbShockPerpAbs\%. When
+the tolls are indexed to inflation, $g$ moves with inflation and $r$ is best read as a nominal rate that
+moves with it as well, so that the concession is closer to a real bond than to a nominal one. That is the
+link to \cref{sec10:inflation}.
+
+\FloatBarrier
+% =====================================================================================
+\section{Storage and the convenience yield}
+\label{sec10:storage}
+
+Chapter~4 priced a forward on a stored commodity by cash and carry: buying the commodity, storing it at a
+cost and delivering it, bounds the forward price from above, and the shortfall below that bound defines
+the implied convenience yield, the benefit of holding the physical good that \textcite{kaldor1939} named.
+Chapter~9 showed that the shape of the futures curve decides the carry earned by a futures position. This
+section asks what sets the convenience yield, using two futures prices, which are observed every day,
+instead of a spot price, which for crude oil and gas is an average of private trades.
+
+In this section the interest rate $r$ is constant, so futures and forward prices agree, as Chapter~4
+showed, and storage costs a share $u$ of the stored quantity per year, paid in kind, so that one unit
+stored for $\Delta$ years becomes $e^{-u\Delta}$ units. Payment in kind is a modelling convention; a
+storage charge paid in cash changes the carry formula.
+
+\begin{proposition}[Calendar spreads and the price of storage]\label{prop10:storage}
+Let $F_1$ and $F_2$ be the futures prices for delivery at $T_1<T_2$, with $\Delta=T_2-T_1$. Suppose storage
+is available at the cost $u$, the commodity delivered under either contract can be stored and
+redelivered, and the futures can be traded without basis, financing or margin frictions.
+\begin{enumerate}[label=(\alph*)]
+  \item If there is no arbitrage, $F_2\le F_1e^{(r+u)\Delta}$.
+  \item If a holder who has no use for the commodity between $T_1$ and $T_2$ chooses to store it over that
+        interval, then $F_2\ge F_1e^{(r+u)\Delta}$, so with (a) the spread is at full carry.
+\end{enumerate}
+The \emph{net convenience yield} implied by the two contracts, $y-u=r-\ln(F_2/F_1)/\Delta$, is
+therefore at least $-u$, so the gross yield $y$ is at least zero. In this frictionless model a strictly
+positive implied convenience yield means that no holder without an inventory-service benefit chooses to
+carry a marginal unit over this interval.
+\end{proposition}
+
+\begin{proof}
+(a) Take a long position in one
+contract for $T_1$ and a short position in $e^{-u\Delta}$ contracts for $T_2$. At $T_1$ take delivery of
+one unit, paying $F_1$ with money borrowed until $T_2$, and store it; at $T_2$ deliver the $e^{-u\Delta}$
+units that remain. The strategy costs nothing at the start and pays $e^{-u\Delta}F_2-e^{r\Delta}F_1$ at
+$T_2$, which cannot be positive without arbitrage.
+(b) A holder of one unit at $T_1$ who stores it has $e^{-u\Delta}$ units at $T_2$. The alternative is to
+deliver the unit against a short contract for $T_1$, invest $F_1$ until $T_2$ and buy
+$F_1e^{r\Delta}/F_2$ units with a long contract for $T_2$. A holder without other use for the
+commodity stores only if storing leaves at least as many units, $e^{-u\Delta}\ge F_1e^{r\Delta}/F_2$,
+which is the stated inequality. The last statement rewrites the two inequalities in terms of $y-u$.
+\end{proof}
+
+When the curve is inverted, so that the later contract trades below full carry, someone is storing the
+commodity at an apparent loss. \textcite{working1949} explained this by the services of inventory: a
+refiner or a utility that runs short of stock must stop or buy at any price, so a stock on hand is worth
+more to it than a promise of delivery. The marginal value of those services falls as stocks rise, which
+gives the \emph{supply of storage} curve of \textcite{working1949} and \textcite{brennan1958}: the price of
+storage, $\ln(F_2/F_1)/\Delta-r$, rises with inventories and approaches full carry when stocks are ample.
+\textcite{famafrench1987} tested this with the basis of many commodities, and \textcite{gorton2013} relate
+the basis and the risk premiums of commodity futures to inventories.
+
+\paragraph{Crude oil}
+The US Energy Information Administration published monthly averages of the daily closing prices of the
+first four NYMEX crude oil contracts until April 2024, and publishes monthly US crude oil stocks excluding
+the Strategic Petroleum Reserve, which here run to \sgStockLast. The first and fourth contracts are about
+three months apart, so $\Delta=1/4$, and the 3 month bill rate stands in for $r$. Inventories are
+measured against their norm, the log of the stock less the average log stock in the same calendar month
+of the previous five years. Averages of daily closes are not prices on a single day, and the delivery
+months of the averaged contracts shift within the month, so the measure is approximate.
+
+From \sgOilFirst{} to \sgOilLast, \sgNOil{} months, the net convenience yield had a correlation of
+\sgCorrOil{} with the inventory measure (\cref{fig10:working}). In the fifth of months with the lowest stocks,
+on average \sgDevLow\% against the norm, it averaged \sgQLow\% a year; in the fifth with the highest
+stocks, \sgDevHigh\% above the norm, it averaged \sgQHigh\%. A quadratic fit is convex, steep where stocks
+are scarce and flatter where they are ample, the shape Working described, though a fit of this kind
+describes the sample and does not by itself identify the schedule of marginal convenience yields. Over the longer record from
+\sgBackFirst{} to \sgCurveLast{} the fourth contract was below the first in \sgBackShare\% of months, and the
+net convenience yield averaged \sgCyMean\% a year.
+
+\begin{figure}[!b]
+  \centering
+  \includegraphics[width=\textwidth]{ch10/fig09_working}
+  \caption{Net convenience yield implied by the first and fourth NYMEX contracts and the 3 month bill rate
+  against inventories measured against the same month of the previous five years, with a quadratic fit.
+  (a) WTI crude oil and US crude stocks excluding the SPR, \sgOilFirst{} to \sgOilLast. (b) Henry Hub
+  natural gas and US working gas in storage, \sgGasFirst{} to \sgOilLast. Some extreme months lie outside
+  the axes.}
+  \label{fig10:working}
+\end{figure}
+
+
+April 2020 shows the other end of the curve. As demand collapsed, inventories rose to \sgAprDev\% above
+their norm and storage near the delivery point filled; the May contract settled at a negative price on
+20 April. In the EIA's monthly averages the first contract averaged \sgAprOne{} dollars a barrel in April
+and the fourth \sgAprFour, a net convenience yield of \sgAprCy\% a year. Read mechanically, the frictionless carry bound
+of \cref{prop10:storage} with $y\ge0$ would put the annual cost of storage at the margin at \sgAprCyAbs\% or
+more. A figure that extreme says the simple model had stopped describing the market: storage near the
+delivery point was scarce, and deliverability, location, funding and limits on storage capacity all
+entered the spread that month. The spread alone cannot separate them from the cost of storage.
+
+\Cref{fig10:curves} sets April 2020 beside two other months, each curve divided by its first contract,
+with dotted lines for the curve that full carry at the bill rate would give with nothing paid for
+storage. In April 2020 the fourth contract was \cvAprSpread\% above the first, where the bill would have
+carried the price up by \cvAprCarry\%. In \cvBackWhen, the steepest backwardation of any month from January 1990 to \cvLastWhen,
+the fourth contract was \cvBackSpreadAbs\% below the first, and in \cvMedWhen, the month with the median
+slope, the two were within \cvMedSpread\% of each other.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{ch10/fig17_curves}
+  \caption{Monthly averages of the first four NYMEX crude oil contracts, relative to the first, in three
+  months, with the full carry curve at the 3 month bill rate and no storage cost dotted.}
+  \label{fig10:curves}
+\end{figure}
+
+\FloatBarrier
+
+\paragraph{Natural gas}
+Gas is stored in summer and drawn in winter, so its curve has a seasonal shape that crude oil lacks. The
+same measure for Henry Hub gas against working gas in storage had a correlation of \sgCorrGas{} over
+the \sgNGas{} months with data from \sgGasFirst{} to \sgGasLast; the fourth contract has no average for
+\sgGasMissing. The slope from the first to the second contract, annualised, averaged
+\sgSlopeSep\% a year in September, when the second contract is the first winter month and the first is
+not, and \sgSlopeJan\% in January, when both are late winter months and the second is closer to spring
+(\cref{fig10:gas}). Part (a) of \cref{prop10:storage} limits how steep the curve can be from summer into
+winter, through the cost of storage, but the proposition gives no lower bound on how far it can fall from winter into
+spring, because the reverse trade would need gas that can be borrowed and returned later, and gas held
+for winter use is not lent out that way.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.82\textwidth]{ch10/fig10_gas}
+  \caption{Annualised log slope from the first to the second Henry Hub natural gas contract, averaged by
+  calendar month, \sgGasCurveFirst{} to \sgCurveLast.}
+  \label{fig10:gas}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{The value of a storage facility}
+\label{sec10:facility}
+
+A gas storage field or an oil tank earns the difference between the price at which its owner fills it
+and the price at which the owner empties it. The futures curve lets the owner fix much of that difference
+in advance, and the rest of the facility's value comes from changing the plan as the curve moves.
+
+\begin{proposition}[Intrinsic value of storage]\label{prop10:intrinsic}
+A facility holds at most one unit, costs $c_{\mathrm{in}}$ per unit to fill and $c_{\mathrm{out}}$ to
+empty, is empty at time $0$ and has no other cost. Filling and emptying are instantaneous, nothing is lost in
+storage, the commodity delivered under the contracts can be stored in the facility, and the futures can
+be traded at the quoted prices without costs or margin constraints. Futures prices $F_1,\dots,F_n$ for delivery at
+$t_1<\dots<t_n$ are quoted at time $0$, and $r$ is constant.
+\begin{enumerate}[label=(\alph*)]
+  \item At no cost at time $0$, the owner can fix one cycle of filling and emptying worth the single-cycle \emph{intrinsic value}
+        \begin{equation}\label{eq10:intrinsic}
+          I=\max\Bigl(0,\;\max_{i<j}\bigl[e^{-rt_j}(F_j-c_{\mathrm{out}})-e^{-rt_i}(F_i+c_{\mathrm{in}})\bigr]\Bigr).
+        \end{equation}
+  \item If the owner may later close futures positions and open new ones at the prices then quoted, the
+        value of running the facility with such revisions is at least $I$, since the owner may always keep
+        the plan already fixed, and revisions add nothing when futures prices never change.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(a) Buy one contract for $t_i$ and sell one for $t_j$, for the pair that attains the inner maximum.
+Futures cost nothing to open, and with $r$ constant they are worth the same as forwards, as Chapter~4
+showed, so the position is a forward purchase at $F_i$ and a forward sale at $F_j$. At $t_i$ the owner
+takes delivery, pays $F_i$ and the cost of filling and stores the unit; at $t_j$ the owner pays the cost of
+emptying and delivers it for $F_j$. The present value at $0$ is the bracket. If no bracket is positive,
+the owner leaves the facility empty and $I=0$.
+(b) At a later date $s$ the owner holds the futures positions of a plan fixed earlier and some
+inventory. Compare plans by the discounted value at $s$ of their self-financing cash flows, keeping the
+variation margin already accrued: that margin, paid or received up to $s$ and carried at $r$, is the same
+whatever the owner does next, so it enters every comparison equally. After the settlement at $s$ an open
+position is a claim to its remaining margin and its delivery payment, which with $r$ constant have the
+present value of a delivery at the futures price of date $s$. Changing a hedge alters those remaining
+cash flows, but a position opened or closed at that price has zero value. The rest of the current plan is
+therefore worth the present value, at the prices of date $s$, of its remaining flows, which is its value
+as one of the plans open to the owner at $s$, given what is in the facility. Switching to the best plan at
+those prices costs nothing and replaces that value by the value of the best plan, which is never smaller,
+since the current plan is among those open. Every revision therefore adds a discounted gain that is zero or positive to the $I$ fixed at
+time $0$. If prices never change, the best plan at every date is the one already held and every gain is
+zero.
+\end{proof}
+
+The excess of the facility's value over $I$ is called its extrinsic value. It comes from the movement of
+the curve; it generally benefits from greater spread volatility when the price process and operational
+constraints are otherwise held fixed, but its value requires an explicit stochastic model. With several cycles,
+linear costs and linear limits on how fast the facility can be filled or emptied, the inner maximum of
+\cref{eq10:intrinsic} becomes a linear programme over the quantities injected and withdrawn each month, and
+the argument for (b) is unchanged; valuing the revisions themselves needs a model of how the curve moves.
+
+The listing below sets up that linear programme for one unit of capacity, with injections and
+withdrawals at each delivery date and the inventory kept between empty and full. On the curve of
+\cref{exr10:fifteen} it recovers the intrinsic value of \xoV{} from the best pair of months. On a
+stylised seasonal curve of twelve monthly deliveries, peaking in the fifth, it prints \xoSeasOne{} when
+the facility can be filled in a month and \xoSeasThird{} when it can be filled or emptied by only a third
+of its capacity a month: the rate limit removes almost half the value.
+\Needspace*{26\baselineskip}
+\lstinputlisting[language=Python]{code/ch10/snippets/storage_lp.py}
+
+The EIA averages give a test of part (a) for gas. In each August from \sgLockFirst{} to \sgLockLast,
+the first contract was, for most of the month, the September contract and the fourth the December one,
+and their monthly averages describe an indicative September to December spread. An owner could have
+fixed an actual spread close to it by trading the pair on a day of that month, at that day's prices and
+within the facility's limits. The log spread of the averages was \sgLockMean\% on average, with a standard
+deviation of \sgLockSd\%, never fell below \sgLockMin\%. An owner who instead filled in September and emptied in December at the monthly
+average spot price earned a spread that averaged \sgRealMean\% with a standard deviation of \sgRealSd\%,
+and was positive in \sgRealPos\% of years (\cref{fig10:lock}). The spread fixed in August is known when the
+facility is filled; the spot spread depends on the weather of the coming winter. The fixed spread was on
+average \sgGapMean{} percentage points above the spot spread that followed, with a standard error of
+\sgGapSe{} points, a $t$ statistic of about \sgGapT. That agrees with a premium paid by those who buy
+winter gas forward to those who store it, though \sgLockN{} years of one market is thin evidence for its
+size. Over a whole storage season, July to January, the
+spot spread averaged \sgJanMean\% over the \sgJanN{} seasons from \sgJanFirst{} to \sgJanLast, with a
+standard deviation of \sgJanSd\%.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=\textwidth]{ch10/fig12_lock}
+  \caption{Henry Hub natural gas: the log spread from the first to the fourth NYMEX contract in the August
+  average, about September to December, and the change in the monthly average spot price from September to
+  December of the same year, \sgLockFirst{} to \sgLockLast.}
+  \label{fig10:lock}
+\end{figure}
+
+\FloatBarrier
+% =====================================================================================
+\section{Inflation hedging}
+\label{sec10:inflation}
+
+Real assets are often bought as a hedge against inflation, on the view that rents, crop prices and the
+prices of stored goods rise with the general price level. A hedge in this sense is an asset whose real
+return does not fall when inflation rises. The simplest way to measure it is a regression of the asset's
+nominal return on inflation over the same period,
+\begin{equation}\label{eq10:beta}
+  R_t = a + b\,\pi_t + e_t, \qquad \Cov(e_t,\pi_t)=0,
+\end{equation}
+and \textcite{fama1977} refined it by splitting inflation into the part expected at the start of the period
+and the surprise.
+
+\begin{proposition}[Inflation beta and the real return]\label{prop10:hedge}
+Under \cref{eq10:beta}, the real return $R_t-\pi_t$ satisfies
+\[
+  \Cov(R_t-\pi_t,\pi_t)=(b-1)\Var\pi_t,\qquad
+  \Var(R_t-\pi_t)=(b-1)^2\Var\pi_t+\Var e_t .
+\]
+The real return is uncorrelated with inflation if and only if $b=1$, and the asset's real return varies
+least for a given $\Var e_t$ when $b=1$.
+\end{proposition}
+
+\begin{proof}
+$R_t-\pi_t=a+(b-1)\pi_t+e_t$, with $e_t$ uncorrelated with $\pi_t$; both formulas follow, and for a fixed
+$\Var(e_t)$ the variance is smallest at $b=1$.
+\end{proof}
+
+A beta of one makes an asset a hedge in the sense that its real return is uncorrelated with inflation
+under the regression model; independence would need more assumptions about the residual, and it does not make the asset safe, because the residual $e_t$ remains. A nominal bill held for a year has a
+beta close to one on expected inflation, since its yield is set with inflation in view, and close to zero
+on the surprise. The question for an investor who holds bills is how much of a real asset to add to make
+the real return of the mix as steady as possible.
+
+\begin{proposition}[The least real variance mix]\label{prop10:mix}
+Let $f_t$ be the return on a bill known at the start of period $t$, $x_t$ the return on a risky asset and
+$\pi_t$ inflation. The weight $w$ in the risky asset, with $1-w$ in the bill, that minimises the variance of
+the real return $(1-w)f_t+wx_t-\pi_t$, with $\Var(x_t-f_t)>0$, is
+\begin{equation}\label{eq10:mix}
+  w^*=\frac{\Cov(x_t-f_t,\;\pi_t-f_t)}{\Var(x_t-f_t)},
+\end{equation}
+and it reduces the variance of the real return of the bill alone by the share $\varrho^2$, where $\varrho$ is
+the correlation of $x_t-f_t$ with $\pi_t-f_t$. The weight is unconstrained and may be negative or above
+one; if short positions or borrowing are ruled out, the best permitted weight is $w^*$ moved to the
+nearest end of the allowed range.
+\end{proposition}
+
+\begin{proof}
+The linearised real return is $w(x_t-f_t)-(\pi_t-f_t)$, the error left when $w$ units of $x_t-f_t$
+hedge $\pi_t-f_t$; at $w^*$ it is, up to a constant, minus the least squares residual of $\pi_t-f_t$ on
+$x_t-f_t$. Its variance $\Var(\pi-f)-2w\Cov(x-f,\pi-f)+w^2\Var(x-f)$ is a quadratic in $w$ minimised at $w^*$, where it
+equals $\Var(\pi-f)(1-\varrho^2)$.
+\end{proof}
+
+The objective is linear in $w$ by construction. With simple returns the mix earns exactly
+$(1-w)f_t+wx_t$, but subtracting $\pi_t$ gives the real return only to first order; with log rates the
+subtraction is exact, but the weighted sum is only a first-order log return of the rebalanced mix.
+Either way \cref{eq10:mix} is exact for the linear objective and first order for the mix.
+
+\paragraph{The evidence}
+\Cref{tab10:inflation} reports \cref{eq10:beta} for calendar years from \ihFirst{} to \ihLast, or from the
+first full year of each series, with Newey and West standard errors over two lags. Inflation is the
+December to December change in the CPI, which averaged \ihInflMean\% a year with a standard deviation of
+\ihInflSd\%. The bill is a 3 month Treasury bill rolled each month. Property, houses, farm products,
+timber and oil are price changes without income, so their mean real returns understate what an owner
+earned; equities and bills are total returns. Following \textcite{fama1977}, the bill yield at the end of the previous December
+serves as a proxy for expected inflation, though it also holds expected real interest and other
+components, and the surprise is the rest, so it too is a proxy and not an observed forecast error.
+
+The R listing below reproduces the property row of \cref{tab10:inflation} from the data files, with
+the Newey and West covariance written out: Bartlett weights over two lags and no small sample factor,
+as in the Python code. It prints the \ihNCre{} years, the slope of \ihBCre{} and its standard error of
+\ihSeCre.
+\Needspace*{20\baselineskip}
+\lstinputlisting[language=R]{code/ch10/snippets/inflation.R}
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Calendar year log returns and price changes against CPI inflation, \ihFirst{} to \ihLast{} or from
+  the year shown. Mean and volatility of the real return in percent; the slope on inflation alone, and
+  the slopes on expected and unexpected inflation from one regression using the bill-yield proxy, with Newey and West standard errors in brackets; cumulative real
+  return in 2021 and 2022, when inflation was \ihInflTwo\%. Price changes exclude income.}
+  \label{tab10:inflation}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{@{}lrrrrrrr@{}}
+    \toprule
+    & From & Real mean & Real vol. & Slope on $\pi$ & On expected & On surprise & 2021--22\\
+    \midrule
+    3 month bills & \ihStartBill & \ihRealBill & \ihVolBill & \ihBBill{} (\ihSeBill) & \ihEBill{} (\ihEseBill) & \ihUBill{} (\ihUseBill) & \ihTwoBill\\
+    Commercial property & \ihStartCre & \ihRealCre & \ihVolCre & \ihBCre{} (\ihSeCre) & \ihECre{} (\ihEseCre) & \ihUCre{} (\ihUseCre) & \ihTwoCre\\
+    Houses & \ihStartHpi & \ihRealHpi & \ihVolHpi & \ihBHpi{} (\ihSeHpi) & \ihEHpi{} (\ihEseHpi) & \ihUHpi{} (\ihUseHpi) & \ihTwoHpi\\
+    Equity REITs, price & \ihStartReit & \ihRealReit & \ihVolReit & \ihBReit{} (\ihSeReit) & \ihEReit{} (\ihEseReit) & \ihUReit{} (\ihUseReit) & \ihTwoReit\\
+    US equities & \ihStartMkt & \ihRealMkt & \ihVolMkt & \ihBMkt{} (\ihSeMkt) & \ihEMkt{} (\ihEseMkt) & \ihUMkt{} (\ihUseMkt) & \ihTwoMkt\\
+    Farm products & \ihStartFarm & \ihRealFarm & \ihVolFarm & \ihBFarm{} (\ihSeFarm) & \ihEFarm{} (\ihEseFarm) & \ihUFarm{} (\ihUseFarm) & \ihTwoFarm\\
+    Logs and timber & \ihStartTimber & \ihRealTimber & \ihVolTimber & \ihBTimber{} (\ihSeTimber) & \ihETimber{} (\ihEseTimber) & \ihUTimber{} (\ihUseTimber) & \ihTwoTimber\\
+    Crude oil & \ihStartOil & \ihRealOil & \ihVolOil & \ihBOil{} (\ihSeOil) & \ihEOil{} (\ihEseOil) & \ihUOil{} (\ihUseOil) & \ihTwoOil\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Bills followed expected inflation, with a slope of \ihEBill{} on it, and missed the surprises, with a slope
+of \ihUBill; in 2021 and 2022 they lost \ihTwoBillAbs\% in real terms. Commercial property and house prices had
+slopes on inflation of \ihBCre{} and \ihBHpi, and slopes close to one on the surprise proxy, \ihUCre{} and \ihUHpi, over this sample, as \textcite{fama1977} found for private
+residential real estate, though with standard errors of about
+0.3 the data cannot tell a slope of one from a slope of a half. Farm products and timber had slopes of
+\ihBFarm{} and \ihBTimber, and farm prices rose with the surprises by more than one for one. Oil's slope of
+\ihBOil{} is partly mechanical, because energy prices are part of the CPI, and a regression of this kind
+cannot say which way the influence runs, though energy's weight in the CPI means some of it must run from oil to the index. US equities had a negative slope of \ihBMkt, as
+\textcite{bodie1976} and \textcite{fama1977} found in earlier data, with a standard error too large to say
+much. The REIT sample is short and its slope is not estimated with any precision.
+
+\Cref{fig10:betas} draws the slopes with two standard errors. Taken together, several of these price series have estimated slopes on
+inflation that are positive and often near one, though imprecise and without owner income, and the
+hedge is noisy: the residual volatility is large beside the inflation it is meant to offset. For
+property, \cref{prop10:mix} gives a weight of \ihWcre{} in the property price index, with the rest in
+bills, as the mix with the least real variance, and it cuts the variance of the bills' real return, a
+volatility of \ihRealVolBill\%, by only \ihVarCut\%. A real asset is a hedge against inflation in the sense
+of \cref{prop10:hedge} and a poor one in the sense of \cref{prop10:mix}, because the risks that come with
+it are much larger than the inflation risk it removes.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.86\textwidth]{ch10/fig11_betas}
+  \caption{Slopes of calendar year returns and price changes on CPI inflation, from the year shown to
+  \ihLast, with two Newey and West standard errors.}
+  \label{fig10:betas}
+\end{figure}
+
+\Cref{fig10:crescatter} shows why for property. The fitted slope of \ihBCre{} lies close to the one for
+one line, but the years scatter around it with a residual standard deviation of \scResSd{} points,
+three times the \ihInflSd{} point standard deviation of inflation itself. The largest miss, in \scBigYear, was \scBigRes{} points.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.66\textwidth]{ch10/fig18_crescatter}
+  \caption{Calendar year log changes in the Z.1 commercial property price index against December to
+  December CPI inflation, \ihFirst{} to \ihLast, with the fitted line of \cref{tab10:inflation} and a one for
+  one line.}
+  \label{fig10:crescatter}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Longer horizons}
+\label{sec10:horizon}
+
+An investor who holds a building for ten years cares about its real value at the end more than about
+each year's return. The slope on inflation can differ between horizons, and there is a simple reason to
+expect it to settle for an asset whose real price returns to a trend.
+
+\begin{proposition}[Inflation slopes at long horizons]\label{prop10:horizon}
+Let $p_t$ be the log price level and $v_t$ the log price of an asset, with $v_t=\theta p_t+\delta t+u_t$,
+where $u_t$ is stationary with variance $\sigma_u^2$, and suppose that $\Var(p_{t+k}-p_t)\to\infty$ as
+$k\to\infty$. Write $\Delta_k x_t=x_t-x_{t-k}$. The slope of the $k$ period change in $v$ on the $k$
+period change in $p$,
+\[
+  b_k=\frac{\Cov(\Delta_k v_t,\Delta_k p_t)}{\Var(\Delta_k p_t)},
+  \qquad\text{satisfies}\qquad
+  \lvert b_k-\theta\rvert\le\frac{2\sigma_u}{\sqrt{\Var(\Delta_k p_t)}},
+\]
+so $b_k\to\theta$. If $u_t$ is uncorrelated with the price level at all leads and lags, $b_k=\theta$ at
+every horizon.
+\end{proposition}
+
+\begin{proof}
+$\Delta_k v_t=\theta\Delta_k p_t+\delta k+\Delta_k u_t$, and the constant $\delta k$ has no covariance with
+anything, so $b_k-\theta=\Cov(\Delta_k u_t,\Delta_k p_t)/\Var(\Delta_k p_t)$. By the Cauchy and Schwarz
+inequality the covariance is at most $\sqrt{\Var(\Delta_k u_t)\Var(\Delta_k p_t)}$ in absolute value, and
+$\Var(\Delta_k u_t)=2\sigma_u^2(1-\rho_k)\le4\sigma_u^2$, where $\rho_k$ is the $k$th autocorrelation of
+$u_t$. Dividing gives the bound, which goes to zero because $\Var(\Delta_k p_t)$ grows without limit. If
+$u_t$ is uncorrelated with $p_s$ for all $s$, the covariance is zero for every $k$.
+\end{proof}
+
+The condition on the price level holds when inflation is stationary with a long run variance above zero,
+for then $\Var(\Delta_k p_t)$ grows in proportion to $k$. The slope moves with the horizon only through the
+covariance of the gap $u_t$ with inflation: an asset whose price follows the price level with a lag, as
+the rent on a lease fixed in nominal terms does, has a gap that is low after a burst of inflation, so its
+slope is below $\theta$ over short horizons and approaches $\theta$ over long ones (Exercise~\ref{exr10:sixteen}).
+The bound is a worst case and is slow: it shrinks only with the square root of the horizon.
+\textcite{boudoukh1993} found that the relation between stock returns and inflation, negative over short
+horizons, turns positive over five years in two centuries of US and UK data.
+
+\Cref{fig10:horizon} repeats the regressions of \cref{tab10:inflation} with overlapping sums over three,
+five and ten years from \ihFirst{} to \ihLast, with Newey and West standard errors over as many lags as the
+horizon. With fifty five years, neighbouring ten year sums have nine of their ten years in common, so the \ihHnTen{}
+overlapping observations carry far less information than \ihHnTen{} independent ones, and the standard
+errors are themselves imprecise. Bills,
+rolled at rates that follow expected inflation, had slopes of \ihHBillThree, \ihHBillFive{} and \ihHBillTen.
+US equities moved as the lag story suggests, from \ihBMkt{} over a year to \ihHMktFive{} over five years and
+\ihHMktTen{} over ten, with a standard error of \ihHsMktTen{} at ten. The property index did not: its slope
+was \ihHCreThree, \ihHCreFive{} and \ihHCreTen{} at three, five and ten years, with standard errors of about
+\ihHsCreTen{} to \ihHsCreThree, and house prices had slopes of \ihHHpiThree, \ihHHpiFive{} and \ihHHpiTen. In the terms of the proposition that
+points to $\theta$ below one for property prices, which the standard errors cannot separate from one.
+Farm product prices had smaller slopes at longer horizons, \ihHFarmTen{} at ten years, and timber larger
+ones, \ihHTimberTen{} with a standard error of \ihHsTimberTen. The REIT series, which starts in 1997 when
+inflation varied little, gives slopes too imprecise to report.
+
+\begin{figure}[!tb]
+  \centering
+  \includegraphics[width=0.86\textwidth]{ch10/fig13_horizon}
+  \caption{Slopes of overlapping one, three, five and ten year sums of returns and price changes on the
+  sums of CPI inflation over the same years, \ihFirst{} to \ihLast, or from the first year of each series.}
+  \label{fig10:horizon}
+\end{figure}
+
+A simulation shows how far those standard errors can be trusted. In the model of
+Exercise~\ref{exr10:sixteen} an asset's log price change is last year's inflation, so the true slope
+over $k$ years is $1-1/k$. Draw inflation as independent normals with the mean and standard deviation of
+\ihFirst{} to \ihLast, and take \lsN{} samples of \lsT{} years from the chapter's random stream
+\texttt{[3817, 3]}. The simulated ten year slope averaged \lsMeanTen{} against a true 0.9, with a standard
+deviation across samples of \lsSdTen; the median Newey and West standard error was \lsSeTen, and a test at
+the 5\% level rejected the true slope in \lsRejTen\% of samples, against \lsRejFive\% at five years and
+\lsRejOne\% at one. These come from an assumed model and say nothing directly about the data, but they show that,
+under this simulated lagged-price model, the specified Newey and West procedure understates ten year
+sampling uncertainty, so a ten year slope two standard errors away from one is weaker evidence than it
+looks; this does not establish the direction of the error in the empirical regressions.
+
+\FloatBarrier
+% =====================================================================================
+\section{Limitations}
+\label{sec10:limits}
+
+The building, its loan and the forest are illustrations with round inputs, and the simulation of
+\cref{sec10:leverage} draws rent growth and exit cap rates from normal laws with no link between them; in a
+real downturn rents fall and cap rates rise together, and the tails of the levered IRR would be wider. The
+loan case study marks single loans to a national index, which moves far less than a single building, uses
+one spread for twenty five years and ignores the covenants and extensions that lenders use when values fall.
+
+The property series are price indexes. The Z.1 index and the FHFA index measure prices of buildings
+and houses, with no rent and no allowance for the capital spending needed to keep a building's value,
+and the REIT series is a revaluation of market value without dividends. Total returns would be higher by
+the income yield, and their correlations with inflation and with the market could differ. The splice of
+the Z.1 index in 1996 changes the method and the property mix at the same time, so not all of the change in
+autocorrelation can be attributed to appraisals. The leverage used to unlever REITs is an assumption
+over a range, and REIT leverage has varied over time.
+
+The storage results rest on monthly averages of daily futures prices that the EIA stopped publishing in
+April 2024, on national inventories that mix grades and locations, and on a bill rate that is not the
+financing rate of a commodity trader. The fixed and realised gas spreads use \sgLockN{} years of monthly averages, and the realised spread
+is measured at spot prices that a storage owner would not obtain exactly. The inflation regressions use
+about fifty annual observations at most, and fewer for REITs and oil, so their standard errors are large; the inflation of 2021 and 2022 is a
+single episode, and the overlapping sums over long horizons add little independent information. The producer price indexes are prices of output, not returns on owning farmland or
+timberland, and the rotation model fixes the price of timber that in practice moves and can be waited out.
+
+\FloatBarrier
+% =====================================================================================
+\section{Summary}
+\label{sec10:summary}
+
+\begin{itemize}
+  \item The cap rate is next year's NOI over value. With constant growth and a capital reserve it equals
+        $(r-g)/(1-\kappa)$, and a buyer who pays that price and sells at the same cap rate earns
+        $(1-\kappa)c+g$, whatever the holding period.
+  \item In a discounted cash flow the exit cap rate carries a share $((1+g)/(1+r))^T$ of the value, which
+        for ten years at \pfR\% and \pfG\% is \pfSaleShare\%.
+  \item A lender's DSCR test is $c/(\lambda k)\ge\underline D$. When the mortgage constant is high against
+        the cap rate, as for the building's loan at \lvRate\%, whose constant of \lvK\% is above the \pfCap\% cap rate, the DSCR test sets the loan, here at \lvLtv\% of value.
+        Leverage at a cost below the expected property return raises the expected equity return, multiplies
+        its volatility by $1/(1-\lambda)$ and can still lower the first year's cash yield.
+  \item Marked to the Z.1 index, \lcShareEighty\% of loans written at \lcLtvZero\% from 1996 passed 80\%
+        during their five year term; the loan of \lcWorst{} reached \lcWorstPeak\%.
+  \item In the smoothing model, appraisal smoothing changes the cumulative return only through its
+        end points and understates volatility, beta and correlation. The Z.1 property index had a first autocorrelation of \smArPre{} and a
+        volatility of \smVolPre\% when it was built from appraisals, and \smArPost{} and \smVolPost\% after it
+        moved to repeat sales.
+  \item Equity REIT returns are most correlated with the property index's later changes. Their
+        correlation with the index rises from \rtCorrCreReit{} in the same quarter to \rtLeadOne{} against
+        the previous quarter's REIT return, and in annual data to \rtCorrYLag{} against the previous
+        year's.
+  \item The Faustmann rotation equates the value of a year's growth with the interest on the timber and
+        the rent on the land, and is shorter than the rotation for a single harvest. A finite concession of
+        30 years at \tbRcon\% and \tbGcon\% growth is worth \tbShareThirty\% of the perpetuity.
+  \item Futures spreads are bounded by full carry. An inverted curve with stocks in storage implies a
+        convenience yield, and the net convenience yield of crude oil fell as inventories rose, with a
+        correlation of \sgCorrOil. The owner of storage can lock in an available spread with futures and keeps the option
+        to revise the plan if the curve moves in its favour, an option whose value depends on how prices move
+        and on the facility's limits; the August monthly average gas futures imply a September to
+        December log spread of \sgLockMean\% on average, against a spot spread of \sgRealMean\% with a volatility of \sgRealSd\%.
+  \item Property, house, farm and timber prices had inflation slopes between \ihBHpi{} and \ihBFarm{} in
+        annual data from the 1970s, or \ihStartTimber{} for timber, and equities a negative slope that is not significant, but the residual risk is large: the property mix with least real variance holds
+        \ihWcre{} in property and cuts the real variance of bills by \ihVarCut\%.
+  \item Over long horizons the slope of an asset whose real price returns to a trend tends to the
+        weight $\theta$ of the price level in its price. Equity slopes rose from \ihBMkt{} over a year to
+        \ihHMktTen{} over ten; property slopes fell from \ihBCre{} to about \ihHCreTen.
+\end{itemize}
+
+\FloatBarrier
+% =====================================================================================
+\section{Exercises}
+\label{sec10:exercises}
+
+\begin{enumerate}[label=\textbf{10.\arabic*}, ref=10.\arabic*, leftmargin=*]
+  \item\label{exr10:one} A building has a potential rent of 1.2 million dollars, vacancy of 5\% and
+  operating expenses of 0.40 million. Its owner reserves 8\% of NOI for capital items, requires 8\% and
+  expects NOI to grow at 2\% a year. Find NOI, the cap rate and the value.
+  \item\label{exr10:two} A ten year DCF uses $r=7\%$, $g=2\%$ and a going-in cap rate of 5\% with no
+  reserve. What share of the value comes from the sale? By how much does the value change if the exit cap
+  rate is 5.5\%, and how close is the approximation of \cref{prop10:exit}?
+  \item\label{exr10:three} A property is bought at a cap rate of 6\% with NOI growing at 2\% and no
+  reserve. What is the IRR if it is sold at the same cap rate? What is it if it is sold after seven years at
+  6.5\%?
+  \item\label{exr10:four} Find the mortgage constant of a loan at 5.5\% amortised monthly over 30 years,
+  and the DSCR of a loan at 70\% of value on a property with a cap rate of 6\%.
+  \item\label{exr10:five} A property earns NOI of 2 million dollars and is worth 32 million. A lender
+  offers 6\% over 25 years and requires a DSCR of at least 1.30 and an LTV of at most 70\%. Which test
+  binds, and how large is the loan?
+  \item\label{exr10:six} What share of a 25 year loan at 6\% is still owed after ten years?
+  \item\label{exr10:seven} A property returns 7\% and debt costs 5.5\%. Find the equity return at 60\%
+  LTV and the equity volatility if the property's volatility is 10\%. What is the equity return if the
+  property returns 4\%?
+  \item\label{exr10:eight} The true quarterly returns of a property portfolio are independent with an
+  annual volatility of 10\%, and an appraisal index smooths them with $\alpha=0.7$. What annual volatility
+  does the index report, scaling its quarterly volatility by $\sqrt4$, and what is its fourth order
+  autocorrelation?
+  \item\label{exr10:nine} An index smoothed with $\alpha=0.6$ reports quarterly returns of 1.0, 1.5, 0.5
+  and $-1.0$ percent. Recover the true returns of the last three quarters.
+  \item\label{exr10:ten} Smoothing with $\alpha=0.5$ is applied to a property whose true beta is one.
+  What is the sum of the slopes in a Dimson regression with the current market return and three lags?
+  \item\label{exr10:eleven} For the forest of \cref{sec10:timber}, find the Faustmann rotation, the single
+  harvest rotation and the land value at $r=5\%$.
+  \item\label{exr10:twelve} A 25 year concession pays 50 in its first year, growing at 3\%, and is discounted
+  at 8\%. Find its value, the share of the perpetuity's value and its duration.
+  \item\label{exr10:thirteen} Crude oil trades at 70 dollars for delivery in one month and 71 for delivery
+  six months after that. The interest rate is 4\% and storage costs 2\% a year. What is the highest
+  price for the later contract that rules out arbitrage, and what net and gross convenience yields do the
+  prices imply?
+  \item\label{exr10:fourteen} An asset has an inflation beta of 0.6 and inflation has a standard deviation
+  of 3\%. Find the covariance of its real return with inflation. If the asset's return in excess of a bill
+  has a volatility of 10\% and a covariance of $0.6\times0.03^2$ with inflation in excess of the bill, what
+  weight in the asset minimises the variance of the real return?
+  \item\label{exr10:fifteen} In September, gas futures for delivery in October, January and April trade at
+  3.00, 3.60 and 3.20 dollars, for delivery in one, four and seven months. The interest rate is 4\%, and
+  filling and emptying a facility of one unit each cost 0.05. The facility starts and ends empty,
+  filling and emptying are instantaneous, and the quoted prices can be traded at once. Find the intrinsic value of one cycle and the
+  pair of months that attains it. What would a cycle from October to April be worth?
+  \item\label{exr10:sixteen} Inflation $\pi_t$ is independent from year to year with variance
+  $\sigma^2$, and an asset's log price is last year's log price level, $v_t=p_{t-1}$. Find $\theta$ and
+  $u_t$ in \cref{prop10:horizon}, and the slope $b_k$ for $k=1$, $5$ and $10$ years.
+\end{enumerate}
+
+\subsection*{Answers}
+\begin{enumerate}[label=\textbf{10.\arabic*}, leftmargin=*]
+  \item Effective gross income is $1.2\times0.95=1.14$ million and NOI is \xaNoi{} thousand. By
+  \cref{prop10:cap} the cap rate is $0.06/0.92=\xaCap\%$ and the value $0.74\times0.92/0.06=\xaValue$ million.
+  \item The share is $(1.02/1.07)^{10}=\xbShare\%$. At an exit cap of 5.5\% the value changes by \xbDrop\%,
+  and the elasticity gives a change in log value of $-\xbShare\%\times\ln1.1=\xbApprox\%$, which is a
+  change of \xbApproxPct\% in value, close because the change is small.
+  \item By \cref{prop10:dcf} the IRR is $6+2=\xcIrr\%$. With the sale at 6.5\% after seven years it is \xcIrrHigh\%.
+  \item The constant is \xdK\%, and the DSCR is $0.06/(0.70\times\xdK\%)=\xdDscr$.
+  \item The constant is \xeK\%. The DSCR test allows $2/(1.30\times\xeK\%)=\xeLoan$ million and the LTV test
+  \xeLtvLoan{} million, so the DSCR test binds and the loan is \xeLtv\% of value.
+  \item By \cref{eq10:balance}, \xfBal\% of the loan.
+  \item $(7-0.6\times5.5)/0.4=\xgRet\%$, with volatility $10/0.4=\xgEqVol\%$. At 4\% the equity earns
+  $(4-3.3)/0.4=\xgRetLow\%$, less than the property: leverage is negative.
+  \item The reported variance is $0.3/1.7$ of the true one, so the reported volatility is
+  $10\%\times\sqrt{0.3/1.7}=\xhVol\%$, and the fourth order autocorrelation is $0.7^4=\xhAcf$.
+  \item By \cref{eq10:unsmooth}, $(1.5-0.6)/0.4=\xiOne$, $(0.5-0.9)/0.4=\xiTwo$ and
+  $(-1.0-0.3)/0.4=\xiThree$ percent. The true returns swing far more than the reported ones.
+  \item The slopes are $0.5\times0.5^j$, and their sum over $j=0,\dots,3$ is \xjSum.
+  \item The Faustmann rotation is \xkF{} years, the single harvest rotation \xkS{} years, and the land is
+  worth \xkLev{} dollars a hectare.
+  \item By \cref{prop10:concession} the value is \xlV, \xlShare\% of the perpetuity's $50/0.05=1000$, and the
+  duration is \xlDur{} years.
+  \item The bound of \cref{prop10:storage} is $70e^{0.06\times0.5}=\xmBound$. The net convenience yield is
+  $0.04-\ln(71/70)/0.5=\xmCy\%$ a year, and adding back the storage cost gives a gross yield of \xmGross\%.
+  \item By \cref{prop10:hedge} the covariance is $(0.6-1)\times0.03^2=\xnCov$. By \cref{prop10:mix} the weight
+  is $0.6\times0.0009/0.01=\xnW$.
+  \item By \cref{eq10:intrinsic}, October to January is worth
+  \[e^{-0.04/3}(3.60-0.05)-e^{-0.04/12}(3.00+0.05)=\xoV,\]
+  the largest of the three pairs. October to April is worth only \xoLast, and January to April is worth
+  nothing, since the curve falls into spring. This is the discounted payoff of the best single cycle under
+  the exercise's assumptions; a full valuation of a storage facility would add its extrinsic value.
+  \item $v_t=p_t-\pi_t$, so $\theta=1$, $\delta=0$ and $u_t=-\pi_t$. Then $\Delta_kv_t=\Delta_kp_t-\pi_t+\pi_{t-k}$.
+  The sum $\Delta_kp_t$ holds $\pi_t$ but not $\pi_{t-k}$, so the covariance is $k\sigma^2-\sigma^2$ and
+  $b_k=1-1/k$: zero over a year, 0.8 over five and 0.9 over ten.
+\end{enumerate}
+
+\FloatBarrier
+% =====================================================================================
+\section{Notes, sources and credits}
+\label{sec10:credits}
+
+\paragraph{Sources}
+The growing perpetuity behind the cap rate is from \textcite{gordon1956}. The smoothing model and its
+inversion are from \textcite{geltner1991,geltner1993}, the lagged regression for betas from
+\textcite{dimson1979}, and the smoothing of hedge fund returns from \textcite{getmansky2004}. The comparison
+of public and private real estate after restating for leverage, property mix and smoothing is from
+\textcite{pagliari2005}. The qualification rules for US REITs are in sections 856 and 857 of the Internal
+Revenue Code \parencite{usc856}. The forest rotation is from \textcite{faustmann1995}, an English translation
+of the article of 1849, with the history and the economics in \textcite{samuelson1976}; the growth curve is
+from \textcite{richards1959}. Convenience yield was named by \textcite{kaldor1939}, the theory of storage is
+from \textcite{working1949} and \textcite{brennan1958}, and its tests on futures bases are in
+\textcite{famafrench1987} and, with inventories, \textcite{gorton2013}. Commodity futures as an asset class are
+discussed by \textcite{gorton2006} and \textcite{erb2006}. Inflation betas and the split into expected and
+unexpected inflation are from \textcite{fama1977}, and the negative relation of stock returns to inflation
+in \textcite{bodie1976}, with its reversal over long horizons in \textcite{boudoukh1993}. The cap rate and exit cap results, the loan tests, the leverage and unlevering
+formulas, the smoothing identity, the concession formulas, the calendar spread bounds, the intrinsic value of storage, the least real
+variance mix and the long horizon bound are short derivations given here for completeness.
+
+\paragraph{Software used}
+The scripts call NumPy \parencite{numpy} for arrays and random numbers, SciPy \parencite{scipy} for root
+finding and optimisation, pandas \parencite{pandas} to read and align the series and to parse the EIA
+tables, statsmodels \parencite{statsmodels} for the Newey and West standard errors, and Matplotlib
+\parencite{matplotlib} for the figures. The cross-checks run in R \parencite{rcore} and GNU Octave
+\parencite{octave}. \texttt{code/requirements-lock.txt} records the full environment.
+
+\paragraph{Projects for comparison}
+The numpy-financial package \parencite{numpyfinancial} and pyxirr \parencite{pyxirr} compute the IRRs and
+loan payments of \cref{sec10:value,sec10:leverage}, and can be used to check the code here. The full list, with
+links, is in \texttt{CREDITS.md}.
+
+\paragraph{Data}
+The commercial property price index and the equity REIT market value and revaluation are from the
+Financial Accounts of the United States (Z.1) of the Federal Reserve Board, the house price index from the
+Federal Housing Finance Agency, the consumer and producer price indexes from the Bureau of Labor
+Statistics, the bill and bond yields from the Federal Reserve, and the spot prices of WTI crude oil and
+Henry Hub gas from the Energy Information Administration, all as published on FRED \parencite{fredch10}. The
+futures prices and inventories are from the EIA \parencite{eiach10}. These are works of US federal agencies,
+and \texttt{scripts/pull\_ch10.py} downloads them, cuts them at 30 September 2026 and ships them with the
+code; the quarterly series end in the second quarter of 2026 and the inventories in July 2026. US equity
+returns are from the data library of \textcite{frenchlib}, in the release built from the CRSP database of
+August 2026 and retrieved on 19 October 2026; these files are not redistributed, and
+\texttt{scripts/build\_french.py -{}-download} rebuilds them. The building, the loans, the forest, the
+concession and the exercise inputs are illustrations.
+
+\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
+\end{refsection}

@@ -31,6 +31,7 @@ def main():
         ax.plot(k[:41], pmf[:41], color=col, ls=ls, marker="o", ms=2, label=f"$\\rho={rho}$")
         nm = {0.0: "Zero", 0.1: "One", 0.3: "Three", 0.6: "Six"}[rho]
         pct(f"cpPZero{nm}", pmf[0], 1); pct(f"cpPTail{nm}", pmf[16:].sum(), 2)
+        pct(f"cpPAbove{nm}", pmf[41:].sum(), 1)       # the mass of the counts the figure does not draw
     ax.set_xlabel("defaults among 100 names within five years"); ax.set_ylabel("probability")
     ax.legend(loc="upper right")
     save(fig, "fig08_default_counts")

@@ -722,7 +722,7 @@ the averages: the five year quote implies \hzTriFive\% by the triangle, the haza
 five years is \hzLFive\%, and the average hazard over five years, $H(5)/5$, is \hzAvgFive\%.
 \Cref{fig6:hazard} shows the step function and the survival curve. The five year survival
 probability is \hzSFive\%, so the risk-neutral probability of default within five years is
-\hzPdFive\%.
+\hzPdFiveX\%.
 
 \begin{figure}[t]
   \centering
@@ -800,8 +800,8 @@ disastrous one both more likely.
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig08_default_counts}
   \caption{Probability of each number of defaults within five years among \cpN{} names with default
-  probability \hzPdFive\%, for factor correlations $\rho=0$, $0.1$, $0.3$ and $0.6$, by
-  \cref{prop6:cond}. Counts above 40 are not drawn.}
+  probability \hzPdFiveX\%, for factor correlations $\rho=0$, $0.1$, $0.3$ and $0.6$, by
+  \cref{prop6:cond}. Counts above 40 are not drawn; at $\rho=0.6$ they carry \cpPAboveSix\% of the probability.}
   \label{fig6:counts}
 \end{figure}
 
@@ -899,6 +899,7 @@ kinks of the tranche payoff are can step over the region entirely and return zer
 the range of $M$ at the two points where the conditional loss $(1-R)p(m)$ equals $a$ and $d$, and that split calculation is the one behind the tranche results above. The
 listing below is a simpler cross-check, a self-contained version of the large-pool calculation for
 $\rho=0.3$ with $p=0.05753$, the default probability to five places.
+\Needspace*{18\baselineskip}
 \lstinputlisting[language=Python]{code/ch06/snippets/lhp_tranche.py}
 The listing integrates over a fixed range without splitting it. For these six tranches it agrees with the split calculation, which a test checks, but it is not a
 general method: for thinner or more senior tranches only the split is reliable.
@@ -1183,7 +1184,7 @@ maturity, that moved the failure probability.
   \includegraphics[width=0.84\textwidth]{ch06/fig12_pool}
   \caption{Number of loans out of \csLoans{} from the \csLast{} vintage that cannot refinance: the
   histogram of \csMcScen{} simulated scenarios and the distribution of \cref{prop6:cond} with
-  $\rho=\csRho$. Counts above 70 are not drawn.}
+  $\rho=\csRho$, for every count from 0 to \csLoans.}
   \label{fig6:pool}
 \end{figure}
 
