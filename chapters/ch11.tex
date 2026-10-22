@@ -293,7 +293,9 @@ $K$ is worth at $t$
 with $Z$ a Brownian motion of its own, $\alpha=\jcAlpha\%$, $\beta=\jcBeta$ and $\sigma_e=\jcSigE\%$. The
 correction term makes the expected growth rate of $V$ exactly $\alpha+\beta\mu_I$, so $\alpha$ is the
 return above what an unfinanced position of $\beta$ in the index would earn; the simulation has no
-risk-free rate, so the cost of financing such a position does not enter. Fees are those of the stylised fund.
+risk-free rate, so the cost of financing such a position does not enter. The deal's debt is not
+modelled on its own but folded into $\beta$ and $\sigma_e$, although in real buyouts the amount of debt
+follows conditions in the credit markets \parencite{axelson2013}. Fees are those of the stylised fund.
 The GP marks each deal at cost for its first year and at $V_t$ afterwards, and the reported NAV is
 net of a carry of 20\% of any profit to date, distributions plus NAV less contributions. There are
 \jcFunds{} funds.

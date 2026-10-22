@@ -4,6 +4,10 @@ Open source projects studied for this book, with the chapters where each one is 
 was checked against the GitHub API on 19 October 2026 and resolves. Licences are as reported by
 GitHub; projects are credited, not copied, unless a chapter states otherwise.
 
+## Acknowledgements
+
+AI tools (ChatGPT and Claude) helped check the code and layout, and helped find and cite sources.
+
 ## Academic writing, LaTeX and figure design (18)
 
 | # | Repository | What it contributed | Chapters |
@@ -96,3 +100,10 @@ Chapter 12: Amit Goyal, data for Welch and Goyal (2008), "A Comprehensive Look a
 
 Institutional Limited Partners Association, ILPA Principles 3.0 (2019):
 https://ilpa.org/industry-guidance/principles-best-practices/ilpa-principles/
+
+## Other public sources for Chapter 9
+
+Dao, T.-L., T.-T. Nguyen, C. Deremble, Y. Lempérière, J.-P. Bouchaud and M. Potters (2017), "Tail
+Protection for Long Investors: Trend Convexity at Work", Journal of Investment Strategies 7(1), 61 to 84,
+https://doi.org/10.21314/JOIS.2017.093, preprint https://arxiv.org/abs/1607.02410 (2016). Its equation
+(7) is the straddle identity of Proposition 9.3.

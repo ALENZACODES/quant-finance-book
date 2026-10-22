@@ -201,7 +201,8 @@ $S_n/(\sigma\sqrt n)$ tends in law to a standard normal $Z$ by the central limit
 probability tends to $\Pr(Z^2<1)=2\Phi(1)-1$.
 \end{proof}
 
-The identity is exact for any path. Its right side is the payoff of a straddle on the total move,
+This identity appears as equation (7) of \textcite{dao2017}, who use it to read the profit of a trend
+rule as long horizon variance less short horizon variance. The identity is exact for any path. Its right side is the payoff of a straddle on the total move,
 $\tfrac12S_n^2$, paid for with the realised variance of the path, $\tfrac12\sum r_t^2$. The linear trend
 rule therefore has a convex payoff in the total move, though it is not a purchased straddle and its
 profit can be negative: it gains on large moves in either direction and loses a little, the realised
@@ -597,7 +598,11 @@ arises when a fund that joins the database brings its earlier, and selected, his
 \textcite{brown1992} showed for mutual funds how survivorship alone creates apparent persistence
 in performance, \textcite{fung2000} and \textcite{liang2000} measured the first two in hedge fund
 databases, and \textcite{aiken2013}, using returns of funds that do not report, found that the
-funds missing from commercial databases did worse than those in them. Each bias can be computed under simple assumptions.
+funds missing from commercial databases did worse than those in them. \textcite{grecu2007} asked why funds
+stop reporting and found that returns are markedly worse at the end of a fund's reporting life, and that
+larger funds and better performing funds are less likely to fail, which points to failure rather than
+success as the usual reason. \textcite{agarwal2013} used the equity holdings that funds
+must disclose to compare those that report to databases with those that do not. Each bias can be computed under simple assumptions.
 
 \begin{proposition}[The mean of the survivors]\label{prop9:survivor}
 Let a fund's $T$ monthly returns be independent $\N(\mu,\sigma^2)$, and let it survive when its average
@@ -1618,7 +1623,8 @@ merger arbitrage from \textcite{mitchell2001} and those of hedge fund indices fr
 \textcite{agarwal2004}; the hidden market exposure of stale prices is from \textcite{asness2001}, with the
 smoothing model of \textcite{getmansky2004}. The database biases were documented by
 \textcite{brown1992} for mutual funds and by \textcite{fung2000}, \textcite{liang2000},
-\textcite{ackermann1999} and \textcite{aiken2013} for hedge funds; the competition and survival of
+\textcite{ackermann1999} and \textcite{aiken2013} for hedge funds, why funds stop reporting is studied by
+\textcite{grecu2007}, and the reporting biases are inferred from equity holdings by \textcite{agarwal2013}; the competition and survival of
 hedge funds and commodity trading advisers are studied by \textcite{brown2001}. The reflection
 principle behind \cref{prop9:closure} is in \textcite{shreve2004}, and the continuity correction for
 monthly monitoring is from \textcite{broadie1997}. Carry across asset classes is from
@@ -1630,7 +1636,9 @@ fund by \textcite{goetzmann2003}, and the fees of funds of funds are analysed by
 Bitcoin was proposed by \textcite{nakamoto2008}, whose Section 11 gives the attacker calculation
 reproduced in \cref{sec9:crypto}; the subsidy schedule and the supply limit are those of the reference
 software, Bitcoin Core \parencite{bitcoincore}. The factor structure of cryptocurrency returns is
-from \textcite{liu2021}. The sign rule, straddle identity, survivor, backfill and closure formulas, the hurdle formulas, the
+from \textcite{liu2021}. The straddle identity of \cref{prop9:straddle} is equation (7) of \textcite{dao2017}, who
+relate trend following to the gap between long and short horizon variance. The sign rule, survivor,
+backfill and closure formulas, the hurdle formulas, the
 high-water mark identity, the netting inequality, the supply limit and the risk share weight are short
 derivations given here for completeness.
 

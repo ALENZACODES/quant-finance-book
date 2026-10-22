@@ -79,6 +79,10 @@ Every script uses a fixed seed, so the numbers in the text are reproduced exactl
 The open source projects that shaped the writing, the figures and the code are listed with links in
 [CREDITS.md](CREDITS.md) and credited by topic at the end of each chapter.
 
+## Acknowledgements
+
+AI tools (ChatGPT and Claude) helped check the code and layout, and helped find and cite sources.
+
 ## Licence
 
 See [LICENSE](LICENSE).
