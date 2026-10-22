@@ -89,7 +89,7 @@ def main():
     put("csSponsor", deal["sponsorScore"], "{:.0f}")
     t0, g0, m0, _ = L.screener_score(deal)
     t1, g1, m1, _ = L.screener_score(dict(deal, exitCapShift=100 * (last.cap1 - P["cap0"])))
-    put("csScore", t0, "{:.0f}"); N["csGrade"] = g0; put("csScoreReal", t1, "{:.0f}"); N["csGradeReal"] = g1
+    put("csScreenExitLtv", m1["exitLtv"], "{:.1f}"); put("csScore", t0, "{:.0f}"); N["csGrade"] = g0; put("csScoreReal", t1, "{:.0f}"); N["csGradeReal"] = g1
     put("csRateZero", last.y0 + P["spread"])
     # figures
     fig, axes = plt.subplots(2, 1, figsize=(6.0, 4.6), sharex=True)

@@ -168,7 +168,7 @@ def density_and_checks():
     # and moved the second decimal.) The grid sums are kept in RAW for the test that compares them.
     put("tailHes", 100 * L.heston_cdf(S0, lt, R, T, **HESTON), "{:.2f}"); put("tailLogn", 100 * ln.cdf(lt), "{:.2f}")
     put("rtailHes", 100 * (1 - L.heston_cdf(S0, 1.2 * F, R, T, **HESTON)), "{:.2f}"); put("rtailLogn", 100 * ln.sf(1.2 * F), "{:.2f}")
-    RAW["tailHesGrid"] = 100 * float(np.sum(dens[Kd < lt]) * h); RAW["rtailHesGrid"] = 100 * float(np.sum(dens[Kd > 1.2 * F]) * h)
+    put("tailHesGrid", 100 * float(np.sum(dens[Kd < lt]) * h), "{:.2f}"); put("rtailHesGrid", 100 * float(np.sum(dens[Kd > 1.2 * F]) * h), "{:.2f}")
     fig, ax = plt.subplots(figsize=(5.4, 2.8))
     sel = (Kd > 50) & (Kd < 160)
     ax.plot(Kd[sel], dens[sel], color=BLUE, label="implied by the Heston smile")

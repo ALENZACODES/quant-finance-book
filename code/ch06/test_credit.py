@@ -59,8 +59,12 @@ def test_snippet(RAW):
                          text=True, check=True).stdout.splitlines()
     vals = [float(l.split(":")[1].strip().rstrip("%")) for l in out]
     p = RAW["hzPdFive"] / 100
-    for (a, d), v in zip([(0, .03), (.03, .07), (.07, .10), (.10, .15), (.15, .30), (.30, 1)], vals):
-        close(v, 100 * L.tranche_el_lhp(round(p, 4), 0.3, 0.4, a, d), 1e-3)
+    assert round(p, 5) == 0.05753     # the value the listing and the text print
+    names = ["EqThree", "MzAThree", "MzBThree", "SnAThree", "SnBThree", "SupThree"]
+    for (a, d), v, k in zip([(0, .03), (.03, .07), (.07, .10), (.10, .15), (.15, .30), (.30, 1)], vals, names):
+        close(v, 100 * L.tranche_el_lhp(round(p, 5), 0.3, 0.4, a, d), 1e-3)
+        # 6.099: the listing reproduces the limit column of the table at printed precision
+        assert abs(v - RAW[f"lh{k}"]) < 0.006, (k, v, RAW[f"lh{k}"])
 
 
 def test_pool_pmf_sums_to_one_and_mean():

@@ -32,7 +32,7 @@ def fits(d):
     sigV, mbar, nm_ = vol(d)
     put("srVolN", nm_, "{:.0f}")
     sigC = sigV / math.sqrt(mbar)
-    put("srSigV", 100 * sigV, "{:.4f}"); put("srSigC", sigC, "{:.5f}"); pct("srMeanBill", mbar)   # sigma to five decimals so the Feller ratio can be reproduced from printed inputs
+    put("srSigV", 100 * sigV, "{:.4f}"); put("srSigC", sigC, "{:.5f}"); pct("srMeanBill", mbar, 3)   # sigma to five decimals so the Feller ratio can be reproduced from printed inputs
     for key, dt in DATES.items():
         q = d[d.date == dt][COLS].values[0] / 100
         out[key] = dict(q=q)

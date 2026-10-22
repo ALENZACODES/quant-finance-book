@@ -89,7 +89,7 @@ def main():
     dL, seL = L.mc_delta_lr(S0, K, R, SIG, T, 100_000, rng_for(3))
     put("deltaPW", dP, "{:.4f}"); put("deltaPWSE", seP, "{:.4f}")
     put("deltaLR", dL, "{:.4f}"); put("deltaLRSE", seL, "{:.4f}")
-    put("deltaSERatio", seL / seP, "{:.1f}"); put("deltaVarRatio", (seL / seP) ** 2, "{:.1f}")
+    put("deltaSERatio", seL / seP, "{:.2f}"); put("deltaVarRatio", (seL / seP) ** 2, "{:.1f}")
     RAW["deltaExact"] = float(L.greeks(S0, K, R, SIG, T)["delta"])
     # figure
     fig, ax = plt.subplots(1, 2, figsize=(6.4, 2.8))

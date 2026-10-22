@@ -11,5 +11,5 @@ def tranche_el(p, rho, R, a, d):
     return integrate.quad(loss, -10, 10, limit=200)[0] / (d - a)
 
 for a, d in [(0, .03), (.03, .07), (.07, .10), (.10, .15), (.15, .30), (.30, 1)]:
-    el = tranche_el(0.0575, 0.3, 0.4, a, d)
+    el = tranche_el(0.05753, 0.3, 0.4, a, d)
     print(f"{100 * a:3.0f} to {100 * d:3.0f}%: {100 * el:8.4f}%")

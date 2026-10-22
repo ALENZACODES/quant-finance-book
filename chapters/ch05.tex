@@ -680,7 +680,8 @@ dominated convergence applies and gives the second form.
 
 With \deltaPaths{} paths the pathwise estimate is \deltaPW{} with standard error \deltaPWSE, and the
 likelihood ratio estimate \deltaLR{} with standard error \deltaLRSE, against the exact \deltaC. The
-pathwise standard error is \deltaSERatio{} times smaller here, about \deltaVarRatio{} times less variance.
+pathwise standard error is \deltaSERatio{} times smaller here, about \deltaVarRatio{} times less variance;
+both ratios come from the unrounded errors, so they differ a little from the ratio of the printed ones.
 The likelihood ratio estimator is the one to use when the payoff jumps, as a digital option's does.
 There the pathwise derivative is zero almost everywhere, so the pathwise estimator returns zero while
 the true delta is positive, because all of the sensitivity sits at the jump.
@@ -1101,7 +1102,9 @@ Multiplied by $e^{rT}$, as \cref{prop5:bl} requires, it is the density under $Q$
 \densInt{} and has mean equal to the forward,
 \densFwd, to within \densTol. \Cref{fig5:density} compares the density with a lognormal at the same at-the-money
 volatility, \densAtmVol\%. The model puts \tailHes\% of probability below 80\% of the forward against
-\tailLogn\% for the lognormal, and \rtailHes\% above 120\% against \rtailLogn\%. Under $Q$ the skew gives
+\tailLogn\% for the lognormal, and \rtailHes\% above 120\% against \rtailLogn\%. These tails come from the
+model's distribution function at the exact cut points; summing the gridded density over whole cells
+gives \tailHesGrid\% and \rtailHesGrid\%, because each cut falls inside a cell of the 0.1 grid. Under $Q$ the skew gives
 a crash more weight and a rally less than the lognormal does; prices alone cannot say how much of that
 is real-world probability and how much is a premium for crash risk.
 

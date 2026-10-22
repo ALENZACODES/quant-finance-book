@@ -46,8 +46,8 @@ rates inside the short-rate models are continuously compounded. Forward and swap
 quarterly or semi-annual schedule are simple. Loan rates in the private credit sections are annual
 rates compounded monthly, the convention of the screener used there. Canadian mortgages repaid in
 blended payments must state their rate calculated yearly or half-yearly under section 6 of the
-Interest Act, so a quoted 6\% compounded half-yearly is about 6.09\% effective against 6.17\%
-compounded monthly; the stylised loans here keep the screener's monthly convention.
+Interest Act, so a quoted 6\% compounded half-yearly is 6.09\% effective a year, while 6\% compounded
+monthly is 6.17\% effective; the stylised loans here keep the screener's monthly convention.
 
 A few letters change meaning between sections. $D$ and $C$ are a bond's modified duration and
 convexity. $r_t$ is the short rate in \cref{sec6:short,sec6:swaps}; in \cref{sec6:merton} $r$ is a
@@ -787,8 +787,8 @@ and the $\varepsilon_i$ are independent of each other and of $M$. So $N$ is bino
 averaging over $M$ gives the formula.
 \end{proof}
 
-Take a pool of \cpN{} names, each with the five year default probability \hzPdFive\% of
-\cref{sec6:hazard} and recovery \hzRec\%, so the expected pool loss is \cpEL\% at every $\rho$.
+Take a pool of \cpN{} names, each with the five year default probability of \cref{sec6:hazard},
+\hzPdFiveX\% (\hzPdFive\% to two places; every calculation below uses the unrounded value), and recovery \hzRec\%, so the expected pool loss is \cpEL\% at every $\rho$.
 \Cref{fig6:counts} shows how the distribution of the number of defaults changes with $\rho$. With
 independent names the probability of no default is \cpPZeroZero\% and the probability of 16 or more
 is \cpPTailZero\%. At $\rho=0.1$ these are \cpPZeroOne\% and \cpPTailOne\%; at $0.3$,
@@ -867,7 +867,7 @@ most at low correlation, where the 100-name pool still has binomial noise: \trEq
 \begin{table}[t]
 \centering
 \caption{Five year expected loss of each tranche, as a percentage of the tranche, for \cpN{} names
-with default probability \hzPdFive\% and recovery \hzRec\% (pool) and in the large-pool limit of
+with default probability \hzPdFiveX\%, $1-S(5)$ from \cref{tab6:hazard}, and recovery \hzRec\% (pool) and in the large-pool limit of
 \cref{prop6:lhp} (limit). An entry of 0.0000 is below 0.00005\%.}
 \label{tab6:tranches}
 \begin{tabular}{lrrrrrr}
@@ -898,7 +898,7 @@ The senior tranches are hit only in the far tail of $M$, and a quadrature that d
 kinks of the tranche payoff are can step over the region entirely and return zero. The code splits
 the range of $M$ at the two points where the conditional loss $(1-R)p(m)$ equals $a$ and $d$, and that split calculation is the one behind the tranche results above. The
 listing below is a simpler cross-check, a self-contained version of the large-pool calculation for
-$\rho=0.3$ with $p$ rounded to four places.
+$\rho=0.3$ with $p=0.05753$, the default probability to five places.
 \lstinputlisting[language=Python]{code/ch06/snippets/lhp_tranche.py}
 The listing integrates over a fixed range without splitting it. For these six tranches it agrees with the split calculation, which a test checks, but it is not a
 general method: for thinner or more senior tranches only the split is reliable.
@@ -921,8 +921,8 @@ Coverage tests protect the senior notes: if the par value of the loans falls too
 notes at and above a given class, or if interest received falls too far below interest due, cash that
 would have gone to the junior notes is diverted to repay the senior ones. A synthetic structure
 holds no loans: it takes credit risk on a reference pool through credit default swaps, and its
-investors in effect sell protection on tranches of that pool, whose expected losses are those of
-\cref{tab6:tranches}.
+investors in effect sell protection on tranches of that pool, and for a homogeneous pool like the one
+above the one-factor model gives those tranches the expected losses of \cref{tab6:tranches}.
 
 The tranche losses above are losses by a five year horizon. A note is exposed until it is repaid, and
 when it is repaid depends on the timing of the collateral's cash. This is where maturity matching
@@ -1172,8 +1172,11 @@ $(b-\eta\zeta)^+/b$ with $b=\csLastB$ and $\eta=\csEta$, which is $(1-\csCost\%)
 If $\bar L$ is the average loss over the pool, the claim loses $\min\bigl((\bar L-1\%)^+,\,99\%\bigr)$
 of the balance. The screen of \cref{sec6:private},
 given this loan at origination with a sponsor rating of \csSponsor{} and no cap rate shift, scores it \csScore, a \csGrade; given the cap rate
-shift that actually happened it scores \csScoreReal, still a \csGradeReal. The screen has no input for
-the rate at maturity, and that rate is what moved the failure probability.
+shift that actually happened it scores \csScoreReal, still a \csGradeReal. Even given that shift, the
+screen sees an exit loan to value of \csScreenExitLtv\%, far from the 90\% at which its exit score
+reaches zero. It has no input for the new lender's tests, a loan to value of at most \csLtv\% and a
+coverage of at least \csDscrMin, or for uncertainty in income, and it is those, applied at the rate at
+maturity, that moved the failure probability.
 
 \begin{figure}[t]
   \centering
@@ -1337,7 +1340,9 @@ organises rates and credit instruments. The full list, with links, is in \texttt
 \paragraph{Data}
 The case study uses the Government of Canada five year benchmark bond yield, series
 \texttt{BD.CDN.5YR.DQ.YLD}, from the Bank of Canada Valet service \parencite{bocvalet}, in the file of
-Chapter~4, which covers \bdFirst{} to \bdDate{} and was retrieved on 19 October 2026. The
+Chapter~4, which covers \bdFirst{} to \bdDate{} and was retrieved on 19 October 2026. The request
+ended on 30 September 2026, so no October value enters any result, and the Bank's file has no value
+for 30 September, so the last observation is \bdDate. The
 study uses the last daily value of each month, so the last month-end is \csMatLast. The Bank can revise
 published values, and the numbers here use the saved file. The CDS quotes in \cref{sec6:hazard}, the
 firm in \cref{sec6:merton} and the loans in \cref{sec6:private} are illustrations and describe no real
