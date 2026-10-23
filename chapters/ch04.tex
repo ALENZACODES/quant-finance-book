@@ -42,31 +42,31 @@ symbols reused with different meanings in later sections.
 \section{Prices that cannot be undercut}
 \label{sec4:why}
 
-An \emph{arbitrage} is a trade that requires no positive initial investment, can never lose, and
+An \emph{arbitrage\ix{Arbitrage}} is a trade that requires no positive initial investment, can never lose, and
 either brings in money today or sometimes gains later. The definition is strict on purpose. A trade that is expected to make money but can
 lose is a bet, however good, and a trade that cannot lose but costs something today is an investment.
 Only when both conditions hold does the trade make money from nothing, and traders who take it move
 prices until the opportunity is gone. Pricing by no arbitrage assumes that this has already happened.
 
-The assumption is weaker than market efficiency in the sense of \textcite{fama1970}. It says nothing
+The assumption is weaker than market efficiency\ix{Efficient market} in the sense of \textcite{fama1970}. It says nothing
 about whether prices reflect information about the future. It only says that prices are consistent
-with each other: a forward cannot be quoted far from the spot price carried forward, and a call
+with each other: a forward cannot be quoted far from the spot price\ix{Spot price} carried forward, and a call
 cannot be worth more than the stock it is written on. These conditions hold whatever anyone believes
 about the future, up to the cost of trading on them.
 
 Enforcing them is not free. Each arbitrage argument below needs someone who can borrow, lend, sell
-short and store, and in practice each of those has a cost. The result is a band of prices rather than
+short\ix{Short selling} and store, and in practice each of those has a cost. The result is a band of prices rather than
 a single price, and \cref{sec4:fwd} measures how wide the band is. For an alternative investment the
 band can be wide: nobody sells a timber tract short to arbitrage a mispriced lumber forward.
 
 \begin{keybox}[Symbols reused between sections]
 Within a section each letter keeps one meaning, apart from running indices ($j$, $k$, $m$) and
 integration variables such as the $u$ in $\Lambda(u,T)$. The letters whose meaning changes between
-sections are noted here, and they are the ones a reader is likely to confuse. $X$ is a claim's payoff in \cref{sec4:ftap} and the log spot price in
+sections are noted here, and they are the ones a reader is likely to confuse. $X$ is a claim's payoff\ix{Payoff} in \cref{sec4:ftap} and the log spot price in
 \cref{sec4:roll}; $V$ is the value of a forward in \cref{sec4:fwd}, the investor's wealth in
-\cref{sec4:roll} and an option value on a tree; $m$ is the compounding frequency in \cref{sec4:curve},
-the deterministic part $m(t)$ of the short rate in \cref{sec4:fut} and the number of rolls in
-\cref{sec4:roll}; $c$ is a coupon rate in \cref{sec4:curve} and $c_k$ a European call value in
+\cref{sec4:roll} and an option value\ix{Option value} on a tree; $m$ is the compounding\ix{Compounding} frequency in \cref{sec4:curve},
+the deterministic part $m(t)$ of the short rate\ix{Short rate} in \cref{sec4:fut} and the number of rolls in
+\cref{sec4:roll}; $c$ is a coupon\ix{Coupon} rate in \cref{sec4:curve} and $c_k$ a European call value in
 \cref{sec4:american}; $w$ is an interpolation weight in \cref{sec4:curve} and $w_{k,j}=V_{k,j}+S_{k,j}$ in
 \cref{sec4:american}; and in \cref{sec4:limit} $d_1$ and $d_2$ are the Black-Scholes arguments, not down
 factors. $S$ is a price, of an asset or at a tree node; the number of states in \cref{sec4:ftap} is $J$.
@@ -77,12 +77,12 @@ of \cref{sec4:fut}, where $r_t$ is the short rate. On a
 tree $u$ and $d$ are the up and down factors, $R$ the gross interest per step and $h$ the step
 length; in \cref{sec4:ftap}, $h$ is instead the upper price bound, and in \cref{sec4:roll} the roll
 step. In \cref{sec4:fut}, $\Lambda(u,T)=(1-e^{-\kappa(T-u)})/\kappa$ is a zero coupon bond's sensitivity
-to the short rate, so its volatility is $\sigma_r\Lambda$; it is unrelated to the storage rate
+to the short rate, so its volatility is $\sigma_r\Lambda$; it is unrelated to the storage\ix{Commodity storage} rate
 $\lambda$. In \cref{sec4:roll}, $b_t(T)$ is the basis and $g_k$ a log futures change. $g$ is a payoff function in \cref{sec4:binom} and an exercise payoff in \cref{sec4:american}; $n$ is an
 asset index in \cref{sec4:ftap}, the number of settlement dates in \cref{sec4:fut} and otherwise the
 number of tree steps; $\epsilon$ is a small perturbation in \cref{sec4:ftap}, $\varepsilon_h$ a log step in
 \cref{sec4:limit} and $\varepsilon_{t+12}$ a regression error in \cref{sec4:case}. $\tau$ is a term or a time to expiry, except in
-\cref{sec4:american}, where it is a stopping time. Continuously compounded rates are $r$ and simple money market rates are
+\cref{sec4:american}, where it is a stopping time. Continuously compounded rates are $r$ and simple money market\ix{Money market} rates are
 $i$ or $y$. An asset's income yield is $\delta$, a commodity's storage rate $\lambda$ and its implied
 convenience yield $\eta$. $K$ is a strike or delivery price, $k$ the contract rate of \cref{prop4:fra} and otherwise an index, $\theta$ a
 portfolio, $q$ a risk-neutral probability and $B$ the money market account. $F_0$ is a forward price, $F(t_1,t_2)$ a forward
@@ -94,9 +94,9 @@ interest rate, and $G$ a futures price.
 \label{sec4:curve}
 
 \begin{definition}\label{def4:curve}
-The \emph{discount factor}\index{discount factor} $D(t)$ is the price today of one dollar paid with certainty at time $t$,
-with $D(0)=1$. The continuously compounded \emph{zero rate}\index{zero rate} is $z(t)=-\ln D(t)/t$. For $t_1<t_2$, the
-simple \emph{forward rate}\index{forward rate} for the period $[t_1,t_2]$ and the \emph{instantaneous forward rate}\index{instantaneous forward rate} at $t$
+The \emph{discount factor\ix{Discount factor}}\index{Discount factor} $D(t)$ is the price today of one dollar paid with certainty at time $t$,
+with $D(0)=1$. The continuously compounded\ix{Compounding}\ix{Continuous compounding} \emph{zero rate\ix{Zero rate}}\index{Zero rate} is $z(t)=-\ln D(t)/t$. For $t_1<t_2$, the
+simple \emph{forward rate\ix{Forward rate}}\index{Forward rate} for the period $[t_1,t_2]$ and the \emph{instantaneous forward rate}\index{Instantaneous forward rate} at $t$
 are
 \begin{equation}\label{eq4:fwd}
   F(t_1,t_2)=\frac{1}{t_2-t_1}\Bigl(\frac{D(t_1)}{D(t_2)}-1\Bigr),\qquad
@@ -109,8 +109,8 @@ compounded $m$ times a year means $D(t)=(1+y/m)^{-mt}$. The forward rate is a pr
 as the next result shows: anyone can lock it in today with two bonds.
 
 \begin{proposition}[Locking in a forward rate]\label{prop4:fra}
-Suppose zero-coupon bonds maturing at $t_1$ and $t_2$ trade at $D(t_1)$ and $D(t_2)$ and there is no
-arbitrage. Then an agreement made today to borrow $1$ at $t_1$ and repay $1+k(t_2-t_1)$ at $t_2$ has
+Suppose zero-coupon bonds\ix{Zero-coupon bond} maturing at $t_1$ and $t_2$ trade at $D(t_1)$ and $D(t_2)$ and there is no
+arbitrage\ix{Arbitrage}. Then an agreement made today to borrow $1$ at $t_1$ and repay $1+k(t_2-t_1)$ at $t_2$ has
 zero value if and only if $k=F(t_1,t_2)$. Also,
 \begin{equation}\label{eq4:zeroavg}
   D(t)=\exp\Bigl(-\int_0^t f(s)\,ds\Bigr),\qquad z(t)=\frac1t\int_0^t f(s)\,ds ,
@@ -127,10 +127,10 @@ $D(t_1)-(1+k\tau)D(t_2)$. This is zero exactly when $1+k\tau=D(t_1)/D(t_2)$, whi
 \cref{eq4:fwd}. For \cref{eq4:zeroavg}, integrate $f=-(\ln D)'$ from $0$ to $t$ and use $\ln D(0)=0$.
 \end{proof}
 
-\paragraph{Bootstrapping a curve} Markets quote bill yields and coupon bond yields, and the discount
+\paragraph{Bootstrapping a curve} Markets quote bill yields and coupon\ix{Coupon} bond yields\ix{Bond yield}, and the discount
 factors have to be inferred from them. Each quote is converted using the instrument's actual cash
 flows, quotation basis and settlement convention. In the simplest case, a coupon bond paying $c/m$ at $t_k=k/m$, $k=1,\dots,mT$, and $1$ at $T$ is worth
-$\sum_k (c/m)D(t_k)+D(T)$. A \emph{par yield}\index{par yield} is the coupon that makes this equal to $1$. Given
+$\sum_k (c/m)D(t_k)+D(T)$. A \emph{par yield\ix{Par yield}}\index{Par yield} is the coupon that makes this equal to $1$. Given
 discount factors at a set of knots, we fill the gaps by interpolating $\ln D$ linearly, which is the
 same as holding the instantaneous forward rate constant between knots.
 
@@ -151,7 +151,7 @@ theorem gives a root, and strict monotonicity makes it unique.
 
 \begin{example}{Building a curve by hand}\label{ex4:boot}
 The instruments here are idealised: bill yields are simple rates for exact terms, and each bond pays
-semiannual coupons at 0.5, 1, 1.5, \ldots{} years and prices at par. Bills for six months and one year yield $4.00\%$ and $4.20\%$ on a simple basis, so $D(0.5)=\hxDHalf$
+semiannual coupons\ix{Semiannual coupons} at 0.5, 1, 1.5, \ldots{} years and prices at par. Bills for six months and one year yield $4.00\%$ and $4.20\%$ on a simple basis, so $D(0.5)=\hxDHalf$
 and $D(1)=\hxDOne$. A two year bond with semiannual coupons has a par yield of $4.50\%$. The unknown
 $D(2)$ enters the price directly and through the interpolated value
 \[
@@ -163,7 +163,7 @@ $D(3)=\hxDThree$. The zero rates rise from $\hxZHalf\%$ at six months to $\hxZTh
 years, and in this example the forward rates lie above them: $F(1,2)=\hxFwdOneTwo\%$ and
 $F(2,3)=\hxFwdTwoThree\%$, both simple rates. Compared on the same compounding basis, a forward rate
 exceeds the zero rate at the end of its period whenever the zero rate rises over that period; a rising
-zero curve need not put every forward above every earlier zero rate. A three year bond with an annual coupon of
+zero curve\ix{Term structure} need not put every forward above every earlier zero rate. A three year bond with an annual coupon of
 $4\%$ is worth \hxBondFour{} per 100. To lock in $F(1,2)$ on 1,000,000, buy 1,000,000 face of the
 one year bond for \fraBuy{} and sell \fraRepay{} face of a two year zero coupon bond (a strip), which raises \fraSell:
 the position costs nothing, pays 1,000,000 in a year and owes \fraRepay{} in two.
@@ -172,11 +172,11 @@ the position costs nothing, pays 1,000,000 in a year and owes \fraRepay{} in two
 \Cref{fig4:goc} applies the same method to the Government of Canada curve on \gocDate, the last
 business day of September (30 September, the National Day for Truth and Reconciliation, is a Bank
 holiday with no published rates). Bills for three
-months, six months and one year yield \gocThreeM\%, \gocSixM\% and \gocOneY\%; benchmark bonds for two
+months, six months and one year yield \gocThreeM\%, \gocSixM\% and \gocOneY\%; benchmark\ix{Benchmark} bonds\ix{Benchmark bond} for two
 to ten years yield from \gocTwoY\% to \gocTenY\%. Two approximations are made. Bill yields are treated
 as simple rates on an actual/365 basis with exact terms of a quarter, half and whole year, and each
 benchmark bond is treated as a par bond with semiannual coupons maturing exactly at its nominal term.
-Benchmark bonds trade close to par but rarely exactly at it, so this is a transparent bootstrap of
+Benchmark bonds trade close to par but rarely exactly at it, so this is a transparent bootstrap\ix{Bootstrap} of
 the quoted benchmark yields, showing the shape they imply, and not a curve fitted to the prices of
 actual bonds. The bootstrap reprices these idealised inputs to within $10^{-15}$, which checks
 the bootstrap; it says nothing about how well the curve prices actual bonds with their own coupons and
@@ -195,7 +195,7 @@ $F(1,2)$ is \gocFwdOneTwo\% and $F(7,10)$ is \gocFwdSevenTen\% a year (\gocFwdOn
   \label{fig4:goc}
 \end{figure}
 
-Monotone-convex interpolation or a smoothing spline removes the steps, at the cost of fitting extra
+Monotone-convex interpolation or a smoothing\ix{Return smoothing} spline removes the steps, at the cost of fitting extra
 parameters. \Cref{eq4:zeroavg} holds for every one of these curves, the log-linear one
 included, because it needs only that $\ln D$ be the integral of $f$; what smoothing changes is the
 forward rates between the observed maturities.
@@ -206,16 +206,16 @@ forward rates between the observed maturities.
 
 \begin{definition}\label{def4:market}
 A \emph{one-period market} has $J$ states of the world at time $1$ and $N$ assets. Asset $n$ costs
-$p_n$ today and pays $A_{sn}$ in state $s$, so the payoff matrix is $A\in\mathbb R^{J\times N}$. A
-portfolio $\theta\in\mathbb R^N$ costs $p^\top\theta$ and pays $A\theta$. It is an \emph{arbitrage}
+$p_n$ today and pays $A_{sn}$ in state $s$, so the payoff\ix{Payoff} matrix is $A\in\mathbb R^{J\times N}$. A
+portfolio $\theta\in\mathbb R^N$ costs $p^\top\theta$ and pays $A\theta$. It is an \emph{arbitrage\ix{Arbitrage}}
 if $p^\top\theta\le0$ and $A\theta\ge0$ in every state, with $p^\top\theta<0$ or $A\theta\ne0$.
-A \emph{state price vector}\index{state price vector} is a $\psi\in\mathbb R^J$ with $\psi_s>0$ for every $s$ and
+A \emph{state price\ix{State prices} vector}\index{State price vector} is a $\psi\in\mathbb R^J$ with $\psi_s>0$ for every $s$ and
 $A^\top\psi=p$.
 \end{definition}
 
 The state price $\psi_s$ is what the market charges today for one dollar paid in state $s$ and nothing
 otherwise. If a riskless bond paying $R$ in every state costs $1$, then $\sum_s\psi_s=1/R$, and
-$q_s=R\psi_s$ are positive numbers that add to one. They are called \emph{risk-neutral probabilities}\index{risk-neutral probabilities}
+$q_s=R\psi_s$ are positive numbers that add to one. They are called \emph{risk-neutral\ix{Risk-neutral pricing} probabilities}\index{Risk-neutral probabilities}
 because every price becomes a discounted expectation under them:
 \begin{equation}\label{eq4:rn}
   p_n=\sum_s\psi_sA_{sn}=\frac1R\sum_sq_sA_{sn}=\frac1R\,\E_Q[A_n].
@@ -286,8 +286,8 @@ the price of a claim that cannot be replicated, which the example after it compu
 \begin{corollary}\label{cor4:complete}
 Suppose there is no arbitrage. The state price vector is unique if and only if the market is
 \emph{complete}, meaning that $A$ has rank $J$, so that every payoff in $\mathbb R^J$ is the payoff of some
-portfolio. In a complete market every claim $X$ has the unique price $\psi^\top X$, which is the cost
-of the portfolio that replicates it.
+portfolio. In a complete market\ix{Complete market} every claim $X$ has the unique price $\psi^\top X$, which is the cost
+of the portfolio that replicates\ix{Replicating portfolio} it.
 \end{corollary}
 
 \begin{proof}
@@ -318,7 +318,7 @@ $\psi\ge0$: any $\psi\ge0$ with $A^\top\psi=p$ is the limit of $(1-\epsilon)\psi
 where $\psi^0$ is strictly positive. The set $\{\psi\ge0:A^\top\psi=p\}$ is bounded, because a portfolio with a strictly positive
 payoff has a positive price that caps the total mass of any such $\psi$; it is also closed, hence compact, so the relaxed problem attains both endpoints. Whether an endpoint
 is itself an arbitrage-free price is taken up after the example. The two expressions for $h$ are a primal and dual pair
-of linear programs. Weak duality is
+of linear programs\ix{Linear programming}. Weak duality is
 direct: if $\psi\ge0$, $A^\top\psi=p$ and $A\theta\ge X$, then
 $p^\top\theta=\psi^\top A\theta\ge\psi^\top X$. Equality of the two optimal values is the strong
 duality theorem of linear programming, which applies because both programs are feasible (the first by
@@ -341,7 +341,7 @@ locks in \putGap{} today with no exposure at all. A linear feasibility check bas
 Remove the call from that market and it becomes incomplete: two assets cannot span three states. The
 risk-neutral probabilities must still price the bond and the stock, which forces $q_u-q_d=0.1$ and
 leaves $q_u$ free between \qUpMin\% and \qUpMax\%. \Cref{fig4:bounds} shows the resulting range of call
-prices for every strike. At $K=100$ the closure of the range is $[\boundLo,\boundHi]$. The upper end is
+prices\ix{Call price} for every strike. At $K=100$ the closure of the range is $[\boundLo,\boundHi]$. The upper end is
 the cost of half a share and a loan of $40/1.02$, which pays 20, 10 and 0, at least as much as the call
 in every state. The lower end is the value of one share and a loan of $100/1.02$, which pays 20, 0 and
 $-20$, never more than the call. Neither portfolio replicates the call, which is not attainable with
@@ -367,16 +367,16 @@ must. Linear programming solves the primal and dual problems separately, and the
 \label{sec4:fwd}
 
 \begin{definition}\label{def4:forward}
-A \emph{forward contract}\index{forward contract} agreed at time $0$ obliges the long side to buy one unit of an asset at time
-$T$ for the delivery price $K$; its payoff at $T$ is $S_T-K$. The \emph{forward price}\index{forward price} $F_0$ is the
+A \emph{forward contract\ix{Forward contract}}\index{Forward contract} agreed at time $0$ obliges the long side to buy one unit of an asset at time
+$T$ for the delivery price\ix{Delivery price} $K$; its payoff at $T$ is $S_T-K$. The \emph{forward price\ix{Forward price}}\index{Forward price} $F_0$ is the
 delivery price that gives the contract zero value at inception.
 \end{definition}
 
-In this section the interest rate $r$ is constant and continuously compounded. An asset may pay income
-at a continuous yield $\delta$, as an equity index pays dividends or a foreign currency earns interest.
+In this section the interest rate\ix{Interest rate} $r$ is constant and continuously compounded. An asset may pay income
+at a continuous yield $\delta$, as an equity index pays dividends or a foreign currency\ix{Currency} earns interest.
 
 \begin{proposition}[Cost of carry]\label{prop4:carry}
-If there is no arbitrage, the forward price of an asset with income yield $\delta$ is
+If there is no arbitrage\ix{Arbitrage}, the forward price of an asset with income yield\ix{Dividend yield} $\delta$ is
 \begin{equation}\label{eq4:carry}
   F_0=S_0e^{(r-\delta)T},
 \end{equation}
@@ -396,38 +396,38 @@ of \cref{eq4:fwdvalue}.
 \end{proof}
 
 The proof is a recipe for the arbitrage. If a forward is quoted above $S_0e^{(r-\delta)T}$, buy the
-asset with borrowed money and sell the forward: this is \emph{cash and carry}\index{cash and carry}. If it is quoted below,
-sell the asset short, lend the proceeds and buy the forward: this is \emph{reverse cash and carry}\index{reverse cash and carry}. The
+asset with borrowed money and sell the forward: this is \emph{cash and carry\ix{Cash and carry}}\index{Cash and carry}. If it is quoted below,
+sell the asset short, lend the proceeds and buy the forward: this is \emph{reverse cash and carry}\index{Reverse cash and carry}. The
 reverse trade needs someone willing to lend the asset, and the short seller must pass on to the lender
 the income the asset pays while the short is open. For an index at 100 with $r=4\%$ and $\delta=2.5\%$,
 the six month forward is \fwdIndex. Three months later, with the
 index at 103, the new forward price is \fwdIndexLater{} and the old contract is worth \fwdValueLater,
 whichever form of \cref{eq4:fwdvalue} is used.
 
-\paragraph{Storage and convenience} A physical commodity costs money to store and pays no income. If the
-commodity can be bought now and stored until $T$, with storage costs at a continuous rate $\lambda$,
-cash and carry gives the upper bound $F_0\le S_0e^{(r+\lambda)T}$. The reverse trade needs someone to
+\paragraph{Storage and convenience} A physical commodity\ix{Commodity} costs money to store and pays no income. If the
+commodity can be bought now and stored until $T$, with storage\ix{Commodity storage} costs at a continuous rate $\lambda$,
+cash and carry gives the upper bound\ix{Upper bound} $F_0\le S_0e^{(r+\lambda)T}$. The reverse trade needs someone to
 sell the commodity now and buy it back later, and an owner who needs the stock to keep a refinery or a
 mill running will not do that for a small gain. Holding inventory gives a benefit that a forward
-position does not, and \textcite{kaldor1939} called it the \emph{convenience yield}\index{convenience yield}. It is inferred
+position does not, and \textcite{kaldor1939} called it the \emph{convenience yield\ix{Convenience yield}}\index{Convenience yield}. It is inferred
 from prices; nobody receives it as a cash payment.
 
 \begin{definition}\label{def4:convenience}
-The \emph{implied convenience yield}\index{implied convenience yield} $\eta$ of a forward on a commodity with storage rate $\lambda$ is
+The \emph{implied convenience yield}\index{Implied convenience yield} $\eta$ of a forward on a commodity with storage rate $\lambda$ is
 defined by $F_0=S_0e^{(r+\lambda-\eta)T}$, that is $\eta=r+\lambda-\ln(F_0/S_0)/T$.
 \end{definition}
 
 The upper bound says $\eta\ge0$; nothing bounds $\eta$ from above. With the spot at 80, $r=4\%$ and
 $\lambda=1\%$, a six month forward at 78 implies $\eta=\convYield\%$ a year. Without a convenience yield
 the forward would be \convNoY. A high implied convenience yield is consistent with scarce inventory,
-though other frictions can affect the inference, and \cref{sec4:roll} turns this into a model.
+though other frictions\ix{Frictions} can affect the inference, and \cref{sec4:roll} turns this into a model.
 
 \begin{proposition}[No-arbitrage band with frictions]\label{prop4:band}
 Suppose trading is unrestricted in size, income is paid as a continuous yield, there are no margin,
 collateral or other costs beyond those named, and any quantity of the asset can be bought at the ask $S^a$ and sold short at the bid
-$S^b\le S^a$, money can be borrowed at $r_b$ and lent at $r_\ell\le r_b$, short sale proceeds earn
+$S^b\le S^a$, money can be borrowed at $r_b$ and lent at $r_\ell\le r_b$, short sale\ix{Short selling} proceeds earn
 $r_\ell$, and a short seller pays the asset's income yield $\delta$ to the lender. Then there is no
-arbitrage between the asset, the money market and a forward if and only if
+arbitrage between the asset, the money market\ix{Money market} and a forward if and only if
 \begin{equation}\label{eq4:band}
   S^be^{(r_\ell-\delta)T}\le F_0\le S^ae^{(r_b-\delta)T}.
 \end{equation}
@@ -468,7 +468,7 @@ lending rates compounds.
   \label{fig4:band}
 \end{figure}
 
-The proposition charges the short seller only the asset's income. Lenders of shares also charge a
+The proposition charges the short seller only the asset's income. Lenders of shares\ix{Stock} also charge a
 fee, and if it is paid as a rate $f$ a year on the value borrowed it acts like extra income on the
 short, so the lower end of the band becomes $S^be^{(r_\ell-\delta-f)T}$. In the US lending market that
 \textcite{davolio2002} studied, 91\% of the stocks on loan cost less than 1\% a year to borrow, at
@@ -478,12 +478,12 @@ and the band widens from \bandWidth{} to \bandWidthSp. A forward on a hard to bo
 well below its carry price with no arbitrage available to anyone who must borrow the asset to short it.
 
 \paragraph{Covered interest parity} A currency is an asset whose income is the foreign interest rate.
-With the exchange rate $S$ quoted as domestic currency per unit of foreign currency and simple money
+With the exchange rate\ix{Exchange rate} $S$ quoted as domestic currency per unit of foreign currency and simple money
 market rates $i_d$ and $i_f$ for a term $\tau$, the argument of \cref{prop4:carry} gives
 \begin{equation}\label{eq4:cip}
   F=S\,\frac{1+i_d\tau}{1+i_f\tau}.
 \end{equation}
-The illustrative numbers that follow are not market quotes. Take $S=1.3700$ Canadian dollars per US
+The illustrative numbers that follow are not market quotes. Take $S=1.3700$ Canadian dollars\ix{USD/CAD exchange rate} per US
 dollar, a Canadian rate of 2.75\% and a US rate of 4.00\% for one year. Then $F=\cipFwd$: the currency
 with the higher interest rate trades at a forward discount, here \cipPoints{} points. If a dealer quotes
 \cipQuote, the US dollar is too dear for forward delivery. Borrow \cipBorrow{} Canadian dollars, buy
@@ -498,28 +498,28 @@ between the rates at which an arbitrageur can borrow and lend, so the band widen
 \section{Futures and forwards}
 \label{sec4:fut}
 
-A futures contract differs from a forward in one respect that matters for pricing. It is marked to
-market at the end of every trading day, so gains and losses are paid as they happen rather than at
+A futures contract\ix{Futures contract} differs from a forward in one respect that matters for pricing. It is marked to
+market\ix{Marking to market} at the end of every trading day, so gains and losses are paid as they happen rather than at
 expiry.
 
 \begin{definition}\label{def4:futures}
-Let $0=t_0<t_1<\dots<t_n=T$ be settlement dates. A \emph{futures price}\index{futures price} process $G_{t_k}$ with
+Let $0=t_0<t_1<\dots<t_n=T$ be settlement dates. A \emph{futures price}\index{Futures price} process $G_{t_k}$ with
 $G_T=S_T$ defines a contract that costs nothing to enter or leave and pays the holder
-$G_{t_{k+1}}-G_{t_k}$ at each $t_{k+1}$. The money market account earns the short rate $r_k$ known at
+$G_{t_{k+1}}-G_{t_k}$ at each $t_{k+1}$. The money market account earns the short rate\ix{Short rate} $r_k$ known at
 $t_k$, and its value is $B_k=\exp(\sum_{j<k}r_j(t_{j+1}-t_j))$.
 \end{definition}
 
-The payments $G_{t_{k+1}}-G_{t_k}$ are idealised variation margin. Initial margin, the interest paid on
+The payments $G_{t_{k+1}}-G_{t_k}$ are idealised variation margin\ix{Margin}. Initial margin, the interest paid on
 posted collateral, funding spreads and the rules of the clearing house are left out.
 
-The multiperiod form of \cref{thm4:ftap} says that with no arbitrage there
+The multiperiod form of \cref{thm4:ftap} says that with no arbitrage\ix{Arbitrage} there
 is a measure $Q$, equivalent to the original one, under which the gains process of every traded asset
-divided by $B$ is a martingale. For an asset with no payouts that is its price divided by $B$; for an
+divided by $B$ is a martingale\ix{Martingale}. For an asset with no payouts that is its price divided by $B$; for an
 asset with payouts it is the price divided by $B$ plus the sum of past payouts, each divided by $B$ at
 its payment date. \textcite{harrison1981} prove the equivalence for finitely many states and dates, the setting of
 \cref{prop4:futfwd}, building on \textcite{harrison1979}. The Vasicek and Schwartz\index{Schwartz} examples below take
 such a $Q$ as given in continuous time, where \textcite{harrison1981} show that pricing under it leaves
-no arbitrage among admissible trading strategies. A futures position costs nothing to enter, so its gains process is just the running sum of its
+no arbitrage among admissible trading strategies\ix{Trading}. A futures position\ix{Futures position} costs nothing to enter, so its gains process is just the running sum of its
 settlement payments, each divided by $B$ at its payment date; that is the process to which the proof of
 \cref{prop4:futfwd} applies the martingale property.
 
@@ -530,7 +530,7 @@ Under $Q$,
   G_0-F_0=-\frac{\Cov_Q(1/B_n,\,S_T)}{P(0,T)},
 \end{equation}
 where $P(0,T)=\E_Q[1/B_n]$ is the price of a zero-coupon bond. In particular $G_0=F_0$ when interest
-rates are deterministic.
+rates\ix{Interest rate} are deterministic.
 \end{proposition}
 
 \begin{proof}
@@ -545,13 +545,13 @@ $1/B_n$ is a constant and the covariance is zero.
 
 By the third formula in \cref{eq4:futfwd}, the futures price is above the forward price exactly when
 $\Cov_Q(1/B_n,S_T)<0$, that is when the asset tends to end high on paths where rates have been high and
-the discount factor is low. The intuition is due to \textcite{cox1981}. A long futures position gains
+the discount factor\ix{Discount factor} is low. The intuition is due to \textcite{cox1981}. A long futures position gains
 cash when the price rises. If rates tend to be high at the same time, the cash is reinvested at high
 rates, and losses are financed at low ones. That is worth paying for. A closed form shows how large
 the effect is.
 
 \begin{proposition}[Vasicek short rate]\label{prop4:vasicek}
-Under one risk-neutral measure $Q$ let $W^r$ and $W^S$ be Brownian motions with
+Under one risk-neutral measure\ix{Equivalent martingale measure} $Q$ let $W^r$ and $W^S$ be Brownian motions with
 $d\langle W^r,W^S\rangle_t=\rho\,dt$, let the short rate follow the model of \textcite{vasicek1977},
 $dr_t=\kappa(\bar r-r_t)\,dt+\sigma_r\,dW^r_t$, and let an asset that pays no dividends follow
 $dS_t=r_tS_t\,dt+\sigma_SS_t\,dW^S_t$. With $\Lambda(u,T)=(1-e^{-\kappa(T-u)})/\kappa$ and continuous
@@ -577,7 +577,7 @@ so $F_0=S_0/P(0,T)=S_0\exp(\bar I-\tfrac12v_I)$. Dividing gives \cref{eq4:ffrati
 In this model, even with $\rho=0$ the futures price is higher, because an asset whose drift is the
 short rate is correlated with the discount factor through that drift. With $\kappa=0.3$,
 $\sigma_r=1\%$ and $\sigma_S=20\%$, \cref{fig4:futfwd} and \cref{tab4:futfwd} show the size of the
-gap in basis points of $\ln(G_0/F_0)$. The two prices agree when $\rho=\ffRhoStar$ at five years.
+gap in basis points\ix{Basis point} of $\ln(G_0/F_0)$. The two prices agree when $\rho=\ffRhoStar$ at five years.
 
 \begin{table}[t]
 \centering
@@ -595,7 +595,7 @@ maturity & $\rho=-0.5$ & $\rho=0$ & $\rho=0.5$\\
 \end{tabular}
 \end{table}
 
-A simulation with \ffPaths{} paths under $Q$ (random stream 3 of the chapter seed) checks the formula.
+A simulation with \ffPaths{} paths under $Q$ (random stream\ix{Random numbers} 3 of the chapter seed) checks the formula.
 Each path uses exact Gaussian transitions for the short rate, a trapezoidal approximation for its time
 integral, and correlated Gaussian shocks for the asset, with correlation $\rho$ in each monthly step.
 The monthly approximation does not reproduce the exact joint law of the integrated short rate and the
@@ -608,7 +608,7 @@ with $\rho=0.5$, against \ffFivePos{} from the formula, and \ffMCFiveNeg{} (stan
 is consistent with simulation noise, though agreement of this size does not by itself show that the
 discretised rate integral adds no bias. For contracts of a few months the difference is
 a basis point or two and is usually ignored. For long-dated contracts, and for interest rate futures
-whose underlying is itself a rate, it is the \emph{convexity adjustment}\index{convexity adjustment} that Chapter~6 returns to.
+whose underlying is itself a rate, it is the \emph{convexity adjustment}\index{Convexity adjustment} that Chapter~6 returns to.
 
 \begin{figure}[t]
   \centering
@@ -625,19 +625,19 @@ whose underlying is itself a rate, it is the \emph{convexity adjustment}\index{c
 \section{Commodity term structures and the roll}
 \label{sec4:roll}
 
-A futures curve is in \emph{contango}\index{contango} when prices rise with maturity and in \emph{backwardation}\index{backwardation} when
-they fall. Under cash and carry with a constant convenience yield, the curve is a single exponential,
+A futures\ix{Futures contract} curve\ix{Futures curve} is in \emph{contango}\index{Contango} when prices rise with maturity\ix{Maturity} and in \emph{backwardation}\index{Backwardation} when
+they fall. Under cash and carry with a constant convenience yield\ix{Convenience yield}, the curve is a single exponential,
 up or down for every maturity. Real curves bend: a shortage pushes the front contracts up while
 deferred contracts barely move, because the market expects the shortage to end. The simplest model with
-that feature lets the spot price revert to a long-run level.
+that feature lets the spot price\ix{Spot price} revert to a long-run level.
 
 \begin{definition}\label{def4:schwartz}
-In the one-factor model of \textcite{schwartz1997} the log spot price $X_t=\ln S_t$ is an
-Ornstein-Uhlenbeck process. Under the physical measure $\mathbb P$ and the risk-neutral measure $Q$,
+In the one-factor\ix{Common factor} model of \textcite{schwartz1997} the log spot price $X_t=\ln S_t$ is an
+Ornstein-Uhlenbeck\ix{Ornstein-Uhlenbeck process} process. Under the physical measure\ix{Real-world probability} $\mathbb P$ and the risk-neutral measure\ix{Equivalent martingale measure} $Q$,
 \begin{equation*}
   dX_t=\kappa(\alpha-X_t)\,dt+\sigma\,dW^P_t,\qquad dX_t=\kappa(\alpha^*-X_t)\,dt+\sigma\,dW^Q_t,
 \end{equation*}
-where the difference $\alpha-\alpha^*$ reflects a risk premium. Interest rates are deterministic.
+where the difference $\alpha-\alpha^*$ reflects a risk premium\ix{Risk premium}. Interest rates\ix{Interest rate} are deterministic.
 \end{definition}
 
 \begin{proposition}[Futures curve]\label{prop4:schwartz}
@@ -672,7 +672,7 @@ curve slopes down because the model expects the spot to fall back, and read thro
   \label{fig4:term}
 \end{figure}
 
-\paragraph{Rolling a position} An investor who wants commodity exposure for years cannot hold one
+\paragraph{Rolling a position} An investor who wants commodity\ix{Commodity} exposure\ix{Exposure} for years cannot hold one
 contract, because each expires. The usual strategy holds a near contract, sells it shortly before
 expiry and buys the next one. Write $b_t(T)=\ln G_t(T)-\ln S_t$ for the \emph{basis} of the contract
 expiring at $T$.
@@ -696,7 +696,7 @@ by the definition of $b$. Summing, the spot terms telescope.
 The left side of \cref{eq4:roll} is a statistic of futures prices. Money invested in the strategy
 grows at a slightly different rate, and the difference can be computed exactly. Consider an investor who keeps the
 whole value $V_k$ of the position in bills earning a constant rate $r$ and holds $V_k/G_{t_k}(T_k)$
-contracts of unit size from $t_k$ to $t_k+h$, so that the futures exposure equals current wealth, resetting the number of contracts at each step. Variation margin is
+contracts of unit size from $t_k$ to $t_k+h$, so that the futures exposure equals current wealth, resetting the number of contracts at each step. Variation margin\ix{Margin} is
 paid out of, or into, the bills, and fees, funding spreads and initial margin are ignored. Write
 $g_k=\ln\bigl(G_{t_k+h}(T_k)/G_{t_k}(T_k)\bigr)$. After one step the bills are worth $V_ke^{rh}$ and
 the contracts have paid $V_k(e^{g_k}-1)$, so
@@ -712,7 +712,7 @@ growth of the collateralised position is therefore the bill return plus the sum 
 changes, plus a correction whose terms are close to $rh\,(e^{-g_k}-1)$, the product of the bill
 return and the futures move. Treating the sum in \cref{eq4:roll} plus $r$ as the strategy's return is
 an approximation that drops this correction. On the simulated paths below, with $r=\rollRate\%$ and
-monthly steps, the correction is \rollGapMedBp{} basis points a year at the median across paths and
+monthly steps, the correction is \rollGapMedBp{} basis points a year at the median\ix{Median} across paths and
 at most \rollGapMaxBp{} basis points a year.
 
 The identity in \cref{eq4:roll} is exact and holds in any model; what a model adds is the size of the
@@ -720,7 +720,7 @@ roll. In backwardation the held contract sits below spot and, if the curve keeps
 towards it as expiry nears, so the roll tends to be positive. In contango it tends to be negative.
 
 \begin{proposition}[Expected roll]\label{prop4:expectedroll}
-In the model of \cref{def4:schwartz}, with $X$ stationary under the physical measure $\mathbb P$ and contracts
+In the model of \cref{def4:schwartz}, with $X$ stationary\ix{Stationarity} under the physical measure $\mathbb P$ and contracts
 held from $\tau$ to $\tau-h$ years before expiry, the expected roll per step and the expected log
 futures change per step are both
 \begin{equation}\label{eq4:expectedroll}
@@ -734,21 +734,21 @@ By \cref{eq4:schwartz}, $b(X,\tau)=\ln G(X,\tau)-X$ is affine in $X$ with slope 
 Under stationarity $\E_{\mathbb P}[X_t]=\alpha$ at every date, so the expected roll is
 $b(\alpha,\tau-h)-b(\alpha,\tau)$, which simplifies to \cref{eq4:expectedroll}. The expected spot term
 $\E_{\mathbb P}[X_{t+h}-X_t]$ is zero, so the expected log futures change is the same. Both statements are about
-the model's decomposition of log prices under $\mathbb P$; the expected growth of wealth adds $r$ and the
+the model's decomposition of log prices\ix{Log price} under $\mathbb P$; the expected growth\ix{Expected growth} of wealth adds $r$ and the
 correction in \cref{eq4:wealth}.
 \end{proof}
 
 With $\alpha-\alpha^*=0.05$, monthly rolls from two months to one month before expiry, and the
 parameters above, \cref{eq4:expectedroll} gives \rollTheory\% a year, a small difference of two larger terms: the premium term contributes
-\rollPremTerm\% a year and the convexity term \rollConvTerm\%. The first term is the risk
+\rollPremTerm\% a year and the convexity\ix{Convexity} term \rollConvTerm\%. The first term is the risk
 premium; the second is the convexity cost of measuring returns in logs, and it would vanish in
 arithmetic returns. A simulation of \rollPaths{} independent forty year paths under $\mathbb P$, each started
-from the stationary law and moved by exact Ornstein-Uhlenbeck transitions (random stream 4 of the
+from the stationary law and moved by exact Ornstein-Uhlenbeck transitions (random stream\ix{Random numbers} 4 of the
 chapter seed), gives an average roll of \rollMCMean\% a year (standard error \rollMCSE). Their
 average log wealth growth from \cref{eq4:wealth}, bills included, is \rollWealthMean\% a year, against
 \rollApproxMean\% from the sum of log futures changes plus $r$. For a single investor the spread across paths matters more. The spot term telescopes to the change
 in the log spot price over the whole period, which stationarity keeps small, while the roll adds a
-term every month that depends on the basis at that date, so a path that spends years in contango or
+term every month that depends on the basis\ix{Basis} at that date, so a path that spends years in contango or
 in backwardation accumulates it. Across paths the forty year average roll ranges from \rollMCLo\% to
 \rollMCHi\% a year (5th to 95th percentile), while the average
 spot return ranges only from \rollMCSpotLo\% to \rollMCSpotHi\%. The cross-path standard deviation of the average roll, \rollMCSd{} points,
@@ -769,12 +769,12 @@ in long-run returns across commodities. The older theory of normal backwardation
 \parencite{keynes1930} explains a positive premium as payment to speculators who take risk off
 producers' hands, and $\alpha>\alpha^*$ is one way to put that compensation into the model, with no claim that it measures the premium in actual markets.
 
-Three frictions separate the model's rolled position from a fund that holds one. The collateral earns
+Three frictions\ix{Frictions} separate the model's rolled position from a fund that holds one. The collateral earns
 what the fund's cash and bills earn, which need not be the bill rate of the model, and the fund charges
 a management fee on all of it. Each
 roll is two trades and pays the bid and ask on both legs, every month for a monthly roll. And a large
 fund that rolls on dates it announces is trading where others can see it coming. For the monthly rolls of
-the United States Oil Fund, an exchange traded fund that holds crude oil futures, \textcite{bessembinder2016} find that liquidity was
+the United States Oil\ix{Crude oil} Fund, an exchange traded fund that holds crude oil futures, \textcite{bessembinder2016} find that liquidity was
 better on roll dates, with narrower spreads and deeper books, because traders who expected the flow
 stood ready to take the other side; the concern that others trade ahead of predictable rolls at the
 fund's expense was not borne out on average. Index data share a further limitation: a continuous futures
@@ -796,11 +796,11 @@ those dates at those settlement prices.
 \label{sec4:binom}
 
 \begin{definition}\label{def4:binomial}
-In the \emph{binomial model}\index{binomial model} with $n$ steps a stock starts at $S_0$ and at each step is multiplied by
+In the \emph{binomial model\ix{Binomial tree}}\index{Binomial tree} with $n$ steps a stock starts at $S_0$ and at each step is multiplied by
 $u$ or by $d$, with $0<d<u$. A riskless account grows by the factor $R>0$ per step. A portfolio holds
-$\Delta_k$ shares and $\beta_k$ units of currency in the account from step $k$ to step $k+1$, chosen at
-step $k$ with knowledge of the path so far; at step $k+1$, before rebalancing, it is worth
-$\Delta_kS_{k+1}+\beta_kR$. It is \emph{self-financing} if
+$\Delta_k$ shares\ix{Stock} and $\beta_k$ units of currency in the account from step $k$ to step $k+1$, chosen at
+step $k$ with knowledge of the path so far; at step $k+1$, before rebalancing\ix{Rebalancing}, it is worth
+$\Delta_kS_{k+1}+\beta_kR$. It is \emph{self-financing\ix{Self-financing strategy}} if
 $\Delta_kS_{k+1}+\beta_kR=\Delta_{k+1}S_{k+1}+\beta_{k+1}$ for $k=0,\dots,n-2$, so that rebalancing at
 step $k+1$ neither adds nor removes money.
 \end{definition}
@@ -860,8 +860,8 @@ These are the parameters of \textcite{cox1979}. For $h$ small, $d<R<u$, so \cref
 
 \begin{theorem}[Convergence to Black-Scholes]\label{thm4:crr}
 Let $S_0,K,T,\sigma>0$, let the rate $r$ be constant and let the stock pay no dividends. For each $n$
-let $P_n$ and $C_n$ be the prices of a European put and call with strike $K$ and expiry $T$ on the tree
-defined by \eqref{eq4:crr}. As $n\to\infty$, $P_n$ and $C_n$ converge to the Black-Scholes prices
+let $P_n$ and $C_n$ be the prices of a European put and call with strike\ix{Strike} $K$ and expiry $T$ on the tree
+defined by \eqref{eq4:crr}. As $n\to\infty$, $P_n$ and $C_n$ converge to the Black-Scholes\ix{Black-Scholes formula} prices
 \begin{equation}\label{eq4:bs}
   C=S_0\Phi(d_1)-Ke^{-rT}\Phi(d_2),\qquad P=Ke^{-rT}\Phi(-d_2)-S_0\Phi(-d_1),
 \end{equation}
@@ -878,10 +878,10 @@ so $\E_Q[\xi_k]=2q_n-1=(r-\tfrac12\sigma^2)\sqrt h/\sigma+O(h)$. Hence the mean 
 $n\,\varepsilon_h\,(2q_n-1)=(r-\tfrac12\sigma^2)T+O(\sqrt h)$, and its variance is $n\,\varepsilon_h^2\bigl(1-(2q_n-1)^2\bigr)=\sigma^2T+O(h)$.
 The summands $\varepsilon_h\xi_k$ form a triangular array of independent variables bounded by $\varepsilon_h\to0$, so the
 Lindeberg condition holds trivially, and the Lindeberg-Feller central limit theorem gives
-$\ln(S_n/S_0)\Rightarrow\N\bigl((r-\tfrac12\sigma^2)T,\sigma^2T\bigr)$. The put payoff
-$x\mapsto(K-S_0e^x)^+$ is bounded and continuous, so $P_n=R^{-n}\E_Q[(K-S_n)^+]$ converges to
+$\ln(S_n/S_0)\Rightarrow\N\bigl((r-\tfrac12\sigma^2)T,\sigma^2T\bigr)$. The put payoff\ix{Payoff}
+$x\mapsto(K-S_0e^x)^+$ is bounded and continuous, so $P_n=R^{-n}\E_Q[(K-S_n)^+]$ converges\ix{Convergence} to
 $e^{-rT}\E[(K-S_T)^+]$ with $\ln S_T$ normal as above, which evaluates to $P$ in \cref{eq4:bs} (the
-calculation is the lognormal integral of Chapter~1). Finally put-call parity holds exactly on every
+calculation is the lognormal\ix{Lognormal distribution} integral of Chapter~1). Finally put-call parity\ix{Put-call parity} holds exactly on every
 tree, $C_n-P_n=S_0-KR^{-n}=S_0-Ke^{-rT}$, because the difference of payoffs is $S_n-K$; the same identity
 holds for $C$ and $P$, so $C_n\to C$.
 
@@ -918,15 +918,15 @@ of the asymptotic order.
 
 The oscillation can be removed. \textcite{leisen1996} take an odd number of steps, so that the middle
 of the terminal nodes falls on the strike, and choose $q$ and the up and down factors so that the
-binomial tail probabilities match $\Phi(d_1)$ and $\Phi(d_2)$ through the normal approximation of
+binomial tail probabilities match $\Phi(d_1)$ and $\Phi(d_2)$ through the normal approximation\ix{Normal approximation} of
 \textcite{peizer1968}. For this construction and payoff they find the error falling like $n^{-2}$;
 here the fitted slope for odd $n\ge31$ is \lrSlope, and at $n=101$ the price is \lrHundredOne, an error
-of \lrErrHundredOne{} millionths. Back on the plain Cox-Ross-Rubinstein tree, at the root of a 1,000 step tree the hedge ratio
+of \lrErrHundredOne{} millionths. Back on the plain Cox-Ross-Rubinstein tree, at the root of a 1,000 step tree the hedge ratio\ix{Delta}
 of \cref{eq4:onestep} for the same call is \treeDelta, equal to the Black-Scholes delta $\Phi(d_1)=\bsDelta$ to four
 places.
 
 The listing below prices a one year at-the-money put ($S_0=K=100$, $r=5\%$, $\sigma=20\%$, 1,000
-steps) by backward induction, as a European option and, with one extra line, as an American one.
+steps) by backward induction\ix{Backward induction}, as a European option and, with one extra line, as an American one.
 \lstinputlisting[language=Python]{code/ch04/snippets/crr.py}
 It prints \snipEu{} and \snipAm. The European value differs from the Black-Scholes put, \bsPut, in the
 third decimal; the American value is the subject of the next section.
@@ -935,10 +935,10 @@ third decimal; the American value is the subject of the next section.
 \section{American options}
 \label{sec4:american}
 
-An American option can be exercised at any step. Its holder chooses a \emph{stopping time}: a rule
+An American option\ix{American option} can be exercised at any step. Its holder chooses a \emph{stopping time\ix{Stopping time}}: a rule
 $\tau$ taking values in $\{0,\dots,n\}$ such that whether $\tau=k$ is decided by the path up to step
 $k$. For an option with exercise value $g(S_k)$, define the \emph{Snell envelope}\index{Snell envelope} by backward
-induction:
+induction\ix{Backward induction}:
 \begin{equation}\label{eq4:snell}
   V_n=g(S_n),\qquad V_k=\max\bigl\{g(S_k),\;R^{-1}\E_Q[V_{k+1}\mid\mathcal F_k]\bigr\}.
 \end{equation}
@@ -956,20 +956,20 @@ supermartingale, and $Y_k\ge R^{-k}g(S_k)$. For a stopping time $\tau\le n$,
 \end{equation*}
 and each term has $\E_Q[\mathbf 1\{\tau>k\}(Y_{k+1}-Y_k)]\le0$ because $\{\tau>k\}$ is known at step
 $k$. So $\E_Q[R^{-\tau}g(S_\tau)]\le\E_Q[Y_\tau]\le Y_0=V_0$. For $\tau^*$, on $\{\tau^*>k\}$ the
-maximum in \cref{eq4:snell} is the continuation value, so $Y_k=\E_Q[Y_{k+1}\mid\mathcal F_k]$ there
+maximum in \cref{eq4:snell} is the continuation value\ix{Continuation value}, so $Y_k=\E_Q[Y_{k+1}\mid\mathcal F_k]$ there
 and every term above has expectation zero. Hence $\E_Q[Y_{\tau^*}]=V_0$, and $Y_{\tau^*}=R^{-\tau^*}g(S_{\tau^*})$
 by the definition of $\tau^*$.
 \end{proof}
 
 The seller can hedge an American option too. At each step the seller holds the portfolio that
-replicates next step's option value $V_{k+1}$. It costs the continuation value
+replicates next step's option value\ix{Option value} $V_{k+1}$. It costs the continuation value
 $R^{-1}\E_Q[V_{k+1}\mid\mathcal F_k]\le V_k$, so any excess of $V_k$ over that can be withdrawn, and at
 the next step the portfolio is worth $V_{k+1}\ge g(S_{k+1})$, enough to pay the holder if the option is
 exercised there. No cash is ever added. The two-period put of \cref{fig4:tree} shows the exercise rule at work.
 With $K=105$ and the tree of the example after \cref{prop4:onestep}, the
-put is in the money at the down node, $S=90$, where exercise pays \tpExDown{} and waiting is worth
+put is in the money\ix{Moneyness} at the down node, $S=90$, where exercise pays \tpExDown{} and waiting is worth
 \tpContDown. The holder exercises, and the put is worth \tpAmerican{} today against \tpEuropean{} for
-the European put, an early exercise premium of \tpPremium.
+the European put\ix{European put}, an early exercise\ix{Early exercise} premium of \tpPremium.
 
 \begin{figure}[t]
   \centering
@@ -980,14 +980,14 @@ the European put, an early exercise premium of \tpPremium.
 \end{figure}
 
 \begin{proposition}[No early exercise of a call]\label{prop4:merton}
-On a tree with $R>1$ and a stock that pays no dividends, an American call with a strictly positive
-strike has the same value as the
-European call, and early exercise is never strictly optimal.
+On a tree with $R>1$ and a stock that pays no dividends\ix{Dividends}, an American call with a strictly positive
+strike\ix{Strike} has the same value as the
+European call\ix{European call}, and early exercise is never strictly optimal.
 \end{proposition}
 
 \begin{proof}
 Let $c_k$ be the European call value at step $k$. Since $x\mapsto(x-K)^+$ is convex and
-$\E_Q[S_n\mid\mathcal F_k]=R^{n-k}S_k$, Jensen's inequality gives
+$\E_Q[S_n\mid\mathcal F_k]=R^{n-k}S_k$, Jensen's inequality\ix{Jensen's inequality} gives
 $c_k\ge R^{-(n-k)}(R^{n-k}S_k-K)^+\ge S_k-KR^{-(n-k)}$. Since also $c_k\ge0$, this gives
 $c_k\ge(S_k-K)^+$ at every node. Now argue backwards: if $V_{k+1}=c_{k+1}$, then the continuation value
 in \cref{eq4:snell} is $c_k$, which is at least the exercise value, so $V_k=c_k$. That proves the
@@ -1000,13 +1000,13 @@ This is the tree version of a result of \textcite{merton1973}. A dividend breaks
 $\E_Q[S_n\mid\mathcal F_k]$ is then less than $R^{n-k}S_k$. With a continuous dividend yield of 4\%,
 which enters the tree through $q=(e^{(r-\delta)h}-d)/(u-d)$ while values are discounted at $r$, the one
 year at-the-money call ($r=5\%$, $\sigma=20\%$) is worth \amCallDiv{} as an American option and \euCallDiv{} as a European one on a
-1,000 step tree. Without the dividend the two trees agree to within $10^{-10}$, both at \amCallNoDiv.
+1,000 step tree. Without the dividend the two trees\ix{Decision tree} agree to within $10^{-10}$, both at \amCallNoDiv.
 
 For puts early exercise is valuable even without dividends: receiving $K$ early earns interest. The
 next result shows that the region where exercise is optimal is always below a boundary.
 
 \begin{proposition}[Exercise boundary of a put]\label{prop4:boundary}
-On any recombining tree with $d<R<u$ and no dividends, let $V_{k,j}$ be the American put value at the
+On any recombining tree with $d<R<u$ and no dividends, let $V_{k,j}$ be the American put\ix{American put} value at the
 node with $j$ up moves after $k$ steps. Then $V_{k,j}+S_{k,j}$ is nondecreasing in $j$. Consequently,
 at each step at which exercise is optimal at some node there is a level $b_k$, one of the node prices of that step, such that the put's exercise region at positive payoff consists
 exactly of the nodes with $S_{k,j}\le b_k$ (and $b_k<K$).
@@ -1040,7 +1040,7 @@ date reflects the grid and not the option. From there the raw levels alternate b
 nodes: one step later, \bndTenSecondT{} years before expiry, the level is already the lower node,
 \bndTenSecond. The envelope, the running minimum taken outward from expiry, first reaches \bndTenFirstEnv{}
 \bndTenEnvT{} years before expiry, the step nearest expiry at which that node is the level, and stays
-there out to ten years, approaching the boundary of the perpetual put, which \textcite{merton1973} found in closed form. These
+there out to ten years, approaching the boundary of the perpetual put\ix{Perpetual put}, which \textcite{merton1973} found in closed form\ix{Closed form}. These
 are properties of this model, with constant rate and volatility and no dividends. In the continuous model a perpetual put does not depend on time, so its value solves
 $\tfrac12\sigma^2S^2V''+rSV'-rV=0$ where it is not exercised. The solutions are $S$ and $S^{-\gamma}$
 with $\gamma=2r/\sigma^2$; boundedness excludes the first, and the conditions $V(b)=K-b$ and
@@ -1069,36 +1069,36 @@ standard way to price it.
 \section{Case study: do forward rates forecast?}
 \label{sec4:case}
 
-\Cref{prop4:fra} shows that anyone can lock in a forward rate with two bonds. Whether it is also a
-good forecast depends on the term premium, the extra return that investors demand for holding longer
+\Cref{prop4:fra} shows that anyone can lock in a forward rate\ix{Forward rate} with two bonds. Whether it is also a
+good forecast depends on the term premium\ix{Term premium}, the extra return that investors demand for holding longer
 bonds. The test of \textcite{fama1987} regresses the realised change in the spot rate on the
 forward-spot spread:
 \begin{equation}\label{eq4:fb}
   y_{t+12}-y_t=a+b\,\bigl(F_t(1,2)-y_t\bigr)+\varepsilon_{t+12},
 \end{equation}
-where $y_t$ is the one year bill rate at the end of month $t$, a simple rate, and $F_t(1,2)$ is the
+where $y_t$ is the one year bill rate\ix{Treasury bill} at the end of month $t$, a simple rate, and $F_t(1,2)$ is the
 simple forward rate, read from that month's curve, for borrowing from one year ahead to two years
 ahead. The pure expectations hypothesis gives $a=0$ and $b=1$. A constant premium keeps $b=1$ and makes
 $a$ equal to minus the premium. Both statements hold to first order, because the hypothesis is stated
-for expected returns while the regression uses simple rates. A slope of zero means the spread carries
+for expected returns\ix{Expected return} while the regression\ix{Linear regression} uses simple rates. A slope of zero means the spread carries
 no information about the future change.
 
-The data are month-end Government of Canada yields from \fbStart{} to \fbEnd, \caseMonths{} months,
+The data are month-end Government of Canada\ix{Government of Canada bond} yields from \fbStart{} to \fbEnd, \caseMonths{} months,
 from the Bank of Canada's Valet service \parencite{bocvalet}. The response is the change in the one
 year bill rate over the next twelve months and the explanatory variable is the one year forward rate
 one year ahead less the current one year bill rate, both at month ends. Each month the six month and one year bills and the
-two and three year benchmark bonds are bootstrapped as in \cref{sec4:curve}, and the forward rates are
+two and three year benchmark\ix{Benchmark} bonds\ix{Benchmark bond} are bootstrapped as in \cref{sec4:curve}, and the forward rates are
 read off the curve on the same simple basis as the bill yield. Each month is matched with the bill
 rate twelve months later, so the last twelve months have no realised outcome and drop out, leaving
 \fbOneN{} observations for the regression; the last month-end is \fbOneLastDate, observed on \gocDate. The regression
 errors overlap by eleven months, so standard errors use the estimator of \textcite{newey1987} with
-twelve lags.
+twelve lags\ix{Lag}.
 
 The slope is \fbOneSlope{} with a standard error of \fbOneSE{} on \fbOneN{} observations, a 95\%
 interval of \fbOneLo{} to \fbOneHi. Zero is rejected ($t=\fbOneTZero$) and one is not, though narrowly
 ($t=\fbOneTOne$). Failing to reject one is weaker than evidence that the slope is one: the interval
 also covers slopes near a quarter. The forward-spot spread explains \fbOneRSq{} of the variance of the
-change. Two years ahead, regressing $y_{t+24}-y_t$ on $F_t(2,3)-y_t$ with 24 Newey-West lags, the slope
+change. Two years ahead, regressing $y_{t+24}-y_t$ on $F_t(2,3)-y_t$ with 24 Newey-West\ix{Newey-West standard errors} lags, the slope
 is \fbTwoSlope{} (standard error \fbTwoSE, interval \fbTwoLo{} to \fbTwoHi) on \fbTwoN{} observations.
 That regression loses two years at the end and its errors overlap by 23 months, so it is less precise. On average the forward rate
 exceeded the rate it targets by \fwdErrMean{} basis points, with a standard error of \fwdErrSE, so the average error is not distinguishable from zero
@@ -1120,7 +1120,7 @@ directions. Most of the variation in the change comes from a few episodes, the l
 \end{figure}
 
 Three cautions apply. Twenty-five years of overlapping annual changes contain about 25 non-overlapping annual windows,
-which need not be 25 statistically independent observations, and conventional Newey-West inference can be unreliable when observations overlap this heavily, so the $t$ statistic against one should not be read precisely. Benchmark bonds are not par bonds
+which need not be 25 statistically independent observations, and conventional Newey-West inference can be unreliable when observations overlap this heavily, so the $t$ statistic against one should not be read precisely. Benchmark bonds are not par bonds\ix{Par bond}
 of exact maturity, so the forward rates carry measurement error, which, if it is unrelated to the true spread and to the
 later rate change, biases the slope towards zero.
 And as a forecast in the plain sense the forward rate did worse than assuming no change: its mean
@@ -1144,7 +1144,7 @@ super-replication bounds.
 
 Cash and carry fixes the forward price of a financial asset at the spot price grown at the interest
 rate less the income yield. Frictions turn the price into a band. For currencies the frictionless
-relation is covered interest parity\index{covered interest parity}, and transaction costs and funding spreads widen it into a band of
+relation is covered interest parity\index{Covered interest parity}, and transaction costs and funding spreads widen it into a band of
 the same kind. Commodities add storage costs and a convenience yield that only holders of inventory enjoy, so only the cash-and-carry side of the
 arbitrage works. Futures and forwards differ when interest rates are random, by an amount that
 depends on the covariance between the asset and the discount factor and, in the Vasicek example, grows
@@ -1206,8 +1206,8 @@ April 2024, report the share of months in contango and the mean annualised basis
 second contracts. Regress the next month's log change in the first contract on the log ratio of the
 second to the first. Is the slope distinguishable from one, the value under which the futures price is
 an unbiased forecast, and what does the use of monthly averages do to the test?
-\item Use \texttt{cip\_forward} with the one month bill rates of the two countries in
-\texttt{data/usdcad\_rates.csv} to build a daily one month USD/CAD forward from 2007. Report the forward
+\item The file \texttt{data/usdcad\_rates.csv} holds the one month bill rates of the two countries.
+Use them with \texttt{cip\_forward} to build a daily one month USD/CAD forward from 2007. Report the forward
 points in pips, their range, and the share of days on which the US dollar trades at a forward discount,
 and relate the sign of the points to the gap between the two bill rates.
 \end{enumerate}

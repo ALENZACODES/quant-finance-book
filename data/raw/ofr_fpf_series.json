@@ -1,0 +1,9304 @@
+{
+"FPF-STRATEGY_CREDIT_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+4.8
+],
+[
+"2013-06-30",
+2.2
+],
+[
+"2013-09-30",
+2.4
+],
+[
+"2013-12-31",
+4.5
+],
+[
+"2014-03-31",
+4.5
+],
+[
+"2014-06-30",
+3.9
+],
+[
+"2014-09-30",
+1.8
+],
+[
+"2014-12-31",
+0.3
+],
+[
+"2015-03-31",
+2.7
+],
+[
+"2015-06-30",
+1.4
+],
+[
+"2015-09-30",
+-0.5
+],
+[
+"2015-12-31",
+0.2
+],
+[
+"2016-03-31",
+0.1
+],
+[
+"2016-06-30",
+3.7
+],
+[
+"2016-09-30",
+5.6
+],
+[
+"2016-12-31",
+4.5
+],
+[
+"2017-03-31",
+3.6
+],
+[
+"2017-06-30",
+2.9
+],
+[
+"2017-09-30",
+3.8
+],
+[
+"2017-12-31",
+3.9
+],
+[
+"2018-03-31",
+3.0
+],
+[
+"2018-06-30",
+3.4
+],
+[
+"2018-09-30",
+4.0
+],
+[
+"2018-12-31",
+0.2
+],
+[
+"2019-03-31",
+4.0
+],
+[
+"2019-06-30",
+2.9
+],
+[
+"2019-09-30",
+2.2
+],
+[
+"2019-12-31",
+3.8
+],
+[
+"2020-03-31",
+-5.5
+],
+[
+"2020-06-30",
+8.0
+],
+[
+"2020-09-30",
+5.8
+],
+[
+"2020-12-31",
+6.9
+],
+[
+"2021-03-31",
+6.5
+],
+[
+"2021-06-30",
+5.8
+],
+[
+"2021-09-30",
+4.6
+],
+[
+"2021-12-31",
+3.6
+],
+[
+"2022-03-31",
+3.2
+],
+[
+"2022-06-30",
+0.4
+],
+[
+"2022-09-30",
+2.7
+],
+[
+"2022-12-31",
+3.1
+],
+[
+"2023-03-31",
+4.9
+],
+[
+"2023-06-30",
+4.6
+],
+[
+"2023-09-30",
+4.9
+],
+[
+"2023-12-31",
+4.2
+],
+[
+"2024-03-31",
+6.0
+],
+[
+"2024-06-30",
+5.5
+],
+[
+"2024-09-30",
+6.4
+],
+[
+"2024-12-31",
+4.4
+],
+[
+"2025-03-31",
+5.1
+],
+[
+"2025-06-30",
+5.4
+],
+[
+"2025-09-30",
+6.7
+],
+[
+"2025-12-31",
+3.0
+],
+[
+"2026-03-31",
+5.4
+],
+[
+"2026-06-30",
+6.2
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_CREDIT_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Credit strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_CREDIT_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+3.9
+],
+[
+"2013-06-30",
+1.6
+],
+[
+"2013-09-30",
+1.9
+],
+[
+"2013-12-31",
+3.5
+],
+[
+"2014-03-31",
+3.5
+],
+[
+"2014-06-30",
+3.0
+],
+[
+"2014-09-30",
+1.2
+],
+[
+"2014-12-31",
+-0.1
+],
+[
+"2015-03-31",
+2.0
+],
+[
+"2015-06-30",
+1.0
+],
+[
+"2015-09-30",
+-1.0
+],
+[
+"2015-12-31",
+-0.9
+],
+[
+"2016-03-31",
+0.0
+],
+[
+"2016-06-30",
+3.0
+],
+[
+"2016-09-30",
+4.4
+],
+[
+"2016-12-31",
+3.4
+],
+[
+"2017-03-31",
+2.8
+],
+[
+"2017-06-30",
+2.3
+],
+[
+"2017-09-30",
+2.8
+],
+[
+"2017-12-31",
+3.0
+],
+[
+"2018-03-31",
+2.2
+],
+[
+"2018-06-30",
+2.6
+],
+[
+"2018-09-30",
+3.0
+],
+[
+"2018-12-31",
+-0.1
+],
+[
+"2019-03-31",
+3.7
+],
+[
+"2019-06-30",
+2.5
+],
+[
+"2019-09-30",
+1.9
+],
+[
+"2019-12-31",
+2.9
+],
+[
+"2020-03-31",
+-7.3
+],
+[
+"2020-06-30",
+8.0
+],
+[
+"2020-09-30",
+4.1
+],
+[
+"2020-12-31",
+5.6
+],
+[
+"2021-03-31",
+5.1
+],
+[
+"2021-06-30",
+4.6
+],
+[
+"2021-09-30",
+4.2
+],
+[
+"2021-12-31",
+2.7
+],
+[
+"2022-03-31",
+2.6
+],
+[
+"2022-06-30",
+-0.6
+],
+[
+"2022-09-30",
+3.3
+],
+[
+"2022-12-31",
+3.7
+],
+[
+"2023-03-31",
+3.7
+],
+[
+"2023-06-30",
+4.7
+],
+[
+"2023-09-30",
+4.0
+],
+[
+"2023-12-31",
+3.3
+],
+[
+"2024-03-31",
+4.6
+],
+[
+"2024-06-30",
+4.3
+],
+[
+"2024-09-30",
+4.8
+],
+[
+"2024-12-31",
+3.4
+],
+[
+"2025-03-31",
+4.7
+],
+[
+"2025-06-30",
+5.0
+],
+[
+"2025-09-30",
+5.7
+],
+[
+"2025-12-31",
+2.5
+],
+[
+"2026-03-31",
+3.9
+],
+[
+"2026-06-30",
+5.1
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_CREDIT_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Credit strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_CREDIT_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+1.62
+],
+[
+"2013-06-30",
+1.696
+],
+[
+"2013-09-30",
+1.683
+],
+[
+"2013-12-31",
+1.571
+],
+[
+"2014-03-31",
+1.565
+],
+[
+"2014-06-30",
+1.472
+],
+[
+"2014-09-30",
+1.545
+],
+[
+"2014-12-31",
+1.54
+],
+[
+"2015-03-31",
+1.548
+],
+[
+"2015-06-30",
+1.583
+],
+[
+"2015-09-30",
+1.658
+],
+[
+"2015-12-31",
+1.61
+],
+[
+"2016-03-31",
+1.595
+],
+[
+"2016-06-30",
+1.597
+],
+[
+"2016-09-30",
+1.671
+],
+[
+"2016-12-31",
+1.59
+],
+[
+"2017-03-31",
+1.581
+],
+[
+"2017-06-30",
+1.627
+],
+[
+"2017-09-30",
+1.52
+],
+[
+"2017-12-31",
+1.527
+],
+[
+"2018-03-31",
+1.516
+],
+[
+"2018-06-30",
+1.542
+],
+[
+"2018-09-30",
+1.56
+],
+[
+"2018-12-31",
+1.605
+],
+[
+"2019-03-31",
+1.59
+],
+[
+"2019-06-30",
+1.63
+],
+[
+"2019-09-30",
+1.646
+],
+[
+"2019-12-31",
+1.625
+],
+[
+"2020-03-31",
+1.753
+],
+[
+"2020-06-30",
+1.594
+],
+[
+"2020-09-30",
+1.555
+],
+[
+"2020-12-31",
+1.554
+],
+[
+"2021-03-31",
+1.532
+],
+[
+"2021-06-30",
+1.58
+],
+[
+"2021-09-30",
+1.503
+],
+[
+"2021-12-31",
+1.592
+],
+[
+"2022-03-31",
+1.623
+],
+[
+"2022-06-30",
+1.65
+],
+[
+"2022-09-30",
+1.658
+],
+[
+"2022-12-31",
+1.667
+],
+[
+"2023-03-31",
+1.677
+],
+[
+"2023-06-30",
+1.717
+],
+[
+"2023-09-30",
+1.68
+],
+[
+"2023-12-31",
+1.657
+],
+[
+"2024-03-31",
+1.678
+],
+[
+"2024-06-30",
+1.691
+],
+[
+"2024-09-30",
+1.695
+],
+[
+"2024-12-31",
+1.735
+],
+[
+"2025-03-31",
+1.719
+],
+[
+"2025-06-30",
+1.755
+],
+[
+"2025-09-30",
+1.767
+],
+[
+"2025-12-31",
+1.792
+],
+[
+"2026-03-31",
+1.764
+],
+[
+"2026-06-30",
+1.739
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_CREDIT_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Credit strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_EQUITY_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+8.1
+],
+[
+"2013-06-30",
+2.6
+],
+[
+"2013-09-30",
+5.7
+],
+[
+"2013-12-31",
+7.7
+],
+[
+"2014-03-31",
+2.0
+],
+[
+"2014-06-30",
+4.4
+],
+[
+"2014-09-30",
+1.0
+],
+[
+"2014-12-31",
+4.1
+],
+[
+"2015-03-31",
+5.6
+],
+[
+"2015-06-30",
+2.2
+],
+[
+"2015-09-30",
+-4.6
+],
+[
+"2015-12-31",
+3.9
+],
+[
+"2016-03-31",
+-4.2
+],
+[
+"2016-06-30",
+1.3
+],
+[
+"2016-09-30",
+5.6
+],
+[
+"2016-12-31",
+0.8
+],
+[
+"2017-03-31",
+6.5
+],
+[
+"2017-06-30",
+4.2
+],
+[
+"2017-09-30",
+4.4
+],
+[
+"2017-12-31",
+4.3
+],
+[
+"2018-03-31",
+1.8
+],
+[
+"2018-06-30",
+2.5
+],
+[
+"2018-09-30",
+2.7
+],
+[
+"2018-12-31",
+-8.7
+],
+[
+"2019-03-31",
+12.1
+],
+[
+"2019-06-30",
+4.1
+],
+[
+"2019-09-30",
+0.0
+],
+[
+"2019-12-31",
+9.0
+],
+[
+"2020-03-31",
+-11.3
+],
+[
+"2020-06-30",
+19.5
+],
+[
+"2020-09-30",
+10.3
+],
+[
+"2020-12-31",
+15.5
+],
+[
+"2021-03-31",
+3.2
+],
+[
+"2021-06-30",
+7.5
+],
+[
+"2021-09-30",
+1.2
+],
+[
+"2021-12-31",
+1.9
+],
+[
+"2022-03-31",
+-6.1
+],
+[
+"2022-06-30",
+-7.6
+],
+[
+"2022-09-30",
+-1.6
+],
+[
+"2022-12-31",
+6.6
+],
+[
+"2023-03-31",
+5.9
+],
+[
+"2023-06-30",
+5.1
+],
+[
+"2023-09-30",
+0.1
+],
+[
+"2023-12-31",
+8.7
+],
+[
+"2024-03-31",
+9.4
+],
+[
+"2024-06-30",
+2.3
+],
+[
+"2024-09-30",
+5.7
+],
+[
+"2024-12-31",
+3.8
+],
+[
+"2025-03-31",
+0.8
+],
+[
+"2025-06-30",
+10.6
+],
+[
+"2025-09-30",
+7.8
+],
+[
+"2025-12-31",
+6.6
+],
+[
+"2026-03-31",
+-0.6
+],
+[
+"2026-06-30",
+19.6
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_EQUITY_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Equity strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_EQUITY_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+6.7
+],
+[
+"2013-06-30",
+2.0
+],
+[
+"2013-09-30",
+4.8
+],
+[
+"2013-12-31",
+6.5
+],
+[
+"2014-03-31",
+1.3
+],
+[
+"2014-06-30",
+3.6
+],
+[
+"2014-09-30",
+0.7
+],
+[
+"2014-12-31",
+3.4
+],
+[
+"2015-03-31",
+4.6
+],
+[
+"2015-06-30",
+1.7
+],
+[
+"2015-09-30",
+-4.6
+],
+[
+"2015-12-31",
+3.3
+],
+[
+"2016-03-31",
+-4.4
+],
+[
+"2016-06-30",
+1.0
+],
+[
+"2016-09-30",
+5.2
+],
+[
+"2016-12-31",
+0.5
+],
+[
+"2017-03-31",
+5.7
+],
+[
+"2017-06-30",
+3.6
+],
+[
+"2017-09-30",
+3.9
+],
+[
+"2017-12-31",
+3.7
+],
+[
+"2018-03-31",
+1.2
+],
+[
+"2018-06-30",
+2.0
+],
+[
+"2018-09-30",
+2.3
+],
+[
+"2018-12-31",
+-8.6
+],
+[
+"2019-03-31",
+11.0
+],
+[
+"2019-06-30",
+3.6
+],
+[
+"2019-09-30",
+-0.2
+],
+[
+"2019-12-31",
+8.0
+],
+[
+"2020-03-31",
+-11.5
+],
+[
+"2020-06-30",
+17.5
+],
+[
+"2020-09-30",
+9.1
+],
+[
+"2020-12-31",
+13.8
+],
+[
+"2021-03-31",
+2.5
+],
+[
+"2021-06-30",
+6.6
+],
+[
+"2021-09-30",
+0.8
+],
+[
+"2021-12-31",
+1.4
+],
+[
+"2022-03-31",
+-6.5
+],
+[
+"2022-06-30",
+-7.8
+],
+[
+"2022-09-30",
+-1.9
+],
+[
+"2022-12-31",
+6.1
+],
+[
+"2023-03-31",
+5.3
+],
+[
+"2023-06-30",
+4.5
+],
+[
+"2023-09-30",
+-0.3
+],
+[
+"2023-12-31",
+8.0
+],
+[
+"2024-03-31",
+8.5
+],
+[
+"2024-06-30",
+1.9
+],
+[
+"2024-09-30",
+5.1
+],
+[
+"2024-12-31",
+3.2
+],
+[
+"2025-03-31",
+0.2
+],
+[
+"2025-06-30",
+9.5
+],
+[
+"2025-09-30",
+7.1
+],
+[
+"2025-12-31",
+5.9
+],
+[
+"2026-03-31",
+-1.1
+],
+[
+"2026-06-30",
+17.3
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_EQUITY_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Equity strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_EQUITY_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+1.551
+],
+[
+"2013-06-30",
+1.541
+],
+[
+"2013-09-30",
+1.548
+],
+[
+"2013-12-31",
+1.566
+],
+[
+"2014-03-31",
+1.546
+],
+[
+"2014-06-30",
+1.517
+],
+[
+"2014-09-30",
+1.506
+],
+[
+"2014-12-31",
+1.515
+],
+[
+"2015-03-31",
+1.528
+],
+[
+"2015-06-30",
+1.53
+],
+[
+"2015-09-30",
+1.52
+],
+[
+"2015-12-31",
+1.506
+],
+[
+"2016-03-31",
+1.479
+],
+[
+"2016-06-30",
+1.46
+],
+[
+"2016-09-30",
+1.457
+],
+[
+"2016-12-31",
+1.465
+],
+[
+"2017-03-31",
+1.469
+],
+[
+"2017-06-30",
+1.488
+],
+[
+"2017-09-30",
+1.479
+],
+[
+"2017-12-31",
+1.473
+],
+[
+"2018-03-31",
+1.486
+],
+[
+"2018-06-30",
+1.512
+],
+[
+"2018-09-30",
+1.47
+],
+[
+"2018-12-31",
+1.492
+],
+[
+"2019-03-31",
+1.477
+],
+[
+"2019-06-30",
+1.508
+],
+[
+"2019-09-30",
+1.513
+],
+[
+"2019-12-31",
+1.54
+],
+[
+"2020-03-31",
+1.456
+],
+[
+"2020-06-30",
+1.455
+],
+[
+"2020-09-30",
+1.451
+],
+[
+"2020-12-31",
+1.478
+],
+[
+"2021-03-31",
+1.44
+],
+[
+"2021-06-30",
+1.436
+],
+[
+"2021-09-30",
+1.43
+],
+[
+"2021-12-31",
+1.437
+],
+[
+"2022-03-31",
+1.449
+],
+[
+"2022-06-30",
+1.477
+],
+[
+"2022-09-30",
+1.492
+],
+[
+"2022-12-31",
+1.501
+],
+[
+"2023-03-31",
+1.498
+],
+[
+"2023-06-30",
+1.539
+],
+[
+"2023-09-30",
+1.517
+],
+[
+"2023-12-31",
+1.554
+],
+[
+"2024-03-31",
+1.579
+],
+[
+"2024-06-30",
+1.616
+],
+[
+"2024-09-30",
+1.744
+],
+[
+"2024-12-31",
+1.77
+],
+[
+"2025-03-31",
+1.809
+],
+[
+"2025-06-30",
+1.862
+],
+[
+"2025-09-30",
+1.778
+],
+[
+"2025-12-31",
+1.8
+],
+[
+"2026-03-31",
+1.81
+],
+[
+"2026-06-30",
+1.841
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_EQUITY_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Equity strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_EVENT_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+6.9
+],
+[
+"2013-06-30",
+4.3
+],
+[
+"2013-09-30",
+5.1
+],
+[
+"2013-12-31",
+7.1
+],
+[
+"2014-03-31",
+5.0
+],
+[
+"2014-06-30",
+5.1
+],
+[
+"2014-09-30",
+-0.8
+],
+[
+"2014-12-31",
+-1.4
+],
+[
+"2015-03-31",
+3.7
+],
+[
+"2015-06-30",
+1.4
+],
+[
+"2015-09-30",
+-4.5
+],
+[
+"2015-12-31",
+-0.2
+],
+[
+"2016-03-31",
+-1.3
+],
+[
+"2016-06-30",
+2.1
+],
+[
+"2016-09-30",
+5.5
+],
+[
+"2016-12-31",
+4.9
+],
+[
+"2017-03-31",
+4.7
+],
+[
+"2017-06-30",
+4.3
+],
+[
+"2017-09-30",
+3.9
+],
+[
+"2017-12-31",
+4.2
+],
+[
+"2018-03-31",
+2.5
+],
+[
+"2018-06-30",
+4.4
+],
+[
+"2018-09-30",
+3.7
+],
+[
+"2018-12-31",
+-2.5
+],
+[
+"2019-03-31",
+6.3
+],
+[
+"2019-06-30",
+4.0
+],
+[
+"2019-09-30",
+0.7
+],
+[
+"2019-12-31",
+4.2
+],
+[
+"2020-03-31",
+-11.6
+],
+[
+"2020-06-30",
+10.9
+],
+[
+"2020-09-30",
+8.4
+],
+[
+"2020-12-31",
+13.3
+],
+[
+"2021-03-31",
+11.9
+],
+[
+"2021-06-30",
+11.3
+],
+[
+"2021-09-30",
+8.8
+],
+[
+"2021-12-31",
+6.0
+],
+[
+"2022-03-31",
+5.2
+],
+[
+"2022-06-30",
+0.2
+],
+[
+"2022-09-30",
+4.2
+],
+[
+"2022-12-31",
+6.9
+],
+[
+"2023-03-31",
+6.5
+],
+[
+"2023-06-30",
+5.9
+],
+[
+"2023-09-30",
+6.4
+],
+[
+"2023-12-31",
+8.6
+],
+[
+"2024-03-31",
+8.1
+],
+[
+"2024-06-30",
+6.6
+],
+[
+"2024-09-30",
+8.6
+],
+[
+"2024-12-31",
+9.3
+],
+[
+"2025-03-31",
+6.1
+],
+[
+"2025-06-30",
+7.9
+],
+[
+"2025-09-30",
+8.7
+],
+[
+"2025-12-31",
+7.6
+],
+[
+"2026-03-31",
+5.8
+],
+[
+"2026-06-30",
+9.3
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_EVENT_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Event strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_EVENT_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+5.5
+],
+[
+"2013-06-30",
+3.3
+],
+[
+"2013-09-30",
+4.0
+],
+[
+"2013-12-31",
+5.7
+],
+[
+"2014-03-31",
+3.8
+],
+[
+"2014-06-30",
+3.9
+],
+[
+"2014-09-30",
+-1.1
+],
+[
+"2014-12-31",
+-1.7
+],
+[
+"2015-03-31",
+2.7
+],
+[
+"2015-06-30",
+0.7
+],
+[
+"2015-09-30",
+-5.1
+],
+[
+"2015-12-31",
+-0.8
+],
+[
+"2016-03-31",
+-2.3
+],
+[
+"2016-06-30",
+1.5
+],
+[
+"2016-09-30",
+4.2
+],
+[
+"2016-12-31",
+3.5
+],
+[
+"2017-03-31",
+3.4
+],
+[
+"2017-06-30",
+3.1
+],
+[
+"2017-09-30",
+2.8
+],
+[
+"2017-12-31",
+3.1
+],
+[
+"2018-03-31",
+1.4
+],
+[
+"2018-06-30",
+3.8
+],
+[
+"2018-09-30",
+2.7
+],
+[
+"2018-12-31",
+-3.1
+],
+[
+"2019-03-31",
+5.0
+],
+[
+"2019-06-30",
+3.1
+],
+[
+"2019-09-30",
+-0.1
+],
+[
+"2019-12-31",
+3.3
+],
+[
+"2020-03-31",
+-12.3
+],
+[
+"2020-06-30",
+10.1
+],
+[
+"2020-09-30",
+6.6
+],
+[
+"2020-12-31",
+10.5
+],
+[
+"2021-03-31",
+9.2
+],
+[
+"2021-06-30",
+8.9
+],
+[
+"2021-09-30",
+6.6
+],
+[
+"2021-12-31",
+4.6
+],
+[
+"2022-03-31",
+3.4
+],
+[
+"2022-06-30",
+-1.1
+],
+[
+"2022-09-30",
+2.2
+],
+[
+"2022-12-31",
+4.9
+],
+[
+"2023-03-31",
+4.3
+],
+[
+"2023-06-30",
+3.8
+],
+[
+"2023-09-30",
+4.3
+],
+[
+"2023-12-31",
+6.1
+],
+[
+"2024-03-31",
+5.8
+],
+[
+"2024-06-30",
+4.4
+],
+[
+"2024-09-30",
+6.2
+],
+[
+"2024-12-31",
+6.4
+],
+[
+"2025-03-31",
+4.0
+],
+[
+"2025-06-30",
+5.8
+],
+[
+"2025-09-30",
+6.0
+],
+[
+"2025-12-31",
+4.9
+],
+[
+"2026-03-31",
+4.2
+],
+[
+"2026-06-30",
+7.2
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_EVENT_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Event strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_EVENT_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+1.317
+],
+[
+"2013-06-30",
+1.333
+],
+[
+"2013-09-30",
+1.331
+],
+[
+"2013-12-31",
+1.362
+],
+[
+"2014-03-31",
+1.36
+],
+[
+"2014-06-30",
+1.361
+],
+[
+"2014-09-30",
+1.353
+],
+[
+"2014-12-31",
+1.343
+],
+[
+"2015-03-31",
+1.315
+],
+[
+"2015-06-30",
+1.372
+],
+[
+"2015-09-30",
+1.354
+],
+[
+"2015-12-31",
+1.369
+],
+[
+"2016-03-31",
+1.361
+],
+[
+"2016-06-30",
+1.342
+],
+[
+"2016-09-30",
+1.314
+],
+[
+"2016-12-31",
+1.318
+],
+[
+"2017-03-31",
+1.316
+],
+[
+"2017-06-30",
+1.316
+],
+[
+"2017-09-30",
+1.29
+],
+[
+"2017-12-31",
+1.298
+],
+[
+"2018-03-31",
+1.294
+],
+[
+"2018-06-30",
+1.282
+],
+[
+"2018-09-30",
+1.277
+],
+[
+"2018-12-31",
+1.248
+],
+[
+"2019-03-31",
+1.238
+],
+[
+"2019-06-30",
+1.31
+],
+[
+"2019-09-30",
+1.267
+],
+[
+"2019-12-31",
+1.263
+],
+[
+"2020-03-31",
+1.322
+],
+[
+"2020-06-30",
+1.316
+],
+[
+"2020-09-30",
+1.286
+],
+[
+"2020-12-31",
+1.32
+],
+[
+"2021-03-31",
+1.381
+],
+[
+"2021-06-30",
+1.394
+],
+[
+"2021-09-30",
+1.32
+],
+[
+"2021-12-31",
+1.318
+],
+[
+"2022-03-31",
+1.301
+],
+[
+"2022-06-30",
+1.302
+],
+[
+"2022-09-30",
+1.295
+],
+[
+"2022-12-31",
+1.26
+],
+[
+"2023-03-31",
+1.217
+],
+[
+"2023-06-30",
+1.21
+],
+[
+"2023-09-30",
+1.244
+],
+[
+"2023-12-31",
+1.234
+],
+[
+"2024-03-31",
+1.236
+],
+[
+"2024-06-30",
+1.231
+],
+[
+"2024-09-30",
+1.244
+],
+[
+"2024-12-31",
+1.243
+],
+[
+"2025-03-31",
+1.377
+],
+[
+"2025-06-30",
+1.352
+],
+[
+"2025-09-30",
+1.308
+],
+[
+"2025-12-31",
+1.334
+],
+[
+"2026-03-31",
+1.339
+],
+[
+"2026-06-30",
+1.34
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_EVENT_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Event strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_FUTURES_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+4.4
+],
+[
+"2013-06-30",
+-6.5
+],
+[
+"2013-09-30",
+-0.4
+],
+[
+"2013-12-31",
+3.4
+],
+[
+"2014-03-31",
+0.5
+],
+[
+"2014-06-30",
+6.0
+],
+[
+"2014-09-30",
+null
+],
+[
+"2014-12-31",
+null
+],
+[
+"2015-03-31",
+5.9
+],
+[
+"2015-06-30",
+-6.0
+],
+[
+"2015-09-30",
+5.1
+],
+[
+"2015-12-31",
+1.8
+],
+[
+"2016-03-31",
+7.3
+],
+[
+"2016-06-30",
+-0.1
+],
+[
+"2016-09-30",
+-1.8
+],
+[
+"2016-12-31",
+-1.7
+],
+[
+"2017-03-31",
+0.5
+],
+[
+"2017-06-30",
+-1.6
+],
+[
+"2017-09-30",
+2.3
+],
+[
+"2017-12-31",
+8.1
+],
+[
+"2018-03-31",
+-5.0
+],
+[
+"2018-06-30",
+1.4
+],
+[
+"2018-09-30",
+2.9
+],
+[
+"2018-12-31",
+-3.0
+],
+[
+"2019-03-31",
+6.3
+],
+[
+"2019-06-30",
+5.7
+],
+[
+"2019-09-30",
+3.8
+],
+[
+"2019-12-31",
+-0.2
+],
+[
+"2020-03-31",
+-2.3
+],
+[
+"2020-06-30",
+-1.7
+],
+[
+"2020-09-30",
+1.2
+],
+[
+"2020-12-31",
+8.3
+],
+[
+"2021-03-31",
+2.8
+],
+[
+"2021-06-30",
+9.0
+],
+[
+"2021-09-30",
+5.0
+],
+[
+"2021-12-31",
+2.2
+],
+[
+"2022-03-31",
+11.8
+],
+[
+"2022-06-30",
+9.2
+],
+[
+"2022-09-30",
+3.9
+],
+[
+"2022-12-31",
+-4.9
+],
+[
+"2023-03-31",
+-6.3
+],
+[
+"2023-06-30",
+8.4
+],
+[
+"2023-09-30",
+3.2
+],
+[
+"2023-12-31",
+-0.7
+],
+[
+"2024-03-31",
+12.8
+],
+[
+"2024-06-30",
+-3.7
+],
+[
+"2024-09-30",
+-4.3
+],
+[
+"2024-12-31",
+-0.6
+],
+[
+"2025-03-31",
+-3.4
+],
+[
+"2025-06-30",
+-4.2
+],
+[
+"2025-09-30",
+7.6
+],
+[
+"2025-12-31",
+7.9
+],
+[
+"2026-03-31",
+6.8
+],
+[
+"2026-06-30",
+1.9
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_FUTURES_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Managed futures strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_FUTURES_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+3.7
+],
+[
+"2013-06-30",
+-7.0
+],
+[
+"2013-09-30",
+-0.7
+],
+[
+"2013-12-31",
+2.9
+],
+[
+"2014-03-31",
+-0.9
+],
+[
+"2014-06-30",
+5.6
+],
+[
+"2014-09-30",
+null
+],
+[
+"2014-12-31",
+null
+],
+[
+"2015-03-31",
+5.3
+],
+[
+"2015-06-30",
+-6.7
+],
+[
+"2015-09-30",
+5.1
+],
+[
+"2015-12-31",
+-0.5
+],
+[
+"2016-03-31",
+3.8
+],
+[
+"2016-06-30",
+0.2
+],
+[
+"2016-09-30",
+-2.3
+],
+[
+"2016-12-31",
+-3.6
+],
+[
+"2017-03-31",
+0.0
+],
+[
+"2017-06-30",
+-2.5
+],
+[
+"2017-09-30",
+1.6
+],
+[
+"2017-12-31",
+7.1
+],
+[
+"2018-03-31",
+-4.8
+],
+[
+"2018-06-30",
+0.4
+],
+[
+"2018-09-30",
+2.7
+],
+[
+"2018-12-31",
+-4.1
+],
+[
+"2019-03-31",
+5.1
+],
+[
+"2019-06-30",
+4.9
+],
+[
+"2019-09-30",
+3.3
+],
+[
+"2019-12-31",
+-0.3
+],
+[
+"2020-03-31",
+-2.2
+],
+[
+"2020-06-30",
+-2.1
+],
+[
+"2020-09-30",
+0.6
+],
+[
+"2020-12-31",
+7.8
+],
+[
+"2021-03-31",
+2.5
+],
+[
+"2021-06-30",
+8.3
+],
+[
+"2021-09-30",
+4.5
+],
+[
+"2021-12-31",
+2.0
+],
+[
+"2022-03-31",
+10.7
+],
+[
+"2022-06-30",
+8.5
+],
+[
+"2022-09-30",
+3.4
+],
+[
+"2022-12-31",
+-4.8
+],
+[
+"2023-03-31",
+-6.4
+],
+[
+"2023-06-30",
+8.1
+],
+[
+"2023-09-30",
+2.9
+],
+[
+"2023-12-31",
+-0.9
+],
+[
+"2024-03-31",
+12.1
+],
+[
+"2024-06-30",
+-3.6
+],
+[
+"2024-09-30",
+-4.2
+],
+[
+"2024-12-31",
+-0.9
+],
+[
+"2025-03-31",
+-3.6
+],
+[
+"2025-06-30",
+-4.9
+],
+[
+"2025-09-30",
+7.4
+],
+[
+"2025-12-31",
+7.5
+],
+[
+"2026-03-31",
+6.2
+],
+[
+"2026-06-30",
+1.4
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_FUTURES_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Managed futures strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_FUTURES_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+1.08
+],
+[
+"2013-06-30",
+1.098
+],
+[
+"2013-09-30",
+1.118
+],
+[
+"2013-12-31",
+1.129
+],
+[
+"2014-03-31",
+1.205
+],
+[
+"2014-06-30",
+1.134
+],
+[
+"2014-09-30",
+null
+],
+[
+"2014-12-31",
+1.178
+],
+[
+"2015-03-31",
+1.147
+],
+[
+"2015-06-30",
+1.167
+],
+[
+"2015-09-30",
+1.209
+],
+[
+"2015-12-31",
+1.162
+],
+[
+"2016-03-31",
+1.162
+],
+[
+"2016-06-30",
+1.216
+],
+[
+"2016-09-30",
+1.172
+],
+[
+"2016-12-31",
+1.168
+],
+[
+"2017-03-31",
+1.178
+],
+[
+"2017-06-30",
+1.235
+],
+[
+"2017-09-30",
+1.202
+],
+[
+"2017-12-31",
+1.235
+],
+[
+"2018-03-31",
+1.182
+],
+[
+"2018-06-30",
+1.297
+],
+[
+"2018-09-30",
+1.286
+],
+[
+"2018-12-31",
+1.321
+],
+[
+"2019-03-31",
+1.354
+],
+[
+"2019-06-30",
+1.426
+],
+[
+"2019-09-30",
+1.467
+],
+[
+"2019-12-31",
+1.376
+],
+[
+"2020-03-31",
+1.416
+],
+[
+"2020-06-30",
+1.435
+],
+[
+"2020-09-30",
+1.461
+],
+[
+"2020-12-31",
+1.476
+],
+[
+"2021-03-31",
+1.512
+],
+[
+"2021-06-30",
+1.51
+],
+[
+"2021-09-30",
+1.53
+],
+[
+"2021-12-31",
+1.428
+],
+[
+"2022-03-31",
+1.497
+],
+[
+"2022-06-30",
+1.883
+],
+[
+"2022-09-30",
+1.645
+],
+[
+"2022-12-31",
+1.459
+],
+[
+"2023-03-31",
+1.766
+],
+[
+"2023-06-30",
+1.587
+],
+[
+"2023-09-30",
+1.693
+],
+[
+"2023-12-31",
+1.623
+],
+[
+"2024-03-31",
+1.786
+],
+[
+"2024-06-30",
+1.821
+],
+[
+"2024-09-30",
+2.23
+],
+[
+"2024-12-31",
+1.875
+],
+[
+"2025-03-31",
+2.069
+],
+[
+"2025-06-30",
+2.23
+],
+[
+"2025-09-30",
+2.354
+],
+[
+"2025-12-31",
+2.247
+],
+[
+"2026-03-31",
+2.31
+],
+[
+"2026-06-30",
+2.474
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_FUTURES_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Managed futures strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_MACRO_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+3.2
+],
+[
+"2013-06-30",
+-0.4
+],
+[
+"2013-09-30",
+-0.1
+],
+[
+"2013-12-31",
+2.5
+],
+[
+"2014-03-31",
+0.3
+],
+[
+"2014-06-30",
+0.9
+],
+[
+"2014-09-30",
+1.4
+],
+[
+"2014-12-31",
+0.3
+],
+[
+"2015-03-31",
+1.9
+],
+[
+"2015-06-30",
+-0.4
+],
+[
+"2015-09-30",
+-1.5
+],
+[
+"2015-12-31",
+0.3
+],
+[
+"2016-03-31",
+-0.4
+],
+[
+"2016-06-30",
+1.4
+],
+[
+"2016-09-30",
+1.5
+],
+[
+"2016-12-31",
+2.5
+],
+[
+"2017-03-31",
+1.8
+],
+[
+"2017-06-30",
+0.3
+],
+[
+"2017-09-30",
+2.5
+],
+[
+"2017-12-31",
+1.6
+],
+[
+"2018-03-31",
+2.4
+],
+[
+"2018-06-30",
+1.0
+],
+[
+"2018-09-30",
+0.9
+],
+[
+"2018-12-31",
+-3.2
+],
+[
+"2019-03-31",
+5.5
+],
+[
+"2019-06-30",
+3.5
+],
+[
+"2019-09-30",
+0.4
+],
+[
+"2019-12-31",
+4.4
+],
+[
+"2020-03-31",
+-2.6
+],
+[
+"2020-06-30",
+6.3
+],
+[
+"2020-09-30",
+4.4
+],
+[
+"2020-12-31",
+9.2
+],
+[
+"2021-03-31",
+1.3
+],
+[
+"2021-06-30",
+1.0
+],
+[
+"2021-09-30",
+-0.4
+],
+[
+"2021-12-31",
+-2.3
+],
+[
+"2022-03-31",
+3.6
+],
+[
+"2022-06-30",
+1.2
+],
+[
+"2022-09-30",
+3.7
+],
+[
+"2022-12-31",
+3.9
+],
+[
+"2023-03-31",
+-1.2
+],
+[
+"2023-06-30",
+1.1
+],
+[
+"2023-09-30",
+3.5
+],
+[
+"2023-12-31",
+2.8
+],
+[
+"2024-03-31",
+4.4
+],
+[
+"2024-06-30",
+1.4
+],
+[
+"2024-09-30",
+1.8
+],
+[
+"2024-12-31",
+5.4
+],
+[
+"2025-03-31",
+3.9
+],
+[
+"2025-06-30",
+4.2
+],
+[
+"2025-09-30",
+3.5
+],
+[
+"2025-12-31",
+5.2
+],
+[
+"2026-03-31",
+2.9
+],
+[
+"2026-06-30",
+4.7
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_MACRO_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Macro strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_MACRO_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+2.2
+],
+[
+"2013-06-30",
+-1.1
+],
+[
+"2013-09-30",
+-0.4
+],
+[
+"2013-12-31",
+1.7
+],
+[
+"2014-03-31",
+-0.2
+],
+[
+"2014-06-30",
+0.4
+],
+[
+"2014-09-30",
+1.0
+],
+[
+"2014-12-31",
+-0.3
+],
+[
+"2015-03-31",
+1.1
+],
+[
+"2015-06-30",
+-0.6
+],
+[
+"2015-09-30",
+-1.8
+],
+[
+"2015-12-31",
+-0.1
+],
+[
+"2016-03-31",
+-0.7
+],
+[
+"2016-06-30",
+1.0
+],
+[
+"2016-09-30",
+1.1
+],
+[
+"2016-12-31",
+1.9
+],
+[
+"2017-03-31",
+1.4
+],
+[
+"2017-06-30",
+0.1
+],
+[
+"2017-09-30",
+2.0
+],
+[
+"2017-12-31",
+1.3
+],
+[
+"2018-03-31",
+1.4
+],
+[
+"2018-06-30",
+0.5
+],
+[
+"2018-09-30",
+0.5
+],
+[
+"2018-12-31",
+-3.3
+],
+[
+"2019-03-31",
+4.9
+],
+[
+"2019-06-30",
+2.9
+],
+[
+"2019-09-30",
+0.1
+],
+[
+"2019-12-31",
+3.6
+],
+[
+"2020-03-31",
+-3.1
+],
+[
+"2020-06-30",
+5.7
+],
+[
+"2020-09-30",
+3.5
+],
+[
+"2020-12-31",
+7.6
+],
+[
+"2021-03-31",
+0.9
+],
+[
+"2021-06-30",
+0.8
+],
+[
+"2021-09-30",
+-0.1
+],
+[
+"2021-12-31",
+-1.9
+],
+[
+"2022-03-31",
+3.6
+],
+[
+"2022-06-30",
+1.0
+],
+[
+"2022-09-30",
+4.2
+],
+[
+"2022-12-31",
+2.7
+],
+[
+"2023-03-31",
+-1.6
+],
+[
+"2023-06-30",
+1.2
+],
+[
+"2023-09-30",
+2.8
+],
+[
+"2023-12-31",
+2.5
+],
+[
+"2024-03-31",
+3.6
+],
+[
+"2024-06-30",
+0.8
+],
+[
+"2024-09-30",
+1.3
+],
+[
+"2024-12-31",
+4.1
+],
+[
+"2025-03-31",
+3.0
+],
+[
+"2025-06-30",
+3.3
+],
+[
+"2025-09-30",
+2.9
+],
+[
+"2025-12-31",
+4.2
+],
+[
+"2026-03-31",
+2.4
+],
+[
+"2026-06-30",
+3.6
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_MACRO_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Macro strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_MACRO_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+2.36
+],
+[
+"2013-06-30",
+2.548
+],
+[
+"2013-09-30",
+2.536
+],
+[
+"2013-12-31",
+2.277
+],
+[
+"2014-03-31",
+2.514
+],
+[
+"2014-06-30",
+2.253
+],
+[
+"2014-09-30",
+2.463
+],
+[
+"2014-12-31",
+2.409
+],
+[
+"2015-03-31",
+2.036
+],
+[
+"2015-06-30",
+1.981
+],
+[
+"2015-09-30",
+2.119
+],
+[
+"2015-12-31",
+2.154
+],
+[
+"2016-03-31",
+2.289
+],
+[
+"2016-06-30",
+2.714
+],
+[
+"2016-09-30",
+2.684
+],
+[
+"2016-12-31",
+2.708
+],
+[
+"2017-03-31",
+3.012
+],
+[
+"2017-06-30",
+2.736
+],
+[
+"2017-09-30",
+2.961
+],
+[
+"2017-12-31",
+2.68
+],
+[
+"2018-03-31",
+3.336
+],
+[
+"2018-06-30",
+2.923
+],
+[
+"2018-09-30",
+3.329
+],
+[
+"2018-12-31",
+3.832
+],
+[
+"2019-03-31",
+4.071
+],
+[
+"2019-06-30",
+4.066
+],
+[
+"2019-09-30",
+3.974
+],
+[
+"2019-12-31",
+4.429
+],
+[
+"2020-03-31",
+4.471
+],
+[
+"2020-06-30",
+3.747
+],
+[
+"2020-09-30",
+4.471
+],
+[
+"2020-12-31",
+4.152
+],
+[
+"2021-03-31",
+4.083
+],
+[
+"2021-06-30",
+4.482
+],
+[
+"2021-09-30",
+4.668
+],
+[
+"2021-12-31",
+4.178
+],
+[
+"2022-03-31",
+4.742
+],
+[
+"2022-06-30",
+4.541
+],
+[
+"2022-09-30",
+4.673
+],
+[
+"2022-12-31",
+4.994
+],
+[
+"2023-03-31",
+5.003
+],
+[
+"2023-06-30",
+5.111
+],
+[
+"2023-09-30",
+5.895
+],
+[
+"2023-12-31",
+6.13
+],
+[
+"2024-03-31",
+6.52
+],
+[
+"2024-06-30",
+6.687
+],
+[
+"2024-09-30",
+7.114
+],
+[
+"2024-12-31",
+6.794
+],
+[
+"2025-03-31",
+7.681
+],
+[
+"2025-06-30",
+7.175
+],
+[
+"2025-09-30",
+7.21
+],
+[
+"2025-12-31",
+7.23
+],
+[
+"2026-03-31",
+7.409
+],
+[
+"2026-06-30",
+6.816
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_MACRO_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Macro strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_MULTI_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+4.8
+],
+[
+"2013-06-30",
+2.3
+],
+[
+"2013-09-30",
+3.5
+],
+[
+"2013-12-31",
+5.1
+],
+[
+"2014-03-31",
+2.8
+],
+[
+"2014-06-30",
+3.1
+],
+[
+"2014-09-30",
+0.8
+],
+[
+"2014-12-31",
+1.6
+],
+[
+"2015-03-31",
+5.3
+],
+[
+"2015-06-30",
+0.5
+],
+[
+"2015-09-30",
+-1.8
+],
+[
+"2015-12-31",
+0.7
+],
+[
+"2016-03-31",
+-1.2
+],
+[
+"2016-06-30",
+2.0
+],
+[
+"2016-09-30",
+3.5
+],
+[
+"2016-12-31",
+5.3
+],
+[
+"2017-03-31",
+2.9
+],
+[
+"2017-06-30",
+0.8
+],
+[
+"2017-09-30",
+2.9
+],
+[
+"2017-12-31",
+3.1
+],
+[
+"2018-03-31",
+1.8
+],
+[
+"2018-06-30",
+2.2
+],
+[
+"2018-09-30",
+1.9
+],
+[
+"2018-12-31",
+-0.5
+],
+[
+"2019-03-31",
+3.1
+],
+[
+"2019-06-30",
+2.7
+],
+[
+"2019-09-30",
+1.0
+],
+[
+"2019-12-31",
+3.1
+],
+[
+"2020-03-31",
+-6.8
+],
+[
+"2020-06-30",
+8.7
+],
+[
+"2020-09-30",
+5.3
+],
+[
+"2020-12-31",
+9.1
+],
+[
+"2021-03-31",
+4.1
+],
+[
+"2021-06-30",
+5.0
+],
+[
+"2021-09-30",
+3.7
+],
+[
+"2021-12-31",
+2.8
+],
+[
+"2022-03-31",
+3.7
+],
+[
+"2022-06-30",
+1.5
+],
+[
+"2022-09-30",
+2.4
+],
+[
+"2022-12-31",
+0.3
+],
+[
+"2023-03-31",
+1.8
+],
+[
+"2023-06-30",
+2.5
+],
+[
+"2023-09-30",
+3.9
+],
+[
+"2023-12-31",
+2.5
+],
+[
+"2024-03-31",
+6.1
+],
+[
+"2024-06-30",
+3.0
+],
+[
+"2024-09-30",
+3.7
+],
+[
+"2024-12-31",
+4.5
+],
+[
+"2025-03-31",
+3.3
+],
+[
+"2025-06-30",
+5.7
+],
+[
+"2025-09-30",
+4.4
+],
+[
+"2025-12-31",
+5.3
+],
+[
+"2026-03-31",
+1.9
+],
+[
+"2026-06-30",
+9.9
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_MULTI_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Multi strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_MULTI_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+3.9
+],
+[
+"2013-06-30",
+1.6
+],
+[
+"2013-09-30",
+2.8
+],
+[
+"2013-12-31",
+4.0
+],
+[
+"2014-03-31",
+2.0
+],
+[
+"2014-06-30",
+2.4
+],
+[
+"2014-09-30",
+0.6
+],
+[
+"2014-12-31",
+1.3
+],
+[
+"2015-03-31",
+4.1
+],
+[
+"2015-06-30",
+0.0
+],
+[
+"2015-09-30",
+-2.0
+],
+[
+"2015-12-31",
+0.3
+],
+[
+"2016-03-31",
+-1.9
+],
+[
+"2016-06-30",
+1.5
+],
+[
+"2016-09-30",
+2.9
+],
+[
+"2016-12-31",
+4.4
+],
+[
+"2017-03-31",
+2.1
+],
+[
+"2017-06-30",
+0.3
+],
+[
+"2017-09-30",
+2.3
+],
+[
+"2017-12-31",
+2.4
+],
+[
+"2018-03-31",
+1.2
+],
+[
+"2018-06-30",
+1.4
+],
+[
+"2018-09-30",
+1.4
+],
+[
+"2018-12-31",
+-1.2
+],
+[
+"2019-03-31",
+2.4
+],
+[
+"2019-06-30",
+2.0
+],
+[
+"2019-09-30",
+0.5
+],
+[
+"2019-12-31",
+2.5
+],
+[
+"2020-03-31",
+-6.8
+],
+[
+"2020-06-30",
+7.3
+],
+[
+"2020-09-30",
+4.1
+],
+[
+"2020-12-31",
+7.4
+],
+[
+"2021-03-31",
+3.2
+],
+[
+"2021-06-30",
+3.7
+],
+[
+"2021-09-30",
+3.3
+],
+[
+"2021-12-31",
+2.3
+],
+[
+"2022-03-31",
+2.7
+],
+[
+"2022-06-30",
+1.4
+],
+[
+"2022-09-30",
+2.3
+],
+[
+"2022-12-31",
+0.3
+],
+[
+"2023-03-31",
+1.5
+],
+[
+"2023-06-30",
+2.0
+],
+[
+"2023-09-30",
+3.3
+],
+[
+"2023-12-31",
+1.8
+],
+[
+"2024-03-31",
+5.2
+],
+[
+"2024-06-30",
+2.3
+],
+[
+"2024-09-30",
+3.0
+],
+[
+"2024-12-31",
+3.7
+],
+[
+"2025-03-31",
+2.6
+],
+[
+"2025-06-30",
+4.9
+],
+[
+"2025-09-30",
+3.5
+],
+[
+"2025-12-31",
+4.2
+],
+[
+"2026-03-31",
+1.0
+],
+[
+"2026-06-30",
+8.2
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_MULTI_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Multi strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_MULTI_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+2.073
+],
+[
+"2013-06-30",
+2.256
+],
+[
+"2013-09-30",
+2.25
+],
+[
+"2013-12-31",
+2.135
+],
+[
+"2014-03-31",
+2.166
+],
+[
+"2014-06-30",
+2.162
+],
+[
+"2014-09-30",
+2.17
+],
+[
+"2014-12-31",
+2.144
+],
+[
+"2015-03-31",
+2.155
+],
+[
+"2015-06-30",
+2.137
+],
+[
+"2015-09-30",
+2.214
+],
+[
+"2015-12-31",
+2.212
+],
+[
+"2016-03-31",
+2.308
+],
+[
+"2016-06-30",
+2.329
+],
+[
+"2016-09-30",
+2.456
+],
+[
+"2016-12-31",
+2.499
+],
+[
+"2017-03-31",
+2.576
+],
+[
+"2017-06-30",
+2.555
+],
+[
+"2017-09-30",
+2.558
+],
+[
+"2017-12-31",
+2.582
+],
+[
+"2018-03-31",
+2.479
+],
+[
+"2018-06-30",
+2.733
+],
+[
+"2018-09-30",
+2.831
+],
+[
+"2018-12-31",
+2.628
+],
+[
+"2019-03-31",
+2.613
+],
+[
+"2019-06-30",
+2.588
+],
+[
+"2019-09-30",
+2.621
+],
+[
+"2019-12-31",
+2.732
+],
+[
+"2020-03-31",
+2.904
+],
+[
+"2020-06-30",
+2.714
+],
+[
+"2020-09-30",
+2.931
+],
+[
+"2020-12-31",
+3.07
+],
+[
+"2021-03-31",
+3.193
+],
+[
+"2021-06-30",
+3.285
+],
+[
+"2021-09-30",
+3.301
+],
+[
+"2021-12-31",
+3.325
+],
+[
+"2022-03-31",
+3.166
+],
+[
+"2022-06-30",
+3.176
+],
+[
+"2022-09-30",
+3.084
+],
+[
+"2022-12-31",
+3.316
+],
+[
+"2023-03-31",
+3.347
+],
+[
+"2023-06-30",
+3.792
+],
+[
+"2023-09-30",
+3.876
+],
+[
+"2023-12-31",
+3.954
+],
+[
+"2024-03-31",
+3.987
+],
+[
+"2024-06-30",
+4.163
+],
+[
+"2024-09-30",
+4.384
+],
+[
+"2024-12-31",
+4.407
+],
+[
+"2025-03-31",
+4.434
+],
+[
+"2025-06-30",
+4.78
+],
+[
+"2025-09-30",
+4.595
+],
+[
+"2025-12-31",
+4.657
+],
+[
+"2026-03-31",
+4.472
+],
+[
+"2026-06-30",
+4.462
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_MULTI_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Multi strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_OTHER_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+5.8
+],
+[
+"2013-06-30",
+1.8
+],
+[
+"2013-09-30",
+5.5
+],
+[
+"2013-12-31",
+5.5
+],
+[
+"2014-03-31",
+5.5
+],
+[
+"2014-06-30",
+7.2
+],
+[
+"2014-09-30",
+2.8
+],
+[
+"2014-12-31",
+1.9
+],
+[
+"2015-03-31",
+5.3
+],
+[
+"2015-06-30",
+3.4
+],
+[
+"2015-09-30",
+-0.5
+],
+[
+"2015-12-31",
+2.8
+],
+[
+"2016-03-31",
+3.9
+],
+[
+"2016-06-30",
+5.6
+],
+[
+"2016-09-30",
+6.2
+],
+[
+"2016-12-31",
+5.3
+],
+[
+"2017-03-31",
+5.8
+],
+[
+"2017-06-30",
+4.0
+],
+[
+"2017-09-30",
+4.7
+],
+[
+"2017-12-31",
+5.8
+],
+[
+"2018-03-31",
+4.6
+],
+[
+"2018-06-30",
+5.2
+],
+[
+"2018-09-30",
+5.1
+],
+[
+"2018-12-31",
+0.0
+],
+[
+"2019-03-31",
+8.0
+],
+[
+"2019-06-30",
+5.3
+],
+[
+"2019-09-30",
+4.1
+],
+[
+"2019-12-31",
+5.7
+],
+[
+"2020-03-31",
+-5.1
+],
+[
+"2020-06-30",
+10.0
+],
+[
+"2020-09-30",
+6.9
+],
+[
+"2020-12-31",
+11.0
+],
+[
+"2021-03-31",
+10.5
+],
+[
+"2021-06-30",
+10.6
+],
+[
+"2021-09-30",
+9.5
+],
+[
+"2021-12-31",
+9.8
+],
+[
+"2022-03-31",
+7.8
+],
+[
+"2022-06-30",
+4.5
+],
+[
+"2022-09-30",
+5.4
+],
+[
+"2022-12-31",
+6.4
+],
+[
+"2023-03-31",
+8.4
+],
+[
+"2023-06-30",
+8.2
+],
+[
+"2023-09-30",
+7.1
+],
+[
+"2023-12-31",
+7.8
+],
+[
+"2024-03-31",
+8.9
+],
+[
+"2024-06-30",
+7.9
+],
+[
+"2024-09-30",
+9.2
+],
+[
+"2024-12-31",
+7.6
+],
+[
+"2025-03-31",
+8.0
+],
+[
+"2025-06-30",
+9.8
+],
+[
+"2025-09-30",
+9.5
+],
+[
+"2025-12-31",
+7.4
+],
+[
+"2026-03-31",
+7.8
+],
+[
+"2026-06-30",
+11.8
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_OTHER_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Other strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_OTHER_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+4.1
+],
+[
+"2013-06-30",
+0.4
+],
+[
+"2013-09-30",
+4.3
+],
+[
+"2013-12-31",
+4.1
+],
+[
+"2014-03-31",
+4.0
+],
+[
+"2014-06-30",
+5.4
+],
+[
+"2014-09-30",
+1.9
+],
+[
+"2014-12-31",
+0.8
+],
+[
+"2015-03-31",
+3.7
+],
+[
+"2015-06-30",
+2.1
+],
+[
+"2015-09-30",
+-1.0
+],
+[
+"2015-12-31",
+1.9
+],
+[
+"2016-03-31",
+2.5
+],
+[
+"2016-06-30",
+4.1
+],
+[
+"2016-09-30",
+4.7
+],
+[
+"2016-12-31",
+3.6
+],
+[
+"2017-03-31",
+4.8
+],
+[
+"2017-06-30",
+3.3
+],
+[
+"2017-09-30",
+3.9
+],
+[
+"2017-12-31",
+4.4
+],
+[
+"2018-03-31",
+3.6
+],
+[
+"2018-06-30",
+4.3
+],
+[
+"2018-09-30",
+4.3
+],
+[
+"2018-12-31",
+-0.4
+],
+[
+"2019-03-31",
+6.9
+],
+[
+"2019-06-30",
+4.3
+],
+[
+"2019-09-30",
+3.1
+],
+[
+"2019-12-31",
+4.7
+],
+[
+"2020-03-31",
+-6.2
+],
+[
+"2020-06-30",
+7.5
+],
+[
+"2020-09-30",
+5.2
+],
+[
+"2020-12-31",
+8.7
+],
+[
+"2021-03-31",
+7.8
+],
+[
+"2021-06-30",
+8.5
+],
+[
+"2021-09-30",
+8.3
+],
+[
+"2021-12-31",
+8.1
+],
+[
+"2022-03-31",
+6.1
+],
+[
+"2022-06-30",
+3.2
+],
+[
+"2022-09-30",
+4.3
+],
+[
+"2022-12-31",
+4.8
+],
+[
+"2023-03-31",
+6.3
+],
+[
+"2023-06-30",
+6.2
+],
+[
+"2023-09-30",
+5.2
+],
+[
+"2023-12-31",
+6.2
+],
+[
+"2024-03-31",
+7.3
+],
+[
+"2024-06-30",
+5.8
+],
+[
+"2024-09-30",
+7.1
+],
+[
+"2024-12-31",
+5.6
+],
+[
+"2025-03-31",
+5.7
+],
+[
+"2025-06-30",
+8.0
+],
+[
+"2025-09-30",
+7.4
+],
+[
+"2025-12-31",
+5.5
+],
+[
+"2026-03-31",
+5.5
+],
+[
+"2026-06-30",
+9.4
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_OTHER_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Other strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_OTHER_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+1.345
+],
+[
+"2013-06-30",
+1.344
+],
+[
+"2013-09-30",
+1.36
+],
+[
+"2013-12-31",
+1.331
+],
+[
+"2014-03-31",
+1.371
+],
+[
+"2014-06-30",
+1.393
+],
+[
+"2014-09-30",
+1.395
+],
+[
+"2014-12-31",
+1.376
+],
+[
+"2015-03-31",
+1.404
+],
+[
+"2015-06-30",
+1.348
+],
+[
+"2015-09-30",
+1.369
+],
+[
+"2015-12-31",
+1.31
+],
+[
+"2016-03-31",
+1.377
+],
+[
+"2016-06-30",
+1.373
+],
+[
+"2016-09-30",
+1.362
+],
+[
+"2016-12-31",
+1.333
+],
+[
+"2017-03-31",
+1.303
+],
+[
+"2017-06-30",
+1.345
+],
+[
+"2017-09-30",
+1.361
+],
+[
+"2017-12-31",
+1.369
+],
+[
+"2018-03-31",
+1.302
+],
+[
+"2018-06-30",
+1.316
+],
+[
+"2018-09-30",
+1.323
+],
+[
+"2018-12-31",
+1.393
+],
+[
+"2019-03-31",
+1.405
+],
+[
+"2019-06-30",
+1.413
+],
+[
+"2019-09-30",
+1.405
+],
+[
+"2019-12-31",
+1.411
+],
+[
+"2020-03-31",
+1.458
+],
+[
+"2020-06-30",
+1.378
+],
+[
+"2020-09-30",
+1.364
+],
+[
+"2020-12-31",
+1.355
+],
+[
+"2021-03-31",
+1.3
+],
+[
+"2021-06-30",
+1.276
+],
+[
+"2021-09-30",
+1.287
+],
+[
+"2021-12-31",
+1.312
+],
+[
+"2022-03-31",
+1.308
+],
+[
+"2022-06-30",
+1.303
+],
+[
+"2022-09-30",
+1.317
+],
+[
+"2022-12-31",
+1.318
+],
+[
+"2023-03-31",
+1.352
+],
+[
+"2023-06-30",
+1.315
+],
+[
+"2023-09-30",
+1.336
+],
+[
+"2023-12-31",
+1.359
+],
+[
+"2024-03-31",
+1.341
+],
+[
+"2024-06-30",
+1.352
+],
+[
+"2024-09-30",
+1.38
+],
+[
+"2024-12-31",
+1.396
+],
+[
+"2025-03-31",
+1.395
+],
+[
+"2025-06-30",
+1.425
+],
+[
+"2025-09-30",
+1.392
+],
+[
+"2025-12-31",
+1.401
+],
+[
+"2026-03-31",
+1.391
+],
+[
+"2026-06-30",
+1.386
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_OTHER_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Other strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_RV_GROSSRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+4.7
+],
+[
+"2013-06-30",
+1.0
+],
+[
+"2013-09-30",
+2.6
+],
+[
+"2013-12-31",
+3.1
+],
+[
+"2014-03-31",
+4.1
+],
+[
+"2014-06-30",
+3.1
+],
+[
+"2014-09-30",
+1.0
+],
+[
+"2014-12-31",
+0.2
+],
+[
+"2015-03-31",
+2.4
+],
+[
+"2015-06-30",
+1.4
+],
+[
+"2015-09-30",
+0.6
+],
+[
+"2015-12-31",
+0.2
+],
+[
+"2016-03-31",
+0.1
+],
+[
+"2016-06-30",
+2.5
+],
+[
+"2016-09-30",
+3.4
+],
+[
+"2016-12-31",
+2.1
+],
+[
+"2017-03-31",
+3.0
+],
+[
+"2017-06-30",
+2.3
+],
+[
+"2017-09-30",
+2.4
+],
+[
+"2017-12-31",
+1.8
+],
+[
+"2018-03-31",
+2.6
+],
+[
+"2018-06-30",
+1.0
+],
+[
+"2018-09-30",
+2.1
+],
+[
+"2018-12-31",
+0.6
+],
+[
+"2019-03-31",
+2.9
+],
+[
+"2019-06-30",
+2.7
+],
+[
+"2019-09-30",
+1.7
+],
+[
+"2019-12-31",
+2.4
+],
+[
+"2020-03-31",
+-8.6
+],
+[
+"2020-06-30",
+8.5
+],
+[
+"2020-09-30",
+5.3
+],
+[
+"2020-12-31",
+6.4
+],
+[
+"2021-03-31",
+4.2
+],
+[
+"2021-06-30",
+3.2
+],
+[
+"2021-09-30",
+3.1
+],
+[
+"2021-12-31",
+2.6
+],
+[
+"2022-03-31",
+2.1
+],
+[
+"2022-06-30",
+0.6
+],
+[
+"2022-09-30",
+1.4
+],
+[
+"2022-12-31",
+2.9
+],
+[
+"2023-03-31",
+3.1
+],
+[
+"2023-06-30",
+2.2
+],
+[
+"2023-09-30",
+3.3
+],
+[
+"2023-12-31",
+4.5
+],
+[
+"2024-03-31",
+3.4
+],
+[
+"2024-06-30",
+3.0
+],
+[
+"2024-09-30",
+4.2
+],
+[
+"2024-12-31",
+3.3
+],
+[
+"2025-03-31",
+3.7
+],
+[
+"2025-06-30",
+2.6
+],
+[
+"2025-09-30",
+3.5
+],
+[
+"2025-12-31",
+3.3
+],
+[
+"2026-03-31",
+1.4
+],
+[
+"2026-06-30",
+3.3
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_RV_GROSSRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Gross returns are before management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Relative value strategy funds: quarterly gross returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31 00:00:00",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_RV_NETRETURN_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+3.6
+],
+[
+"2013-06-30",
+0.5
+],
+[
+"2013-09-30",
+2.0
+],
+[
+"2013-12-31",
+2.3
+],
+[
+"2014-03-31",
+3.2
+],
+[
+"2014-06-30",
+2.4
+],
+[
+"2014-09-30",
+0.6
+],
+[
+"2014-12-31",
+-0.1
+],
+[
+"2015-03-31",
+1.7
+],
+[
+"2015-06-30",
+0.9
+],
+[
+"2015-09-30",
+0.2
+],
+[
+"2015-12-31",
+-0.1
+],
+[
+"2016-03-31",
+-0.4
+],
+[
+"2016-06-30",
+2.0
+],
+[
+"2016-09-30",
+2.9
+],
+[
+"2016-12-31",
+1.5
+],
+[
+"2017-03-31",
+2.3
+],
+[
+"2017-06-30",
+1.7
+],
+[
+"2017-09-30",
+1.6
+],
+[
+"2017-12-31",
+1.3
+],
+[
+"2018-03-31",
+1.8
+],
+[
+"2018-06-30",
+0.7
+],
+[
+"2018-09-30",
+1.6
+],
+[
+"2018-12-31",
+0.2
+],
+[
+"2019-03-31",
+2.3
+],
+[
+"2019-06-30",
+2.1
+],
+[
+"2019-09-30",
+1.2
+],
+[
+"2019-12-31",
+1.9
+],
+[
+"2020-03-31",
+-9.0
+],
+[
+"2020-06-30",
+7.7
+],
+[
+"2020-09-30",
+4.4
+],
+[
+"2020-12-31",
+5.4
+],
+[
+"2021-03-31",
+3.4
+],
+[
+"2021-06-30",
+2.6
+],
+[
+"2021-09-30",
+2.3
+],
+[
+"2021-12-31",
+2.1
+],
+[
+"2022-03-31",
+1.6
+],
+[
+"2022-06-30",
+0.0
+],
+[
+"2022-09-30",
+1.0
+],
+[
+"2022-12-31",
+2.6
+],
+[
+"2023-03-31",
+2.7
+],
+[
+"2023-06-30",
+1.9
+],
+[
+"2023-09-30",
+2.6
+],
+[
+"2023-12-31",
+3.8
+],
+[
+"2024-03-31",
+2.8
+],
+[
+"2024-06-30",
+2.3
+],
+[
+"2024-09-30",
+3.6
+],
+[
+"2024-12-31",
+2.5
+],
+[
+"2025-03-31",
+2.9
+],
+[
+"2025-06-30",
+2.0
+],
+[
+"2025-09-30",
+2.7
+],
+[
+"2025-12-31",
+2.5
+],
+[
+"2026-03-31",
+0.9
+],
+[
+"2026-06-30",
+2.6
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_RV_NETRETURN_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Returns are based on SEC Form PF question 17 and are winsorized at the 1% level. Individual hedge funds\u2019 reported returns are weighted by their net assets and then averaged. Net returns are after management fees, incentive fees, and allocations. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Relative Value strategy funds: quarterly net returns (net asset-weighted average percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "Single Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31 00:00:00",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Net asset-weighted average percent",
+"precision": 1
+}
+}
+},
+"FPF-STRATEGY_RV_LEVERAGERATIO_NAVWMEAN": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+5.538
+],
+[
+"2013-06-30",
+4.954
+],
+[
+"2013-09-30",
+4.979
+],
+[
+"2013-12-31",
+3.986
+],
+[
+"2014-03-31",
+4.199
+],
+[
+"2014-06-30",
+4.566
+],
+[
+"2014-09-30",
+5.038
+],
+[
+"2014-12-31",
+4.156
+],
+[
+"2015-03-31",
+4.923
+],
+[
+"2015-06-30",
+5.252
+],
+[
+"2015-09-30",
+4.88
+],
+[
+"2015-12-31",
+4.415
+],
+[
+"2016-03-31",
+4.653
+],
+[
+"2016-06-30",
+4.803
+],
+[
+"2016-09-30",
+4.427
+],
+[
+"2016-12-31",
+4.234
+],
+[
+"2017-03-31",
+4.946
+],
+[
+"2017-06-30",
+5.151
+],
+[
+"2017-09-30",
+5.921
+],
+[
+"2017-12-31",
+5.715
+],
+[
+"2018-03-31",
+5.137
+],
+[
+"2018-06-30",
+5.204
+],
+[
+"2018-09-30",
+5.044
+],
+[
+"2018-12-31",
+5.894
+],
+[
+"2019-03-31",
+5.961
+],
+[
+"2019-06-30",
+7.524
+],
+[
+"2019-09-30",
+6.04
+],
+[
+"2019-12-31",
+5.709
+],
+[
+"2020-03-31",
+7.466
+],
+[
+"2020-06-30",
+5.706
+],
+[
+"2020-09-30",
+4.591
+],
+[
+"2020-12-31",
+5.127
+],
+[
+"2021-03-31",
+4.655
+],
+[
+"2021-06-30",
+4.636
+],
+[
+"2021-09-30",
+6.055
+],
+[
+"2021-12-31",
+5.62
+],
+[
+"2022-03-31",
+5.231
+],
+[
+"2022-06-30",
+5.697
+],
+[
+"2022-09-30",
+5.466
+],
+[
+"2022-12-31",
+5.029
+],
+[
+"2023-03-31",
+4.95
+],
+[
+"2023-06-30",
+4.737
+],
+[
+"2023-09-30",
+4.644
+],
+[
+"2023-12-31",
+6.415
+],
+[
+"2024-03-31",
+6.206
+],
+[
+"2024-06-30",
+6.411
+],
+[
+"2024-09-30",
+6.679
+],
+[
+"2024-12-31",
+6.231
+],
+[
+"2025-03-31",
+7.347
+],
+[
+"2025-06-30",
+7.401
+],
+[
+"2025-09-30",
+8.439
+],
+[
+"2025-12-31",
+8.337
+],
+[
+"2026-03-31",
+7.936
+],
+[
+"2026-06-30",
+8.102
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-STRATEGY_RV_LEVERAGERATIO_NAVWMEAN",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Leverage is the ratio of gross assets to net assets based on SEC Form PF questions 8 and 9, respectively. Individual hedge funds\u2019 ratios are weighted by their net assets and then averaged. SEC Form PF question 20 lists several investment strategies, and funds self-report their share of net assets managed under each strategy. Reported strategies are mapped into one of nine broad strategies. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Relative value strategy funds: leverage (net asset-weighted average ratio)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31 00:00:00",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "Net asset-weighted average ratio",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_INVESTORLIQUIDITYLE7_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+8.5
+],
+[
+"2013-06-30",
+8.7
+],
+[
+"2013-09-30",
+8.9
+],
+[
+"2013-12-31",
+11.4
+],
+[
+"2014-03-31",
+11.3
+],
+[
+"2014-06-30",
+10.9
+],
+[
+"2014-09-30",
+9.6
+],
+[
+"2014-12-31",
+11.4
+],
+[
+"2015-03-31",
+13.1
+],
+[
+"2015-06-30",
+13.1
+],
+[
+"2015-09-30",
+13.2
+],
+[
+"2015-12-31",
+13.2
+],
+[
+"2016-03-31",
+13.9
+],
+[
+"2016-06-30",
+14.1
+],
+[
+"2016-09-30",
+14.4
+],
+[
+"2016-12-31",
+14.1
+],
+[
+"2017-03-31",
+14.4
+],
+[
+"2017-06-30",
+14.6
+],
+[
+"2017-09-30",
+14.8
+],
+[
+"2017-12-31",
+15.1
+],
+[
+"2018-03-31",
+15.7
+],
+[
+"2018-06-30",
+15.5
+],
+[
+"2018-09-30",
+14.8
+],
+[
+"2018-12-31",
+14.7
+],
+[
+"2019-03-31",
+14.5
+],
+[
+"2019-06-30",
+14.0
+],
+[
+"2019-09-30",
+13.7
+],
+[
+"2019-12-31",
+13.0
+],
+[
+"2020-03-31",
+13.0
+],
+[
+"2020-06-30",
+13.1
+],
+[
+"2020-09-30",
+13.1
+],
+[
+"2020-12-31",
+10.0
+],
+[
+"2021-03-31",
+9.3
+],
+[
+"2021-06-30",
+11.6
+],
+[
+"2021-09-30",
+11.1
+],
+[
+"2021-12-31",
+11.0
+],
+[
+"2022-03-31",
+10.9
+],
+[
+"2022-06-30",
+8.5
+],
+[
+"2022-09-30",
+8.1
+],
+[
+"2022-12-31",
+8.1
+],
+[
+"2023-03-31",
+7.4
+],
+[
+"2023-06-30",
+7.7
+],
+[
+"2023-09-30",
+7.5
+],
+[
+"2023-12-31",
+8.1
+],
+[
+"2024-03-31",
+7.7
+],
+[
+"2024-06-30",
+9.1
+],
+[
+"2024-09-30",
+9.4
+],
+[
+"2024-12-31",
+9.3
+],
+[
+"2025-03-31",
+8.9
+],
+[
+"2025-06-30",
+8.7
+],
+[
+"2025-09-30",
+8.9
+],
+[
+"2025-12-31",
+8.8
+],
+[
+"2026-03-31",
+8.6
+],
+[
+"2026-06-30",
+8.4
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_INVESTORLIQUIDITYLE7_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Investor liquidity is the proportion of net assets (SEC Form PF question 9) redeemable by hedge fund investors within specified periods based on SEC Form PF question 50. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: investor liquidity 0-7 days (percent of total)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_INVESTORLIQUIDITYLE7_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent of total",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_INVESTORLIQUIDITYGT7LE90_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+35.8
+],
+[
+"2013-06-30",
+34.4
+],
+[
+"2013-09-30",
+34.4
+],
+[
+"2013-12-31",
+37.9
+],
+[
+"2014-03-31",
+33.5
+],
+[
+"2014-06-30",
+33.7
+],
+[
+"2014-09-30",
+35.4
+],
+[
+"2014-12-31",
+38.9
+],
+[
+"2015-03-31",
+34.0
+],
+[
+"2015-06-30",
+33.0
+],
+[
+"2015-09-30",
+33.4
+],
+[
+"2015-12-31",
+32.3
+],
+[
+"2016-03-31",
+33.2
+],
+[
+"2016-06-30",
+32.5
+],
+[
+"2016-09-30",
+32.9
+],
+[
+"2016-12-31",
+35.5
+],
+[
+"2017-03-31",
+33.3
+],
+[
+"2017-06-30",
+32.2
+],
+[
+"2017-09-30",
+33.5
+],
+[
+"2017-12-31",
+35.8
+],
+[
+"2018-03-31",
+33.4
+],
+[
+"2018-06-30",
+32.3
+],
+[
+"2018-09-30",
+33.1
+],
+[
+"2018-12-31",
+35.3
+],
+[
+"2019-03-31",
+33.5
+],
+[
+"2019-06-30",
+32.5
+],
+[
+"2019-09-30",
+33.3
+],
+[
+"2019-12-31",
+33.1
+],
+[
+"2020-03-31",
+30.8
+],
+[
+"2020-06-30",
+29.9
+],
+[
+"2020-09-30",
+29.7
+],
+[
+"2020-12-31",
+33.7
+],
+[
+"2021-03-31",
+30.4
+],
+[
+"2021-06-30",
+28.7
+],
+[
+"2021-09-30",
+29.1
+],
+[
+"2021-12-31",
+31.8
+],
+[
+"2022-03-31",
+28.8
+],
+[
+"2022-06-30",
+28.2
+],
+[
+"2022-09-30",
+27.5
+],
+[
+"2022-12-31",
+29.5
+],
+[
+"2023-03-31",
+27.0
+],
+[
+"2023-06-30",
+26.4
+],
+[
+"2023-09-30",
+25.9
+],
+[
+"2023-12-31",
+25.4
+],
+[
+"2024-03-31",
+25.9
+],
+[
+"2024-06-30",
+25.3
+],
+[
+"2024-09-30",
+25.3
+],
+[
+"2024-12-31",
+27.6
+],
+[
+"2025-03-31",
+25.1
+],
+[
+"2025-06-30",
+25.6
+],
+[
+"2025-09-30",
+26.1
+],
+[
+"2025-12-31",
+29.7
+],
+[
+"2026-03-31",
+26.8
+],
+[
+"2026-06-30",
+27.3
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_INVESTORLIQUIDITYGT7LE90_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Investor liquidity is the proportion of net assets (SEC Form PF question 9) redeemable by hedge fund investors within specified periods based on SEC Form PF question 50. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: investor liquidity 8-90 days (percent of total)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_INVESTORLIQUIDITYGT7LE90_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent of total",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_INVESTORLIQUIDITYGT90_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+55.7
+],
+[
+"2013-06-30",
+56.9
+],
+[
+"2013-09-30",
+56.7
+],
+[
+"2013-12-31",
+50.7
+],
+[
+"2014-03-31",
+55.1
+],
+[
+"2014-06-30",
+55.4
+],
+[
+"2014-09-30",
+55.0
+],
+[
+"2014-12-31",
+49.7
+],
+[
+"2015-03-31",
+52.9
+],
+[
+"2015-06-30",
+53.9
+],
+[
+"2015-09-30",
+53.5
+],
+[
+"2015-12-31",
+54.4
+],
+[
+"2016-03-31",
+52.9
+],
+[
+"2016-06-30",
+53.4
+],
+[
+"2016-09-30",
+52.7
+],
+[
+"2016-12-31",
+50.4
+],
+[
+"2017-03-31",
+52.3
+],
+[
+"2017-06-30",
+53.2
+],
+[
+"2017-09-30",
+51.7
+],
+[
+"2017-12-31",
+49.1
+],
+[
+"2018-03-31",
+50.9
+],
+[
+"2018-06-30",
+52.2
+],
+[
+"2018-09-30",
+52.1
+],
+[
+"2018-12-31",
+50.0
+],
+[
+"2019-03-31",
+52.0
+],
+[
+"2019-06-30",
+53.5
+],
+[
+"2019-09-30",
+53.0
+],
+[
+"2019-12-31",
+53.9
+],
+[
+"2020-03-31",
+56.2
+],
+[
+"2020-06-30",
+57.0
+],
+[
+"2020-09-30",
+57.2
+],
+[
+"2020-12-31",
+56.3
+],
+[
+"2021-03-31",
+60.2
+],
+[
+"2021-06-30",
+59.7
+],
+[
+"2021-09-30",
+59.8
+],
+[
+"2021-12-31",
+57.2
+],
+[
+"2022-03-31",
+60.3
+],
+[
+"2022-06-30",
+63.2
+],
+[
+"2022-09-30",
+64.4
+],
+[
+"2022-12-31",
+62.4
+],
+[
+"2023-03-31",
+65.6
+],
+[
+"2023-06-30",
+65.9
+],
+[
+"2023-09-30",
+66.6
+],
+[
+"2023-12-31",
+66.5
+],
+[
+"2024-03-31",
+66.3
+],
+[
+"2024-06-30",
+65.6
+],
+[
+"2024-09-30",
+65.3
+],
+[
+"2024-12-31",
+63.1
+],
+[
+"2025-03-31",
+66.0
+],
+[
+"2025-06-30",
+65.7
+],
+[
+"2025-09-30",
+65.0
+],
+[
+"2025-12-31",
+61.5
+],
+[
+"2026-03-31",
+64.6
+],
+[
+"2026-06-30",
+64.4
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_INVESTORLIQUIDITYGT90_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Investor liquidity is the proportion of net assets (SEC Form PF question 9) redeemable by hedge fund investors within specified periods based on SEC Form PF question 50. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: investor liquidity 91+ days (percent of total)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_INVESTORLIQUIDITYGT90_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent of total",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYLE1_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+39.3
+],
+[
+"2013-06-30",
+40.5
+],
+[
+"2013-09-30",
+41.0
+],
+[
+"2013-12-31",
+38.3
+],
+[
+"2014-03-31",
+39.7
+],
+[
+"2014-06-30",
+38.8
+],
+[
+"2014-09-30",
+39.2
+],
+[
+"2014-12-31",
+39.4
+],
+[
+"2015-03-31",
+39.9
+],
+[
+"2015-06-30",
+39.6
+],
+[
+"2015-09-30",
+40.7
+],
+[
+"2015-12-31",
+39.0
+],
+[
+"2016-03-31",
+40.2
+],
+[
+"2016-06-30",
+40.6
+],
+[
+"2016-09-30",
+37.4
+],
+[
+"2016-12-31",
+39.2
+],
+[
+"2017-03-31",
+36.8
+],
+[
+"2017-06-30",
+36.5
+],
+[
+"2017-09-30",
+35.2
+],
+[
+"2017-12-31",
+36.0
+],
+[
+"2018-03-31",
+36.9
+],
+[
+"2018-06-30",
+37.0
+],
+[
+"2018-09-30",
+38.3
+],
+[
+"2018-12-31",
+38.5
+],
+[
+"2019-03-31",
+37.2
+],
+[
+"2019-06-30",
+36.9
+],
+[
+"2019-09-30",
+36.9
+],
+[
+"2019-12-31",
+34.7
+],
+[
+"2020-03-31",
+39.0
+],
+[
+"2020-06-30",
+39.4
+],
+[
+"2020-09-30",
+35.9
+],
+[
+"2020-12-31",
+32.9
+],
+[
+"2021-03-31",
+34.2
+],
+[
+"2021-06-30",
+33.9
+],
+[
+"2021-09-30",
+33.7
+],
+[
+"2021-12-31",
+32.6
+],
+[
+"2022-03-31",
+35.4
+],
+[
+"2022-06-30",
+34.9
+],
+[
+"2022-09-30",
+34.1
+],
+[
+"2022-12-31",
+33.7
+],
+[
+"2023-03-31",
+32.5
+],
+[
+"2023-06-30",
+32.3
+],
+[
+"2023-09-30",
+33.7
+],
+[
+"2023-12-31",
+33.2
+],
+[
+"2024-03-31",
+35.2
+],
+[
+"2024-06-30",
+34.6
+],
+[
+"2024-09-30",
+34.0
+],
+[
+"2024-12-31",
+34.2
+],
+[
+"2025-03-31",
+37.8
+],
+[
+"2025-06-30",
+39.6
+],
+[
+"2025-09-30",
+37.6
+],
+[
+"2025-12-31",
+36.8
+],
+[
+"2026-03-31",
+40.1
+],
+[
+"2026-06-30",
+41.2
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_PORTFOLIOLIQUIDITYLE1_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. The OFR estimates the proportion of gross assets that may be liquidated, assuming no fire-sale discounting, within specified periods reported on SEC Form PF question 32. The OFR adjusts the \u20180-1 day\u2019 category to include unencumbered cash based on SEC Form PF question 33. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: portfolio liquidity 0-1 day (percent of total)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYLE1_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent of total",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYGT1LE7_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+27.5
+],
+[
+"2013-06-30",
+27.2
+],
+[
+"2013-09-30",
+26.4
+],
+[
+"2013-12-31",
+27.6
+],
+[
+"2014-03-31",
+27.2
+],
+[
+"2014-06-30",
+27.0
+],
+[
+"2014-09-30",
+27.0
+],
+[
+"2014-12-31",
+26.3
+],
+[
+"2015-03-31",
+26.7
+],
+[
+"2015-06-30",
+26.5
+],
+[
+"2015-09-30",
+25.9
+],
+[
+"2015-12-31",
+26.2
+],
+[
+"2016-03-31",
+26.4
+],
+[
+"2016-06-30",
+25.5
+],
+[
+"2016-09-30",
+28.0
+],
+[
+"2016-12-31",
+26.3
+],
+[
+"2017-03-31",
+29.0
+],
+[
+"2017-06-30",
+29.2
+],
+[
+"2017-09-30",
+30.5
+],
+[
+"2017-12-31",
+29.6
+],
+[
+"2018-03-31",
+30.2
+],
+[
+"2018-06-30",
+30.3
+],
+[
+"2018-09-30",
+29.5
+],
+[
+"2018-12-31",
+29.4
+],
+[
+"2019-03-31",
+29.7
+],
+[
+"2019-06-30",
+30.0
+],
+[
+"2019-09-30",
+29.5
+],
+[
+"2019-12-31",
+29.1
+],
+[
+"2020-03-31",
+26.4
+],
+[
+"2020-06-30",
+26.4
+],
+[
+"2020-09-30",
+27.3
+],
+[
+"2020-12-31",
+27.9
+],
+[
+"2021-03-31",
+24.8
+],
+[
+"2021-06-30",
+25.1
+],
+[
+"2021-09-30",
+24.6
+],
+[
+"2021-12-31",
+24.8
+],
+[
+"2022-03-31",
+23.3
+],
+[
+"2022-06-30",
+24.1
+],
+[
+"2022-09-30",
+23.8
+],
+[
+"2022-12-31",
+23.9
+],
+[
+"2023-03-31",
+25.0
+],
+[
+"2023-06-30",
+26.2
+],
+[
+"2023-09-30",
+25.9
+],
+[
+"2023-12-31",
+25.7
+],
+[
+"2024-03-31",
+24.4
+],
+[
+"2024-06-30",
+25.4
+],
+[
+"2024-09-30",
+26.3
+],
+[
+"2024-12-31",
+26.4
+],
+[
+"2025-03-31",
+24.8
+],
+[
+"2025-06-30",
+23.9
+],
+[
+"2025-09-30",
+25.2
+],
+[
+"2025-12-31",
+25.9
+],
+[
+"2026-03-31",
+23.6
+],
+[
+"2026-06-30",
+23.6
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_PORTFOLIOLIQUIDITYGT1LE7_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. The OFR estimates the proportion of gross assets that may be liquidated, assuming no fire-sale discounting, within specified periods reported on SEC Form PF question 32. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: portfolio liquidity 2-7 days (percent of total)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYGT1LE7_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent of total",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYGT7LE90_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+22.4
+],
+[
+"2013-06-30",
+21.6
+],
+[
+"2013-09-30",
+21.6
+],
+[
+"2013-12-31",
+23.5
+],
+[
+"2014-03-31",
+22.8
+],
+[
+"2014-06-30",
+23.7
+],
+[
+"2014-09-30",
+23.5
+],
+[
+"2014-12-31",
+24.1
+],
+[
+"2015-03-31",
+23.5
+],
+[
+"2015-06-30",
+23.2
+],
+[
+"2015-09-30",
+22.2
+],
+[
+"2015-12-31",
+22.6
+],
+[
+"2016-03-31",
+21.2
+],
+[
+"2016-06-30",
+21.7
+],
+[
+"2016-09-30",
+22.6
+],
+[
+"2016-12-31",
+21.9
+],
+[
+"2017-03-31",
+21.6
+],
+[
+"2017-06-30",
+21.5
+],
+[
+"2017-09-30",
+21.5
+],
+[
+"2017-12-31",
+21.4
+],
+[
+"2018-03-31",
+20.0
+],
+[
+"2018-06-30",
+19.8
+],
+[
+"2018-09-30",
+19.0
+],
+[
+"2018-12-31",
+18.4
+],
+[
+"2019-03-31",
+19.5
+],
+[
+"2019-06-30",
+19.4
+],
+[
+"2019-09-30",
+19.0
+],
+[
+"2019-12-31",
+20.8
+],
+[
+"2020-03-31",
+18.8
+],
+[
+"2020-06-30",
+17.8
+],
+[
+"2020-09-30",
+20.5
+],
+[
+"2020-12-31",
+22.2
+],
+[
+"2021-03-31",
+22.7
+],
+[
+"2021-06-30",
+22.5
+],
+[
+"2021-09-30",
+22.4
+],
+[
+"2021-12-31",
+23.2
+],
+[
+"2022-03-31",
+20.9
+],
+[
+"2022-06-30",
+19.1
+],
+[
+"2022-09-30",
+19.6
+],
+[
+"2022-12-31",
+19.4
+],
+[
+"2023-03-31",
+18.8
+],
+[
+"2023-06-30",
+19.0
+],
+[
+"2023-09-30",
+18.1
+],
+[
+"2023-12-31",
+19.8
+],
+[
+"2024-03-31",
+19.3
+],
+[
+"2024-06-30",
+19.1
+],
+[
+"2024-09-30",
+19.2
+],
+[
+"2024-12-31",
+19.1
+],
+[
+"2025-03-31",
+17.6
+],
+[
+"2025-06-30",
+16.7
+],
+[
+"2025-09-30",
+17.5
+],
+[
+"2025-12-31",
+17.8
+],
+[
+"2026-03-31",
+16.8
+],
+[
+"2026-06-30",
+15.9
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_PORTFOLIOLIQUIDITYGT7LE90_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. The OFR estimates the proportion of gross assets that may be liquidated, assuming no fire-sale discounting, within specified periods reported on SEC Form PF question 32. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: portfolio liquidity 8-90 days (percent of total)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYGT7LE90_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent of total",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYGT90_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+10.9
+],
+[
+"2013-06-30",
+10.7
+],
+[
+"2013-09-30",
+11.1
+],
+[
+"2013-12-31",
+10.5
+],
+[
+"2014-03-31",
+10.2
+],
+[
+"2014-06-30",
+10.5
+],
+[
+"2014-09-30",
+10.3
+],
+[
+"2014-12-31",
+10.2
+],
+[
+"2015-03-31",
+9.8
+],
+[
+"2015-06-30",
+10.7
+],
+[
+"2015-09-30",
+11.2
+],
+[
+"2015-12-31",
+12.1
+],
+[
+"2016-03-31",
+12.2
+],
+[
+"2016-06-30",
+12.3
+],
+[
+"2016-09-30",
+12.0
+],
+[
+"2016-12-31",
+12.5
+],
+[
+"2017-03-31",
+12.6
+],
+[
+"2017-06-30",
+12.8
+],
+[
+"2017-09-30",
+12.8
+],
+[
+"2017-12-31",
+12.9
+],
+[
+"2018-03-31",
+13.0
+],
+[
+"2018-06-30",
+12.8
+],
+[
+"2018-09-30",
+13.2
+],
+[
+"2018-12-31",
+13.7
+],
+[
+"2019-03-31",
+13.6
+],
+[
+"2019-06-30",
+13.7
+],
+[
+"2019-09-30",
+14.6
+],
+[
+"2019-12-31",
+15.4
+],
+[
+"2020-03-31",
+15.9
+],
+[
+"2020-06-30",
+16.4
+],
+[
+"2020-09-30",
+16.3
+],
+[
+"2020-12-31",
+17.0
+],
+[
+"2021-03-31",
+18.3
+],
+[
+"2021-06-30",
+18.5
+],
+[
+"2021-09-30",
+19.2
+],
+[
+"2021-12-31",
+19.4
+],
+[
+"2022-03-31",
+20.5
+],
+[
+"2022-06-30",
+21.9
+],
+[
+"2022-09-30",
+22.4
+],
+[
+"2022-12-31",
+23.0
+],
+[
+"2023-03-31",
+23.7
+],
+[
+"2023-06-30",
+22.6
+],
+[
+"2023-09-30",
+22.3
+],
+[
+"2023-12-31",
+21.3
+],
+[
+"2024-03-31",
+21.2
+],
+[
+"2024-06-30",
+20.9
+],
+[
+"2024-09-30",
+20.4
+],
+[
+"2024-12-31",
+20.4
+],
+[
+"2025-03-31",
+19.8
+],
+[
+"2025-06-30",
+19.8
+],
+[
+"2025-09-30",
+19.6
+],
+[
+"2025-12-31",
+19.5
+],
+[
+"2026-03-31",
+19.5
+],
+[
+"2026-06-30",
+19.3
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_PORTFOLIOLIQUIDITYGT90_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. The OFR estimates the proportion of gross assets that may be liquidated, assuming no fire-sale discounting, within specified periods reported on SEC Form PF question 32. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: portfolio liquidity 91+ days (percent of total)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_PORTFOLIOLIQUIDITYGT90_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent of total",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_CANGATE_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+51.9
+],
+[
+"2013-06-30",
+52.3
+],
+[
+"2013-09-30",
+51.5
+],
+[
+"2013-12-31",
+51.4
+],
+[
+"2014-03-31",
+51.8
+],
+[
+"2014-06-30",
+52.2
+],
+[
+"2014-09-30",
+53.6
+],
+[
+"2014-12-31",
+52.8
+],
+[
+"2015-03-31",
+51.9
+],
+[
+"2015-06-30",
+51.5
+],
+[
+"2015-09-30",
+50.7
+],
+[
+"2015-12-31",
+50.5
+],
+[
+"2016-03-31",
+48.6
+],
+[
+"2016-06-30",
+49.1
+],
+[
+"2016-09-30",
+48.5
+],
+[
+"2016-12-31",
+47.0
+],
+[
+"2017-03-31",
+47.4
+],
+[
+"2017-06-30",
+47.0
+],
+[
+"2017-09-30",
+46.4
+],
+[
+"2017-12-31",
+46.0
+],
+[
+"2018-03-31",
+46.7
+],
+[
+"2018-06-30",
+47.1
+],
+[
+"2018-09-30",
+47.4
+],
+[
+"2018-12-31",
+47.2
+],
+[
+"2019-03-31",
+47.7
+],
+[
+"2019-06-30",
+47.9
+],
+[
+"2019-09-30",
+46.9
+],
+[
+"2019-12-31",
+48.0
+],
+[
+"2020-03-31",
+46.8
+],
+[
+"2020-06-30",
+47.4
+],
+[
+"2020-09-30",
+47.3
+],
+[
+"2020-12-31",
+48.5
+],
+[
+"2021-03-31",
+48.5
+],
+[
+"2021-06-30",
+47.1
+],
+[
+"2021-09-30",
+46.2
+],
+[
+"2021-12-31",
+44.9
+],
+[
+"2022-03-31",
+45.2
+],
+[
+"2022-06-30",
+47.7
+],
+[
+"2022-09-30",
+46.5
+],
+[
+"2022-12-31",
+45.6
+],
+[
+"2023-03-31",
+45.2
+],
+[
+"2023-06-30",
+44.7
+],
+[
+"2023-09-30",
+44.4
+],
+[
+"2023-12-31",
+43.6
+],
+[
+"2024-03-31",
+44.0
+],
+[
+"2024-06-30",
+44.4
+],
+[
+"2024-09-30",
+43.2
+],
+[
+"2024-12-31",
+43.3
+],
+[
+"2025-03-31",
+41.6
+],
+[
+"2025-06-30",
+43.0
+],
+[
+"2025-09-30",
+43.3
+],
+[
+"2025-12-31",
+43.4
+],
+[
+"2026-03-31",
+44.1
+],
+[
+"2026-06-30",
+45.1
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_CANGATE_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. The data are the share of hedge fund net assets that may be subjected to material restrictions on investor withdrawals (e.g., gates) based on SEC Form PF question 49(c). This relates to hedge fund advisers\u2019 right to impose gates and not just whether gates are currently imposed. A gate is a type of redemption term that limits the amount of investor outflows allowed. By capping redemptions, gates maintain liquidity and stability within the fund. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: net assets that may be subjected to material restrictions (gates) on investor withdrawals (percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31 00:00:00",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_CURRENTLYGATES_PERCENT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+1.6
+],
+[
+"2013-06-30",
+1.2
+],
+[
+"2013-09-30",
+1.6
+],
+[
+"2013-12-31",
+1.2
+],
+[
+"2014-03-31",
+1.2
+],
+[
+"2014-06-30",
+1.2
+],
+[
+"2014-09-30",
+1.1
+],
+[
+"2014-12-31",
+1.5
+],
+[
+"2015-03-31",
+1.3
+],
+[
+"2015-06-30",
+1.2
+],
+[
+"2015-09-30",
+1.2
+],
+[
+"2015-12-31",
+1.2
+],
+[
+"2016-03-31",
+1.1
+],
+[
+"2016-06-30",
+1.0
+],
+[
+"2016-09-30",
+1.1
+],
+[
+"2016-12-31",
+1.0
+],
+[
+"2017-03-31",
+0.9
+],
+[
+"2017-06-30",
+1.0
+],
+[
+"2017-09-30",
+1.0
+],
+[
+"2017-12-31",
+1.3
+],
+[
+"2018-03-31",
+1.2
+],
+[
+"2018-06-30",
+1.0
+],
+[
+"2018-09-30",
+1.1
+],
+[
+"2018-12-31",
+1.4
+],
+[
+"2019-03-31",
+1.2
+],
+[
+"2019-06-30",
+1.2
+],
+[
+"2019-09-30",
+1.3
+],
+[
+"2019-12-31",
+1.3
+],
+[
+"2020-03-31",
+1.7
+],
+[
+"2020-06-30",
+1.7
+],
+[
+"2020-09-30",
+1.5
+],
+[
+"2020-12-31",
+1.8
+],
+[
+"2021-03-31",
+2.0
+],
+[
+"2021-06-30",
+1.9
+],
+[
+"2021-09-30",
+2.0
+],
+[
+"2021-12-31",
+2.0
+],
+[
+"2022-03-31",
+2.0
+],
+[
+"2022-06-30",
+1.9
+],
+[
+"2022-09-30",
+2.0
+],
+[
+"2022-12-31",
+2.2
+],
+[
+"2023-03-31",
+2.1
+],
+[
+"2023-06-30",
+2.1
+],
+[
+"2023-09-30",
+1.9
+],
+[
+"2023-12-31",
+2.1
+],
+[
+"2024-03-31",
+2.2
+],
+[
+"2024-06-30",
+2.1
+],
+[
+"2024-09-30",
+2.4
+],
+[
+"2024-12-31",
+2.5
+],
+[
+"2025-03-31",
+2.6
+],
+[
+"2025-06-30",
+2.6
+],
+[
+"2025-09-30",
+2.6
+],
+[
+"2025-12-31",
+2.6
+],
+[
+"2026-03-31",
+2.4
+],
+[
+"2026-06-30",
+2.4
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_CURRENTLYGATES_PERCENT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. The data are the share of hedge fund net assets currently subject to material restrictions on investor withdrawals (e.g., gates) based on SEC Form PF question 49(e). See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: net assets with withdrawal restrictions (gates) imposed (percent)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Percent",
+"name": "Percent",
+"precision": 1
+}
+}
+},
+"FPF-ALLQHF_GAV_SUM": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+3883000000000.0
+],
+[
+"2013-06-30",
+3996000000000.0
+],
+[
+"2013-09-30",
+4118000000000.0
+],
+[
+"2013-12-31",
+4349000000000.0
+],
+[
+"2014-03-31",
+4580000000000.0
+],
+[
+"2014-06-30",
+4818000000000.0
+],
+[
+"2014-09-30",
+4927000000000.0
+],
+[
+"2014-12-31",
+4913000000000.0
+],
+[
+"2015-03-31",
+5307000000000.0
+],
+[
+"2015-06-30",
+5262000000000.0
+],
+[
+"2015-09-30",
+5174000000000.0
+],
+[
+"2015-12-31",
+4975000000000.0
+],
+[
+"2016-03-31",
+4985000000000.0
+],
+[
+"2016-06-30",
+5092000000000.0
+],
+[
+"2016-09-30",
+5240000000000.0
+],
+[
+"2016-12-31",
+5208000000000.0
+],
+[
+"2017-03-31",
+5515000000000.0
+],
+[
+"2017-06-30",
+5675000000000.0
+],
+[
+"2017-09-30",
+5882000000000.0
+],
+[
+"2017-12-31",
+5887000000000.0
+],
+[
+"2018-03-31",
+6107000000000.0
+],
+[
+"2018-06-30",
+6310000000000.0
+],
+[
+"2018-09-30",
+6434000000000.0
+],
+[
+"2018-12-31",
+6180000000000.0
+],
+[
+"2019-03-31",
+6510000000000.0
+],
+[
+"2019-06-30",
+6718000000000.0
+],
+[
+"2019-09-30",
+6639000000000.0
+],
+[
+"2019-12-31",
+6702000000000.0
+],
+[
+"2020-03-31",
+6239000000000.0
+],
+[
+"2020-06-30",
+6403000000000.0
+],
+[
+"2020-09-30",
+6825000000000.0
+],
+[
+"2020-12-31",
+7105000000000.0
+],
+[
+"2021-03-31",
+7235000000000.0
+],
+[
+"2021-06-30",
+7895000000000.0
+],
+[
+"2021-09-30",
+8316000000000.0
+],
+[
+"2021-12-31",
+8323000000000.0
+],
+[
+"2022-03-31",
+8258000000000.0
+],
+[
+"2022-06-30",
+7920000000000.0
+],
+[
+"2022-09-30",
+7701000000000.0
+],
+[
+"2022-12-31",
+7825000000000.0
+],
+[
+"2023-03-31",
+8025000000000.0
+],
+[
+"2023-06-30",
+8447000000000.0
+],
+[
+"2023-09-30",
+8766000000000.0
+],
+[
+"2023-12-31",
+9209000000000.0
+],
+[
+"2024-03-31",
+9490000000000.0
+],
+[
+"2024-06-30",
+9626000000000.0
+],
+[
+"2024-09-30",
+10425000000000.0
+],
+[
+"2024-12-31",
+10258000000000.0
+],
+[
+"2025-03-31",
+10939000000000.0
+],
+[
+"2025-06-30",
+11811000000000.0
+],
+[
+"2025-09-30",
+12205000000000.0
+],
+[
+"2025-12-31",
+12589000000000.0
+],
+[
+"2026-03-31",
+12779000000000.0
+],
+[
+"2026-06-30",
+13863000000000.0
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_GAV_SUM",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Gross assets are based on SEC Form PF question 8. Gross assets reflect the market value of balance sheet assets. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: gross assets (U.S. dollars)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-STRATEGY_CREDIT_GAV_SUM",
+"FPF-STRATEGY_EQUITY_GAV_SUM",
+"FPF-STRATEGY_EVENT_GAV_SUM",
+"FPF-STRATEGY_FOF_GAV_SUM",
+"FPF-STRATEGY_FUTURES_GAV_SUM",
+"FPF-STRATEGY_MACRO_GAV_SUM",
+"FPF-STRATEGY_MULTI_GAV_SUM",
+"FPF-STRATEGY_OTHER_GAV_SUM",
+"FPF-STRATEGY_RV_GAV_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "U.S. dollars",
+"precision": 0
+}
+}
+},
+"FPF-ALLQHF_NAV_SUM": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+2042000000000.0
+],
+[
+"2013-06-30",
+2085000000000.0
+],
+[
+"2013-09-30",
+2171000000000.0
+],
+[
+"2013-12-31",
+2388000000000.0
+],
+[
+"2014-03-31",
+2463000000000.0
+],
+[
+"2014-06-30",
+2612000000000.0
+],
+[
+"2014-09-30",
+2591000000000.0
+],
+[
+"2014-12-31",
+2658000000000.0
+],
+[
+"2015-03-31",
+2828000000000.0
+],
+[
+"2015-06-30",
+2847000000000.0
+],
+[
+"2015-09-30",
+2736000000000.0
+],
+[
+"2015-12-31",
+2714000000000.0
+],
+[
+"2016-03-31",
+2646000000000.0
+],
+[
+"2016-06-30",
+2654000000000.0
+],
+[
+"2016-09-30",
+2729000000000.0
+],
+[
+"2016-12-31",
+2733000000000.0
+],
+[
+"2017-03-31",
+2816000000000.0
+],
+[
+"2017-06-30",
+2897000000000.0
+],
+[
+"2017-09-30",
+2987000000000.0
+],
+[
+"2017-12-31",
+3046000000000.0
+],
+[
+"2018-03-31",
+3105000000000.0
+],
+[
+"2018-06-30",
+3153000000000.0
+],
+[
+"2018-09-30",
+3185000000000.0
+],
+[
+"2018-12-31",
+2956000000000.0
+],
+[
+"2019-03-31",
+3117000000000.0
+],
+[
+"2019-06-30",
+3157000000000.0
+],
+[
+"2019-09-30",
+3173000000000.0
+],
+[
+"2019-12-31",
+3221000000000.0
+],
+[
+"2020-03-31",
+2862000000000.0
+],
+[
+"2020-06-30",
+3211000000000.0
+],
+[
+"2020-09-30",
+3398000000000.0
+],
+[
+"2020-12-31",
+3575000000000.0
+],
+[
+"2021-03-31",
+3738000000000.0
+],
+[
+"2021-06-30",
+4051000000000.0
+],
+[
+"2021-09-30",
+4166000000000.0
+],
+[
+"2021-12-31",
+4182000000000.0
+],
+[
+"2022-03-31",
+4136000000000.0
+],
+[
+"2022-06-30",
+3873000000000.0
+],
+[
+"2022-09-30",
+3769000000000.0
+],
+[
+"2022-12-31",
+3778000000000.0
+],
+[
+"2023-03-31",
+3880000000000.0
+],
+[
+"2023-06-30",
+3940000000000.0
+],
+[
+"2023-09-30",
+3964000000000.0
+],
+[
+"2023-12-31",
+3962000000000.0
+],
+[
+"2024-03-31",
+4129000000000.0
+],
+[
+"2024-06-30",
+4126000000000.0
+],
+[
+"2024-09-30",
+4292000000000.0
+],
+[
+"2024-12-31",
+4213000000000.0
+],
+[
+"2025-03-31",
+4319000000000.0
+],
+[
+"2025-06-30",
+4546000000000.0
+],
+[
+"2025-09-30",
+4743000000000.0
+],
+[
+"2025-12-31",
+4849000000000.0
+],
+[
+"2026-03-31",
+4994000000000.0
+],
+[
+"2026-06-30",
+5511000000000.0
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_NAV_SUM",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. Net assets are based on SEC Form PF question 9. Net assets measure the difference between gross assets and liabilities. In other words, net assets reflect the equity of investors in hedge funds. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: net assets (U.S. dollars)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-STRATEGY_CREDIT_NAV_SUM",
+"FPF-STRATEGY_EQUITY_NAV_SUM",
+"FPF-STRATEGY_EVENT_NAV_SUM",
+"FPF-STRATEGY_FOF_NAV_SUM",
+"FPF-STRATEGY_FUTURES_NAV_SUM",
+"FPF-STRATEGY_MACRO_NAV_SUM",
+"FPF-STRATEGY_MULTI_NAV_SUM",
+"FPF-STRATEGY_OTHER_NAV_SUM",
+"FPF-STRATEGY_RV_NAV_SUM"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Value",
+"name": "U.S. dollars",
+"precision": 0
+}
+}
+},
+"FPF-ALLQHF_COUNT": {
+"timeseries": {
+"aggregation": [
+[
+"2013-03-31",
+1219.0
+],
+[
+"2013-06-30",
+1244.0
+],
+[
+"2013-09-30",
+1312.0
+],
+[
+"2013-12-31",
+1351.0
+],
+[
+"2014-03-31",
+1400.0
+],
+[
+"2014-06-30",
+1433.0
+],
+[
+"2014-09-30",
+1439.0
+],
+[
+"2014-12-31",
+1509.0
+],
+[
+"2015-03-31",
+1542.0
+],
+[
+"2015-06-30",
+1569.0
+],
+[
+"2015-09-30",
+1597.0
+],
+[
+"2015-12-31",
+1610.0
+],
+[
+"2016-03-31",
+1580.0
+],
+[
+"2016-06-30",
+1583.0
+],
+[
+"2016-09-30",
+1600.0
+],
+[
+"2016-12-31",
+1621.0
+],
+[
+"2017-03-31",
+1661.0
+],
+[
+"2017-06-30",
+1704.0
+],
+[
+"2017-09-30",
+1717.0
+],
+[
+"2017-12-31",
+1774.0
+],
+[
+"2018-03-31",
+1743.0
+],
+[
+"2018-06-30",
+1784.0
+],
+[
+"2018-09-30",
+1801.0
+],
+[
+"2018-12-31",
+1793.0
+],
+[
+"2019-03-31",
+1766.0
+],
+[
+"2019-06-30",
+1755.0
+],
+[
+"2019-09-30",
+1779.0
+],
+[
+"2019-12-31",
+1795.0
+],
+[
+"2020-03-31",
+1799.0
+],
+[
+"2020-06-30",
+1794.0
+],
+[
+"2020-09-30",
+1763.0
+],
+[
+"2020-12-31",
+1776.0
+],
+[
+"2021-03-31",
+1845.0
+],
+[
+"2021-06-30",
+1940.0
+],
+[
+"2021-09-30",
+2003.0
+],
+[
+"2021-12-31",
+2062.0
+],
+[
+"2022-03-31",
+2073.0
+],
+[
+"2022-06-30",
+2034.0
+],
+[
+"2022-09-30",
+2016.0
+],
+[
+"2022-12-31",
+2043.0
+],
+[
+"2023-03-31",
+2019.0
+],
+[
+"2023-06-30",
+2077.0
+],
+[
+"2023-09-30",
+2082.0
+],
+[
+"2023-12-31",
+2076.0
+],
+[
+"2024-03-31",
+2087.0
+],
+[
+"2024-06-30",
+1996.0
+],
+[
+"2024-09-30",
+2054.0
+],
+[
+"2024-12-31",
+2029.0
+],
+[
+"2025-03-31",
+2053.0
+],
+[
+"2025-06-30",
+2085.0
+],
+[
+"2025-09-30",
+2117.0
+],
+[
+"2025-12-31",
+2146.0
+],
+[
+"2026-03-31",
+2207.0
+],
+[
+"2026-06-30",
+2257.0
+]
+]
+},
+"metadata": {
+"mnemonic": "FPF-ALLQHF_COUNT",
+"description": {
+"notes": "The data are aggregated responses to SEC Form PF. Blank or null values are intentional to avoid potential disclosure of proprietary information of individual filers. Only responses from Qualifying Hedge Funds are included. See additional definitions and methodology on the SEC Form PF Data Sets page of the Hedge Fund Monitor.",
+"name": "Qualifying Hedge Funds: number of Qualifying Hedge Funds (count)",
+"description": "",
+"vintage_approach": "Current vintage, as of last update",
+"subsetting": "None",
+"subtype": "None"
+},
+"schedule": {
+"observation_period": "End of Quarter",
+"observation_frequency": "Quarterly",
+"start_date": "2013-03-31 00:00:00",
+"last_update": "2026-09-16 15:19:27"
+},
+"rights": {
+"description": ""
+},
+"parents": [],
+"release": {
+"long_name": "Hedge Fund Aggregated Statistics from SEC Form PF Filings",
+"href": "/hedge-fund-monitor/datasets/fpf/",
+"frequency": "Quarterly",
+"short_name": "Form PF Statistics"
+},
+"children": [
+"FPF-ALLQHF_ALTERNATE_COUNT",
+"FPF-ALLQHF_NO_COUNTNA",
+"FPF-ALLQHF_NR_COUNT",
+"FPF-ALLQHF_RNT_COUNT",
+"FPF-ALLQHF_RT_COUNT",
+"FPF-ALLQHF_YES_COUNT",
+"FPF-STRATEGY_CREDIT_COUNT",
+"FPF-STRATEGY_EQUITY_COUNT",
+"FPF-STRATEGY_EVENT_COUNT",
+"FPF-STRATEGY_FOF_COUNT",
+"FPF-STRATEGY_FUTURES_COUNT",
+"FPF-STRATEGY_MACRO_COUNT",
+"FPF-STRATEGY_MULTI_COUNT",
+"FPF-STRATEGY_OTHER_COUNT",
+"FPF-STRATEGY_RV_COUNT"
+],
+"unit": {
+"display_magnitude": 0,
+"magnitude": 0,
+"type": "Count",
+"name": "Count",
+"precision": 0
+}
+}
+}
+}

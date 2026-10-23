@@ -224,6 +224,11 @@
   "canYearsIndep": "25",
   "canConvex": "0.084",
   "canConvexBp": "8.4",
+  "canYieldEndDate": "29 September 2026",
+  "canYieldEnd": "3.69",
+  "canYieldEndCc": "3.66",
+  "canCarryBp": "366",
+  "canConvexShare": "2.2",
   "canConvexRealMed": "0.069"
  },
  "RAW": {
@@ -748,6 +753,10 @@
   "canYearsIndep": 24.543650793650794,
   "canConvex": 0.0840971698096807,
   "canConvexBp": 8.409716980968069,
+  "canYieldEnd": 3.69,
+  "canYieldEndCc": 3.6563727356024804,
+  "canCarryBp": 365.63727356024805,
+  "canConvexShare": 2.24830494393228,
   "canConvexRealMed": 0.06939999999999996
  }
 }

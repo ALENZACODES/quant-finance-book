@@ -26,16 +26,16 @@ Canada yields.
 Most results are proved where they are stated and then checked with a number; a few standard
 theorems, such as Descartes' rule of signs, Chebyshev\index{Chebyshev}'s inequality and the central limit theorem, are
 used without proof. The worked examples can be done with a calculator. The figures and the
-quoted numbers come from the scripts in \texttt{code/ch01/}, and every simulation draws from NumPy's
+quoted numbers come from the scripts in \texttt{code/ch01/}, and every simulation draws\ix{Simulation} from NumPy's
 default generator with seed 101. The scripts share one generator, \texttt{default\_rng(101)}, which
 \texttt{run\_all.py} passes from script to script in a fixed order; a script run on its own first
-replays the draws made before it, so it prints the same numbers. The short Jarque-Bera\index{Jarque-Bera} listing starts
+replays the draws made before it, so it prints the same numbers. The short Jarque-Bera\ix{Jarque-Bera test}\index{Jarque-Bera} listing starts
 a fresh \texttt{default\_rng(101)}, and the Jarque-Bera run at $n=60$ uses
 \texttt{default\_rng([101, 60])}, the same seed with a stream number. A test checks that no script
 draws from any other generator.
 \end{keybox}
 
-Suppose a pension plan pays a private equity manager 2\% of its commitment every year plus a fifth
+Suppose a pension plan\ix{Pension plan} pays a private equity manager 2\% of its commitment every year plus a fifth
 of the profits. Ten years later the trustees want to know what the money bought, and the answer
 needs a return, a measure of the risk taken and a fair comparison with what the plan could have
 earned elsewhere. A fee that buys nothing, or a risk the trustees did not know they were running,
@@ -45,12 +45,12 @@ such figures is the subject of this chapter.
 
 A farmland partnership is alternative twice over: appraisers set the value of its farms, and the
 fund that holds them cannot be redeemed for ten years. There is no single accepted definition of an
-alternative investment. For this chapter a more useful test is
+alternative investment\ix{Alternative investments}. For this chapter a more useful test is
 whether the liquidity, the valuation or the payoff of an investment differs materially from that of
 a conventional public portfolio. Many private alternative funds are limited partnerships with negotiated terms, while some
 alternatives, such as listed
-infrastructure and exchange-traded commodity products, trade on public markets. What they share is
-the trouble they make for a performance measure: returns that are asymmetric, values that are
+infrastructure and exchange-traded commodity products, trade on public markets\ix{Public markets}. What they share is
+the trouble they make for a performance measure\ix{Performance measurement}: returns that are asymmetric, values that are
 appraised instead of traded, and fees that make comparison with a public portfolio difficult.
 
 \FloatBarrier
@@ -60,13 +60,13 @@ appraised instead of traded, and fees that make comparison with a public portfol
 
 \subsection{Quoted rates and growth}
 
-Let $P$ be an amount invested for $T$ years at an annual rate $r$. Under \emph{simple interest}\index{simple interest} the
+Let $P$ be an amount invested for $T$ years at an annual rate\ix{Annual rate} $r$. Under \emph{simple interest}\index{Simple interest} the
 interest is paid on the principal only, so the terminal value is $P(1+rT)$. Under \emph{compound
-interest} with $m$ compounding periods per year, interest earns interest at the end of each period:
+interest} with $m$ compounding\ix{Compounding} periods per year, interest earns interest at the end of each period:
 \begin{equation}\label{eq:periodic}
   V_T = P\left(1+\frac{r}{m}\right)^{mT}.
 \end{equation}
-The rate $r$ in \cref{eq:periodic} is a \emph{nominal} or quoted rate. The \emph{effective annual rate}\index{effective annual rate}
+The rate $r$ in \cref{eq:periodic} is a \emph{nominal} or quoted rate\ix{Quoted rate}. The \emph{effective annual rate\ix{Effective annual rate}}\index{Effective annual rate}
 is the growth over one year, $r_{\mathrm{eff}} = (1+r/m)^m - 1$. For a positive quoted rate, the case
 used throughout, the effective rate rises as $m$ grows, but it does not grow without bound.
 
@@ -78,7 +78,7 @@ For $m>\lvert r\rvert$ the base $1+r/m$ is positive, so $(1+r/m)^m = \exp\{m\ln(
 $x=r/m$ gives $m\ln(1+r/m) = r - r^2/(2m) + O(m^{-2}) \to r$, and the exponential is continuous.
 \end{proof}
 
-The limit defines \emph{continuous compounding}\index{continuous compounding}: $V_T = Pe^{rT}$. Continuous rates are the natural
+The limit defines \emph{continuous compounding\ix{Continuous compounding}}\index{Continuous compounding}: $V_T = Pe^{rT}$. Continuous rates are the natural
 language of derivatives pricing and of the stochastic models in later chapters. Converting between
 conventions only requires that the two give the same growth over a year: a continuously compounded
 rate $r_c$ and an annual effective rate $r_a$ are equivalent when $e^{r_c} = 1+r_a$, so
@@ -107,7 +107,7 @@ annual and continuous compounding is closed by quarterly compounding.
 
 Let a position be worth $V_{t-1}>0$ at the start of a period and $V_t$ at the end, and let $D_t$ be
 any cash it pays the holder during the period. The \emph{simple} or total return is
-$R_t = (V_t+D_t-V_{t-1})/V_{t-1}$ and the \emph{log return}\index{log return}, or continuously compounded return, is
+$R_t = (V_t+D_t-V_{t-1})/V_{t-1}$ and the \emph{log return\ix{Log return}}\index{Log return}, or continuously compounded\ix{Compounding} return, is
 $r_t = \ln(1+R_t)$. The logarithm needs $1+R_t>0$, so a total loss has no finite log return. Here $D_t$ is treated as paid at the end of the period; a payment made part way
 through is handled by splitting the period at the payment date. If the cash is reinvested in the
 position, a holder's wealth $W_t$ grows by the factor $1+R_t$ each period. Each kind of return has one property the other lacks.
@@ -115,7 +115,7 @@ position, a holder's wealth $W_t$ grows by the factor $1+R_t$ each period. Each 
 \begin{proposition}\label{prop:additivity}
 (i) Log returns add over time: if $W_t = W_{t-1}(1+R_t)$ with every $W_t>0$, the log return from $0$
 to $T$, $\ln(W_T/W_0)$, equals $\sum_{t=1}^T r_t$.
-(ii) Simple returns add across assets: if a portfolio holds value weights $w_i$ (summing to one) at
+(ii) Simple returns\ix{Simple return} add across assets: if a portfolio holds value weights $w_i$ (summing to one) at
 the start of the period and no money is added or withdrawn during it, its simple return is
 $R_p = \sum_i w_i R_i$.
 \end{proposition}
@@ -127,7 +127,7 @@ $V_{p,t} = \sum_i w_i V_{p,t-1}(1+R_i)$ and $V_{p,t}/V_{p,t-1}-1 = \sum_i w_i R_
 \end{proof}
 
 Neither property carries over to the other definition. The log return of a portfolio is not the
-weighted average of the constituents' log returns, and simple returns compound rather than add. Log
+weighted average\ix{Weighted average} of the constituents' log returns, and simple returns compound rather than add. Log
 returns make compounding through time simple, which is why they are used for multi-period growth,
 volatility scaling and the stochastic models of Chapters~3 and~5. Simple returns aggregate exactly
 across assets over a common period, which is why they are used for portfolio returns and
@@ -135,11 +135,11 @@ attribution. Neither choice removes the need to account for cash flows or for se
 
 \begin{example}{Up 50\%, down a third}\label{ex:updown}
 A fund unit goes from 100 to 150 and back to 100. The simple returns are $+50\%$ and $-33.33\%$, with
-an arithmetic mean of $+8.33\%$ per period, although the investor ends where they began. The log
+an arithmetic mean\ix{Arithmetic mean} of $+8.33\%$ per period, although the investor ends where they began. The log
 returns are $\ln 1.5 = \upLog\%$ and $\ln(100/150) = \downLog\%$, which sum to zero. The arithmetic
-mean of simple returns overstates the growth rate whenever returns vary. When returns are small,
+mean of simple returns overstates the growth rate\ix{Growth rate} whenever returns vary. When returns are small,
 the mean log return is close to the arithmetic mean of the simple returns less half their variance,
-and the compound growth rate, the exponential of the mean log return less one, is close to the mean
+and the compound growth rate\ix{Compound growth rate}, the exponential of the mean log return less one, is close to the mean
 log return itself. Here,
 with the variance computed by dividing by the number of periods, that gives
 $\udMean\%-\udHalfVar\%=\udApprox\%$ against a true growth rate of 0\%. With the sample variance, which divides by one less, it gives
@@ -158,7 +158,7 @@ The gap matters for volatile strategies and for any fee or hurdle computed on ar
 
 Private funds call capital from investors when deals are found and return it when deals are sold.
 The investor does not control the timing, so a return measure for the fund should reflect the actual
-dates and sizes of the flows. The \emph{internal rate of return}\index{internal rate of return} does this, though on its own it
+dates and sizes of the flows. The \emph{internal rate of return\ix{Internal rate of return}\ix{Rate of return}}\index{Internal rate of return} does this, though on its own it
 does not say whether the fund did better than a public alternative; \cref{sec:multiples} returns to
 that question.
 
@@ -175,16 +175,16 @@ becomes $(1+\IRR)^{-t_j}$.
 The IRR is a money-weighted return: it depends jointly on the amounts and dates of all contributions,
 distributions and the terminal value. For
 a fund that has not finished, the \emph{since-inception} or \emph{interim} IRR treats the current net
-asset value (NAV) as if it were a final distribution received today. That makes the interim IRR only
+asset value\ix{Net asset value} (NAV) as if it were a final distribution received today. That makes the interim IRR only
 as good as the NAV, a point that drives the J-curve\index{J-curve} in \cref{sec:jcurve}.
 
 \subsection{Fund A}
 
 Fund A, used from here to \cref{sec:multiples}, is small enough to check with a calculator and
-still shows the J-curve, the fee drag and the IRR's blind spots. Fund A buys one deal a year for
-five years, at costs of 20, 22, 20, 15 and 10. Each deal gains 15\% a year in economic value and is
+still shows the J-curve, the fee drag\ix{Fee drag} and the IRR's blind spots. Fund A buys one deal a year for
+five years, at costs of 20, 22, 20, 15 and 10. Each deal gains 15\% a year in economic value\ix{Economic value} and is
 sold after five years. The fund charges a fee of 2 a year for nine years; in years 0 to 4 the fee is
-called from investors together with the deal cost, and in years 5 to 8 it is deducted from
+called from investors\ix{Investor} together with the deal cost, and in years 5 to 8 it is deducted from
 distributions. Reporting is conservative: a deal is carried at 90\% of cost in the year it is bought,
 at cost in its next two years, and at economic value from its third anniversary until it is sold.
 \Cref{tab:funda} lists the flows to investors and the reported NAV after each date's flows.
@@ -208,16 +208,16 @@ at cost in its next two years, and at economic value from its third anniversary 
 Investors pay in \fundPaidIn{} and receive \fundDistrib. Solving \cref{eq:irr} for the net flows
 (distributions minus contributions) gives a final IRR of \fundIRR\%, below the 15\% earned by each deal
 because of the management fee. With the fee set to zero, every deal's flows and the fund's flows
-have an IRR of exactly \fundIRRNoFee\%, so the whole gap of \feeDrag{} percentage points is the drag
-of the fee. No formula in radicals solves every polynomial of degree five or more, and the fund's NPV is a polynomial of degree nine in $1/(1+r)$, so the IRR is found
-numerically. Newton's method, $r_{k+1} = r_k - \NPV(r_k)/\NPV'(r_k)$,
+have an IRR of exactly \fundIRRNoFee\%, so the whole gap of \feeDrag{} percentage points\ix{Percentage point} is the drag
+of the fee. No formula in radicals solves every polynomial of degree five or more, and the fund's NPV\ix{Net present value} is a polynomial of degree nine in $1/(1+r)$, so the IRR is found
+numerically\ix{Numerical methods}. Newton's method\ix{Newton's method}, $r_{k+1} = r_k - \NPV(r_k)/\NPV'(r_k)$,
 usually converges in a handful of steps from a sensible start, but no start guarantees it. The
 listing raises an error if the derivative is zero or a Newton step reaches or crosses $-100\%$. It
 stops when a step is small, which does not by itself show that the NPV is small at the answer:
 \Needspace*{21\baselineskip}
 \lstinputlisting[language=Python]{code/ch01/snippets/irr_newton.py}
 Run as shown, on the two-decimal flows of \cref{tab:funda}, the listing prints 11.5298\%; the
-unrounded flows give 11.5294\%, and both round to \fundIRR\%. Production code is better off bracketing the root and using Brent's method, as
+unrounded flows give 11.5294\%, and both round to \fundIRR\%. Production code is better off bracketing the root and using Brent's method\ix{Root finding}, as
 \texttt{ch01lib.irr\_all} does, because Newton's method can also converge to the wrong root when there
 is more than one. The \texttt{irr} function of \texttt{numpy-financial} \parencite{numpyfinancial}
 returns the same value.
@@ -227,16 +227,16 @@ returns the same value.
 \section{Why young funds look bad}
 \label{sec:jcurve}
 
-In the early years of a drawdown fund the interim IRR is often negative even when the fund will end
+In the early years of a drawdown fund the interim IRR\ix{Interim IRR} is often negative even when the fund will end
 up doing well. Fees are charged on committed capital from the first day, before investments have had time to grow.
 Some transaction and organisational costs are expensed at once; others are capitalised into the cost
-of an investment, depending on the fund's accounting policy. Valuation adds to the effect. Fair value
+of an investment, depending on the fund's accounting policy. Valuation\ix{Valuation} adds to the effect. Fair value
 estimates can rise or fall before an asset is sold, depending on the evidence available and the
 fund's valuation policy, and in some funds the evidence needed to justify a higher value arrives later than the evidence for
 an impairment. Fund A's rule of 90\% of cost in the year of
 purchase and cost for two more years is a stylised version of that caution.
 
-\Cref{fig:jcurve} shows the result for Fund A. Cumulative net cash flow to investors falls to
+\Cref{fig:jcurve} shows the result for Fund A. Cumulative net cash\ix{Cumulative net cash flow} flow to investors falls to
 \cumTrough{} at year \cumTroughYear{} and turns positive in year \breakEvenYear. The interim IRR starts
 at \interimOne\% after one year and \interimTwo\% after two, is close to zero (\interimThree\%) after
 three, and reaches \interimFive\% after five. From year 7 it stays within ten basis points of the
@@ -262,8 +262,8 @@ interim IRR in its first two years should prompt questions about how its assets 
 \subsection{Several roots, or none}
 
 Write $x = 1/(1+r)$. Then \cref{eq:irr} is the polynomial equation $\sum_t \mathrm{CF}_t x^t = 0$, and
-Descartes' rule of signs bounds the number of positive roots $x$ (hence the number of IRRs above
-$-100\%$) by the number of sign changes in the sequence of cash flows. Descartes' rule gives only an upper
+Descartes\ix{Sign rule}' rule of signs bounds the number of positive roots $x$ (hence the number of IRRs\ix{Internal rate of return} above
+$-100\%$) by the number of sign changes in the sequence of cash flows\ix{Cash flow}. Descartes' rule gives only an upper
 bound. For the commonest pattern there is a sharper statement with a direct proof.
 
 \begin{definition}\label{def:conventional}
@@ -306,11 +306,11 @@ The last statement of \cref{prop:uniqueirr} is what makes the IRR rule work for 
 projects: accepting when the IRR exceeds the cost of capital $r$ is the same as accepting when
 $\NPV(r)>0$. Fund A is of this kind, and panel (a) of \cref{fig:npvprofiles} shows its single crossing.
 
-When cash flows change sign more than once, the NPV equation can have several IRRs or none. Consider $-100$ now, $+230$ in a year
+When cash flows change sign more than once, the NPV\ix{Net present value} equation can have several IRRs or none. Consider $-100$ now, $+230$ in a year
 and $-132$ in two years, a pattern that arises when a fund recalls distributions or a project has
 clean-up costs. Setting $-100 + 230x - 132x^2 = 0$ gives $x = (230\pm 10)/264$, so the IRR is both
 \multiLo\% and \multiHi\% (panel (b)). Both solve the defining equation, so the IRR cannot say on
-its own whether the project is worth doing; the NPV is positive only for discount rates between the
+its own whether the project is worth doing; the NPV is positive only for discount rates\ix{Discount rate} between the
 two. Now consider $+100$, $-300$, $+250$, a
 borrowing-type pattern in which money is received first. The quadratic $100 - 300x + 250x^2$ has a
 negative discriminant, $300^2 - 4\cdot 100\cdot 250 < 0$, so there is no real IRR at all; the NPV is
@@ -329,15 +329,15 @@ positive at every discount rate, with a minimum value of \noneMinNPV{} (panel (c
 
 The IRR is a rate and says nothing about the amount of wealth created. A deal that turns 1 into 2 in a
 year has an IRR of 100\%, while one that turns 1{,}000 into 1{,}500 has 50\%; if only one can be
-done, the first has the higher rate but creates far less wealth at any ordinary cost of capital. Timing creates a subtler problem. Compare a short project, $-100$ now and $+130$ in a year,
+done, the first has the higher rate but creates far less wealth at any ordinary cost of capital\ix{Cost of capital}. Timing creates a subtler problem. Compare a short project, $-100$ now and $+130$ in a year,
 with a long project, $-100$ now and $+200$ in three years. Their IRRs are \irrShort\% and \irrLong\%, so
-IRR ranks the short project first. Their NPVs are equal where
+IRR ranks the short project first. Their NPVs\ix{Net present value} are equal where
 \begin{equation*}
   -100 + \frac{130}{1+r} = -100 + \frac{200}{(1+r)^3}
   \iff (1+r)^2 = \frac{200}{130}
   \iff r = \sqrt{200/130}-1 = \crossRate\% ,
 \end{equation*}
-the \emph{crossover rate}\index{crossover rate}. At any cost of capital below \crossRate\% the long project creates more
+the \emph{crossover rate}\index{Crossover rate}. At any cost of capital below \crossRate\% the long project creates more
 value; at 10\% its NPV is \npvLongTenAbs{} against \npvShortTenAbs{} for the short one
 (\cref{fig:crossover}). The decision rule here is NPV at the cost of capital, and it needs no
 assumption about what happens to the 130. Reinvestment enters only if we ask a different question,
@@ -355,20 +355,20 @@ whose cash flows fall on different dates.
 
 \subsection{IRRs do not average}
 
-Fund X pays $-100$ then $+150$ a year later (IRR \irrX\%); Fund Y pays $-100$ then
+Fund X pays $-100$ then $+150$ a year later (IRR\ix{Internal rate of return} \irrX\%); Fund Y pays $-100$ then
 $+121$ two years later (IRR \irrY\%). A portfolio holding both has flows $-200$, $+150$, $+121$ and an
 IRR of \irrXY\%, not the simple average of 30\%. The combined IRR solves one NPV equation for all the dated flows, so it is no fixed-weight average
 of the two IRRs; Fund Y keeps its capital at work for longer and pulls the result towards its own
 rate. This matters whenever IRRs
-of funds, vintages or deals are averaged in a pitch book or a database.
+of funds, vintages\ix{Vintage year} or deals are averaged in a pitch book or a database.
 
 \subsection{Reinvestment and the IRR}
 
-Computing an IRR assumes nothing about what an investor does with a distribution: it is a rate at
-which the net present value of the flows is zero. Reinvestment enters only when the IRR is read as
+Computing an IRR\ix{Internal rate of return} assumes nothing about what an investor does with a distribution: it is a rate at
+which the net present value of the flows is zero. Reinvestment\ix{Reinvestment} enters only when the IRR is read as
 the rate at which the investor's total wealth grew. That reading needs an assumption about money
 outside the fund: it holds when every interim distribution is reinvested at the IRR and every later
-contribution would otherwise have earned the IRR, because at that rate the compounded inflows exactly
+contribution would otherwise have earned the IRR, because at that rate the compounded\ix{Compounding} inflows exactly
 match the compounded outflows. When a fund with a high IRR makes a large early distribution that the investor can only reinvest
 at a lower rate, the reading overstates the growth of the investor's wealth. The same arithmetic lets
 a quick early exit lift a fund's IRR far more than its multiple \parencite{phalippou2008}. The modified
@@ -381,17 +381,17 @@ IRR makes the reinvestment rate explicit.
 
 \subsection{The modified IRR}
 
-The \emph{modified internal rate of return}\index{modified internal rate of return} builds one annualised rate from explicit financing and
-reinvestment rates: a finance rate $f>-1$ at which outflows are discounted to date $0$, and a
+The \emph{modified internal rate of return\ix{Internal rate of return}}\index{Modified internal rate of return} builds one annualised rate from explicit financing and
+reinvestment\ix{Reinvestment} rates: a finance rate $f>-1$ at which outflows are discounted to date $0$, and a
 reinvestment rate $\rho>-1$ at which inflows are compounded to date $T>0$. With $\mathrm{CF}_t^- = \min(\mathrm{CF}_t,0)$
 and $\mathrm{CF}_t^+ = \max(\mathrm{CF}_t,0)$,
 \begin{equation}\label{eq:mirr}
   \MIRR = \left(\frac{\sum_t \mathrm{CF}_t^+(1+\rho)^{T-t}}{-\sum_t \mathrm{CF}_t^-(1+f)^{-t}}\right)^{1/T}-1 .
 \end{equation}
-Because the right-hand side is an explicit formula, the MIRR always exists and is unique when there is
+Because the right-hand side is an explicit formula, the MIRR\ix{Modified internal rate of return} always exists and is unique when there is
 at least one outflow and one inflow. Its weakness is that the answer depends on the two rates the
-analyst chooses. When both rates equal the cost of capital the MIRR gives the same accept or reject
-decision as the NPV, whatever the pattern of signs.
+analyst chooses. When both rates equal the cost of capital\ix{Cost of capital} the MIRR gives the same accept or reject
+decision as the NPV\ix{Net present value}, whatever the pattern of signs.
 
 \begin{proposition}\label{prop:mirr}
 Let the flows contain at least one outflow and one inflow, and set $f=\rho=r>-1$. Write
@@ -434,14 +434,14 @@ cost of capital, as \cref{prop:uniqueirr} also implies from its IRR.
 
 \subsection{Whose timing counts}
 
-A \emph{time-weighted return}\index{time-weighted return} links the returns of successive sub-periods, $\prod_k(1+R_k)-1$, with
+A \emph{time-weighted\ix{Time-weighted return} return}\index{Time-weighted return} links the returns of successive sub-periods, $\prod_k(1+R_k)-1$, with
 sub-periods cut at every external flow. It measures what one unit invested at the start would have
 earned and is therefore independent of when the investor added or withdrew money. A
-\emph{money-weighted return}\index{money-weighted return} is the IRR of the investor's own flows and does depend on that timing.
+\emph{money-weighted\ix{Money-weighted return} return}\index{Money-weighted return} is the IRR of the investor's own flows and does depend on that timing.
 The independence assumes that the position can be valued reliably on each flow date, which is easy
 for a listed fund and hard for an appraised one.
-Time weighting is the right way to judge a manager who does not control flows, such as a mutual fund
-manager. Money weighting is especially informative when the manager controls the timing and amount of
+Time weighting\ix{Weighting scheme} is the right way to judge a manager who does not control flows, such as a mutual fund
+manager\ix{Fund manager}. Money weighting is especially informative when the manager controls the timing and amount of
 capital deployed, as the general partner of a drawdown fund does, although the result still depends
 on when the cash moved and on how the remaining assets are valued.
 
@@ -459,21 +459,21 @@ loss.
 \section{Multiples and the public market yardstick}
 \label{sec:multiples}
 
-Private fund investors usually read three multiples next to the IRR. With cumulative paid-in capital
-$\mathrm{PIC}$, cumulative distributions $D$ and current NAV,
+Private fund investors usually read three multiples\ix{Comparable companies}\ix{Valuation multiple} next to the IRR. With cumulative paid-in capital\ix{Paid-in capital}
+$\mathrm{PIC}$, cumulative distributions $D$ and current NAV\ix{Net asset value},
 \begin{equation}\label{eq:multiples}
   \mathrm{DPI} = \frac{D}{\mathrm{PIC}},\qquad
   \mathrm{RVPI} = \frac{\mathrm{NAV}}{\mathrm{PIC}},\qquad
   \mathrm{TVPI} = \mathrm{DPI} + \mathrm{RVPI} .
 \end{equation}
-DPI is the realised part of performance, RVPI the unrealised part, and TVPI the total. Multiples
+DPI\ix{Distributed to paid-in} is the realised part of performance, RVPI\ix{Residual value to paid-in} the unrealised part, and TVPI\ix{Total value to paid-in} the total. Multiples
 ignore timing, so a quick early exit cannot inflate them, and they do not penalise slow
-distributions even though waiting lowers their present value. For Fund A at the end of year 5, DPI is \dpiFive, RVPI is \rvpiFive{} and TVPI is \tvpiFive. At
+distributions even though waiting lowers their present value\ix{Present value}. For Fund A at the end of year 5, DPI is \dpiFive, RVPI is \rvpiFive{} and TVPI is \tvpiFive. At
 the end of its life, all value has been distributed and DPI equals TVPI at \tvpiEnd.
 
 Neither the IRR nor the multiples say whether the fund beat what the same money could have earned in
-public markets. A \emph{public market equivalent}\index{public market equivalent} (PME) answers that by pricing the fund's flows with
-a public index. Let $I_t$ be the index level at date $t$, $C_t$ the contributions and $D_t$ the
+public markets\ix{Public markets}. A \emph{public market equivalent}\index{Public market equivalent} (PME\ix{Kaplan-Schoar PME}) answers that by pricing the fund's flows with
+a public index. Let $I_t$ be the index level\ix{Index level} at date $t$, $C_t$ the contributions and $D_t$ the
 distributions. The PME of \textcite{kaplan2005} carries every flow forward to date $T$
 with the index return:
 \begin{equation}\label{eq:kspme}
@@ -485,7 +485,7 @@ the fund's assets.
 \Cref{prop:pme} below states this precisely.
 
 \begin{proposition}\label{prop:pme}
-Let $\mathrm{NPV}_I = \sum_t (D_t - C_t)/I_t + \mathrm{NAV}_T/I_T$ be the net present value of the fund's
+Let $\mathrm{NPV}_I = \sum_t (D_t - C_t)/I_t + \mathrm{NAV}_T/I_T$ be the net present value\ix{Net present value} of the fund's
 flows when each date is discounted by the index level, and suppose $\sum_t C_t>0$. Then
 \begin{equation}\label{eq:pmenpv}
   \mathrm{PME}_{\mathrm{KS}} - 1 = \frac{\mathrm{NPV}_I}{\sum_t C_t/I_t},
@@ -509,7 +509,7 @@ $\NPV(g)$. For conventional flows \cref{prop:uniqueirr} says that $\NPV(g)>0$ ex
 the IRR.
 \end{proof}
 
-The earlier method of \textcite{long1996} builds a shadow portfolio: each contribution buys
+The earlier method of \textcite{long1996} builds a shadow portfolio\ix{Shadow portfolio}: each contribution buys
 the index, each distribution sells the same amount of it, and the IRR of the fund's flows with the
 shadow portfolio's final value is compared with the fund's IRR. A distribution larger than the shadow
 portfolio's value on the day it is paid drives the shadow holding below zero. The shadow portfolio is then short the index, or borrowing against it,
@@ -533,7 +533,7 @@ which is a different investment from the long-only alternative the method sets o
 With the hypothetical index of \cref{tab:index}, which compounds at \indexCAGR\% a year, Fund A has a
 Kaplan and Schoar PME of \ksPME: the index-adjusted value of its distributions and final NAV is
 \ksPME{} times the index-adjusted value of its contributions.
-The Long and Nickels shadow portfolio shows a known flaw (\cref{fig:pme}). Because the fund distributes
+The Long and Nickels\ix{Long-Nickels PME} shadow portfolio shows a known flaw (\cref{fig:pme}). Because the fund distributes
 far more than the index portfolio has grown to, the shadow portfolio is sold down below zero and ends
 at \lnValue, the negative holding described above. The last shadow flow
 is a net outflow, so the flows change sign twice, and their NPV is zero at about 5.8\% and again near
@@ -552,11 +552,11 @@ $-56\%$: the Long and Nickels IRR is not even unique. Ratio methods such as \cre
 \section{Returns on derivatives with no entry price}
 \label{sec:notional}
 
-Forwards, futures and swaps usually have zero market value when they are entered. Margin may have to
+Forwards, futures\ix{Futures contract} and swaps usually have zero market value when they are entered. Margin may have to
 be posted, but that money is collateral and is not the position's price, and any fees or upfront payments are a separate
 matter. A return defined as profit divided by initial value is then undefined, yet managed futures
 funds and overlay programmes must report returns. The standard solution is to express the position relative to its \emph{notional
-principal}, the face amount of the underlying exposure, and to specify how much cash backs it.
+principal\ix{Face value}}, the face amount of the underlying exposure\ix{Exposure}, and to specify how much cash backs it.
 
 A position is \emph{fully collateralised} when cash equal to the notional principal is set aside and
 earns a short-term rate. For a suitable futures contract the position then approximates the economic exposure of holding the
@@ -564,7 +564,7 @@ underlying, though its performance can differ: futures pricing, the contract's s
 the return on the collateral all open gaps. Over a period its profit is the change in value of the derivative plus the interest on
 the collateral. Writing $F_t$ for the futures price, $N$ for the notional and $y$ for the
 collateral yield over the period, and assuming a fixed exposure, collateral that earns that yield and no
-financing or transaction costs, the simple return on a fully collateralised long futures position is
+financing or transaction costs\ix{Transaction costs}, the simple return\ix{Simple return} on a fully collateralised long futures position is
 \begin{equation}\label{eq:fullcoll}
   R^{\text{full}} = \frac{N\,(F_t-F_{t-1})/F_{t-1} + yN}{N} = \frac{F_t-F_{t-1}}{F_{t-1}} + y .
 \end{equation}
@@ -574,12 +574,12 @@ smaller capital base, while the interest shrinks in proportion. The \emph{partia
   R^{\text{part}} = \frac{N\,(F_t-F_{t-1})/F_{t-1} + y\,cN}{cN}
   = \frac{1}{c}\,\frac{F_t-F_{t-1}}{F_{t-1}} + y ,
 \end{equation}
-so the leverage factor is $1/c$. The log return in either case is $\ln(1+R)$, the form to use when returns are compounded or summed
+so the leverage\ix{Leverage} factor is $1/c$. The log return\ix{Log return} in either case is $\ln(1+R)$, the form to use when returns are compounded or summed
 through time.
 
 \begin{example}{A futures position at two collateral levels}\label{ex:notional}
 A manager buys equity index futures with a notional principal of \$10{,}000{,}000. Over a month the
-futures price rises 2\% and Treasury bills yield 0.40\% for the month. Fully collateralised, the profit
+futures price rises 2\% and Treasury bills\ix{Treasury bill} yield 0.40\% for the month. Fully collateralised, the profit
 is \$200{,}000 from the futures plus \$40{,}000 interest, \$\pnlFull{} in total, a simple return of
 \simpleFull\% and a log return of $\ln(1.024) = \logFull\%$. With 25\% collateral (\$2{,}500{,}000) the
 interest falls to \$10{,}000, the profit is \$\pnlPart{}, and the simple return on capital is
@@ -594,8 +594,8 @@ terms a gain looks smaller and a loss looks larger.
 \section{Models and track records}
 \label{sec:distributions}
 
-A model describes the returns that might occur; a track record describes the returns that did.
-Twenty years of a buyout fund's quarterly NAVs is eighty appraisals, not eighty prices. The
+A model describes the returns that might occur; a track record\ix{Track record} describes the returns that did.
+Twenty years of a buyout fund's quarterly NAVs is eighty appraisals\ix{Appraisal}, not eighty prices. The
 empirical distribution of a track record, whether shown as a histogram, a density estimate or a
 table of summary statistics, can be used to estimate a model's parameters once the model has been
 chosen, and the quality of those estimates depends
@@ -604,18 +604,18 @@ assets the track record is itself built from estimates.
 
 \subsection{The normal and lognormal laws}
 
-The normal distribution $\N(\mu,\sigma^2)$ has density
-$(2\pi\sigma^2)^{-1/2}\exp\{-(x-\mu)^2/(2\sigma^2)\}$. It is a useful benchmark for log returns for two
-reasons. First, the central limit theorem says that the standardised sum of independent, identically distributed
-shocks with finite variance tends to a normal law, and versions of it hold for dependent shocks under
-further conditions. Second, linear combinations of jointly normal variables are normal, so a portfolio of assets
+The normal distribution\ix{Normal distribution} $\N(\mu,\sigma^2)$ has density\ix{Density}
+$(2\pi\sigma^2)^{-1/2}\exp\{-(x-\mu)^2/(2\sigma^2)\}$. It is a useful benchmark for log returns\ix{Log return} for two
+reasons. First, the central limit theorem says that the standardised sum of independent, identically distributed\ix{Identically distributed}
+shocks with finite variance\ix{Finite variance} tends to a normal law, and versions of it hold for dependent shocks under
+further conditions. Second, linear combinations of jointly normal\ix{Gaussian process} variables are normal, so a portfolio of assets
 with jointly normal returns has a normal return. The first reason is the
 weaker one for alternatives: jumps, long swings in volatility and heavy tails can make the approach to
 the normal slow, so that a sum is still far from normal at the horizons an investor sees. One
-flaw as a model of simple returns is obvious: it gives positive probability to losing more than
+flaw as a model of simple returns\ix{Simple return} is obvious: it gives positive probability to losing more than
 everything.
 
-The lognormal\index{lognormal} model fixes that flaw. If the log return $Y = \ln(1+R)$ is $\N(\mu,\sigma^2)$, then the
+The lognormal\ix{Lognormal distribution}\index{Lognormal distribution} model fixes that flaw. If the log return $Y = \ln(1+R)$ is $\N(\mu,\sigma^2)$, then the
 gross return $X = 1+R = e^Y$ is lognormal and always positive. Its moments follow from the moment
 generating function of the normal.
 
@@ -625,7 +625,7 @@ Let $X=e^Y$ with $Y\sim\N(\mu,\sigma^2)$, $\sigma>0$, and write $w=e^{\sigma^2}$
   \E[X] &= m, \qquad \Var[X] = m^2(w-1), \label{eq:lnmoments}\\
   S &= (w+2)\sqrt{w-1}, \qquad K_e = w^4+2w^3+3w^2-6, \label{eq:lnshape}
 \end{align}
-the median of $X$ is $e^\mu$ and its mode is $e^{\mu-\sigma^2}$, so $\text{mode}<\text{median}<\text{mean}$.
+the median\ix{Median} of $X$ is $e^\mu$ and its mode is $e^{\mu-\sigma^2}$, so $\text{mode}<\text{median}<\text{mean}$.
 \end{proposition}
 
 \begin{proof}
@@ -636,7 +636,7 @@ the raw moments are
   \E[X^k] &= m^k\,w^{k(k-1)/2}, \label{eq:lnraw}\\
   \text{so}\quad \E[X]&=m,\quad \E[X^2]=m^2w,\quad \E[X^3]=m^3w^3,\quad \E[X^4]=m^4w^6 . \nonumber
 \end{align}
-The central moments $\mu_j=\E[(X-m)^j]$ follow from the binomial expansion:
+The central moments\ix{Central moments} $\mu_j=\E[(X-m)^j]$ follow from the binomial expansion:
 \begin{align*}
   \mu_2 &= \E[X^2]-m^2 = m^2(w-1),\\
   \mu_3 &= \E[X^3]-3m\E[X^2]+2m^3 = m^3\bigl(w^3-3w+2\bigr) = m^3(w-1)^2(w+2),\\
@@ -660,12 +660,12 @@ which is positive for $\ln x<\mu-\sigma^2$ and negative above it, so the mode is
 ordering follows from $\mu-\sigma^2<\mu<\mu+\sigma^2/2$.
 \end{proof}
 
-Since $w>1$, the skewness is positive and the distribution is skewed to the right. Because log returns add over time, a log return with parameters
+Since $w>1$, the skewness\ix{Skewness} is positive and the distribution is skewed to the right. Because log returns add over time, a log return with parameters
 $(\mu,\sigma^2)$ per year has parameters $(\mu h, \sigma^2 h)$ over $h$ years under independence, and the
 skew grows with the horizon (\cref{fig:lognormal}). With $\mu = 6\%$ and $\sigma = 18\%$, the mean,
 median and mode of terminal wealth per unit invested are \lnMeanOne, \lnMedianOne{} and \lnModeOne{}
 after one year, and \lnMeanTwenty, \lnMedianTwenty{} and \lnModeTwenty{} after twenty years, where the
-skewness has risen from \lnSkewOne{} to \lnSkewTwenty. Over long horizons the mean is a poor guide to
+skewness has risen from \lnSkewOne{} to \lnSkewTwenty. Over long horizons\ix{Horizon} the mean is a poor guide to
 what a typical investor will experience.
 
 \begin{figure}[t]
@@ -684,21 +684,21 @@ what a typical investor will experience.
 \subsection{Third and fourth moments}
 
 For a random return $R$ with mean $\mu = \E[R]$ and variance $\sigma^2 = \E[(R-\mu)^2]$, the
-\emph{skewness} and \emph{kurtosis} are the standardised third and fourth central moments,
+\emph{skewness\ix{Skewness}} and \emph{kurtosis\ix{Kurtosis}} are the standardised third and fourth central moments\ix{Central moments},
 \begin{equation}\label{eq:skewkurt}
   S = \frac{\E[(R-\mu)^3]}{\sigma^3},\qquad
   K = \frac{\E[(R-\mu)^4]}{\sigma^4},\qquad K_e = K - 3 .
 \end{equation}
-The normal distribution has $S=0$ and $K=3$, and the \emph{excess kurtosis}\index{excess kurtosis} $K_e$ measures the fourth
+The normal distribution has $S=0$ and $K=3$, and the \emph{excess kurtosis\ix{Excess kurtosis}}\index{Excess kurtosis} $K_e$ measures the fourth
 standardised moment against that benchmark.  The uniform distribution has $K_e<0$, with a flat top and no tails to speak of; the scaled
-Student $t$ law with five degrees of freedom used below has $K_e>0$ and heavier tails than the normal.
+Student $t$ law with five degrees of freedom\ix{Degrees of freedom} used below has $K_e>0$ and heavier tails than the normal.
 Positive excess kurtosis does not fix the centre: many such laws have a taller, narrower peak, but
 the shape near the mean varies from one to another. Positive skewness usually goes with a long right tail: frequent small losses and occasional
 large gains, the profile of a lottery ticket or a long option. Negative skewness usually means the
 reverse, steady small gains and occasional large losses.
 
 From a sample $R_1,\dots,R_n$ with mean $\bar R$ and central moments
-$m_k = n^{-1}\sum_i(R_i-\bar R)^k$, the usual estimators are $s^2 = n\,m_2/(n-1)$ for the variance,
+$m_k = n^{-1}\sum_i(R_i-\bar R)^k$, the usual estimators\ix{Estimation} are $s^2 = n\,m_2/(n-1)$ for the variance,
 $\hat S = m_3/m_2^{3/2}$ and $\hat K_e = m_4/m_2^2 - 3$. The divisor $n-1$ makes $s^2$ unbiased. Small
 sample corrections to $\hat S$ and $\hat K_e$ exist, and statistical packages differ in which they report,
 so a skewness from one package and a skewness from another may not match for short series. This book
@@ -721,10 +721,10 @@ beyond four standard deviations is about \tailNormFour{} in 100{,}000 under the 
 \subsection{Writing puts}
 
 Option positions are a direct source of non-normal returns. Consider a fund that each month sells a
-one-month put struck 5\% below the index level, holding cash equal to the strike as collateral. The
+one-month put struck 5\% below the index level\ix{Index level}, holding cash equal to the strike\ix{Strike} as collateral. The
 premium, priced with an implied volatility of 18\% and a continuously compounded rate of 3\% using the
 formula derived in Chapter~5, is \putPrem{} per 100 of index. The premium is received at the start of the month and added to the collateral, and both earn the 3\%
-rate. With strike $K$, premium $p$ and index level $S_T$ at expiry, the monthly return on capital
+rate. With strike $K$, premium $p$ and index level $S_T$ at expiry, the monthly return\ix{Monthly returns} on capital
 equal to the strike is
 \begin{equation*}
   R = \frac{(K+p)\,e^{0.03/12} - \max(K-S_T,0)}{K} - 1 .
@@ -732,8 +732,8 @@ equal to the strike is
 The index starts at $S_0=100$ and follows a geometric Brownian motion with expected return 7\% and
 volatility 16\% a year, $S_T = S_0\exp\{(0.07-\tfrac12 0.16^2)/12 + 0.16\,Z/\sqrt{12}\}$, so options are
 priced a little rich relative to realised volatility. Taking $Z$ as 200{,}000 standard normal draws
-from the chapter's shared generator, the first draws it makes, the simulated months give a mean monthly return of \pwMean\%, a standard deviation of \pwSD\%, skewness of \pwSkew{}
-and excess kurtosis of \pwExk. The strategy loses money in only \pwProbLoss\% of months, but those losses
+from the chapter's shared generator, the first draws it makes, the simulated months give a mean monthly return of \pwMean\%, a standard deviation of \pwSD\%, skewness\ix{Skewness} of \pwSkew{}
+and excess kurtosis\ix{Kurtosis}\ix{Excess kurtosis} of \pwExk. The strategy loses money in only \pwProbLoss\% of months, but those losses
 are large (\cref{fig:putwriting}). A sample of 240 months, a long track record for most funds, gives
 skewness \pwSkewS{} and excess kurtosis \pwExkS. A manager who reports only the mean and standard
 deviation of such a strategy hides most of its risk.
@@ -750,8 +750,8 @@ deviation of such a strategy hides most of its risk.
 
 \subsection{What one standard deviation promises}
 
-If returns are normal, about 68\% of outcomes lie within one standard deviation of the mean, 95\% within
-two and 99.7\% within three. Without any assumption about the shape, Chebyshev's inequality still gives
+If returns are normal, about 68\% of outcomes lie within one standard deviation\ix{Standard deviation} of the mean, 95\% within
+two and 99.7\% within three. Without any assumption about the shape, Chebyshev\ix{Chebyshev inequality}'s inequality still gives
 $\mathbb P(|R-\mu|\ge k\sigma)\le 1/k^2$. \Cref{tab:cheb} sets the two beside a pair of fat-tailed laws
 scaled to unit variance, the Laplace and the Student $t$ with five degrees of freedom. Beyond two or
 three standard deviations both put more probability than the normal does, though far less than
@@ -784,12 +784,12 @@ reference points, and the distance between them shows how much the shape assumpt
 
 \subsection{Measuring serial dependence}
 
-The \emph{autocorrelation} at lag $k$ is the correlation between a return and the return $k$ periods
+The \emph{autocorrelation\ix{Autocorrelation}} at lag $k$ is the correlation between a return and the return $k$ periods
 earlier, $\rho_k = \Cov(R_t,R_{t-k})/\Var(R_t)$ for a stationary series, estimated by
 $\hat\rho_k = \sum_{t=k+1}^n(R_t-\bar R)(R_{t-k}-\bar R)/\sum_t(R_t-\bar R)^2$. Under the null of
-independent, identically distributed returns with finite variance, $\hat\rho_k$ is approximately
+independent, identically distributed\ix{Identically distributed} returns with finite variance\ix{Finite variance}, $\hat\rho_k$ is approximately
 $\N(0,1/n)$, which gives the $\pm1.96/\sqrt n$ bands used in the figures; with changing volatility or
-other nonlinear dependence those bands can be too narrow. The Durbin-Watson statistic
+other nonlinear dependence\ix{Dependence} those bands can be too narrow. The Durbin-Watson\ix{Durbin-Watson statistic} statistic
 \parencite{durbin1950} was designed for the residuals $e_t$ of a regression and is
 \begin{equation}\label{eq:dw}
   \mathrm{DW} = \frac{\sum_{t=2}^n (e_t-e_{t-1})^2}{\sum_{t=1}^n e_t^2}
@@ -798,13 +798,13 @@ other nonlinear dependence those bands can be too narrow. The Durbin-Watson stat
 \end{equation}
 where the approximation drops end terms of order $1/n$. Values near 2 indicate no first-order
 autocorrelation, values toward 0 positive autocorrelation and values toward 4 negative autocorrelation. This chapter applies it descriptively to demeaned returns;
-its tabulated critical values belong to the regression setting.
+its tabulated critical values\ix{Critical value} belong to the regression setting.
 
 \subsection{Appraisals and smoothing}
 
-Appraisal-based returns, such as those of private real estate or private equity NAVs, adjust slowly
-to new information. A simple and widely used model \parencite{geltner1993} treats the reported return
-$R^*_t$ as a weighted average of the economic return $R_t$ and last period's reported return:
+Appraisal\ix{Appraisal}-based returns, such as those of private real estate\ix{Real estate} or private equity NAVs, adjust slowly
+to new information. A simple and widely used model \parencite{geltner1993} treats the reported return\ix{Reported returns}
+$R^*_t$ as a weighted average\ix{Weighted average} of the economic return $R_t$ and last period's reported return:
 \begin{equation}\label{eq:smooth}
   R^*_t = (1-\phi)R_t + \phi R^*_{t-1},\qquad 0\le\phi<1 .
 \end{equation}
@@ -812,7 +812,7 @@ $R^*_t$ as a weighted average of the economic return $R_t$ and last period's rep
 \begin{proposition}\label{prop:smooth}
 If the economic returns are independent with mean $\mu$ and variance $\sigma^2$, the stationary reported
 returns of \cref{eq:smooth} have mean $\mu$, variance $\sigma^2(1-\phi)/(1+\phi)$ and
-autocorrelation $\phi^k$ at lag $k$.
+autocorrelation\ix{Autocorrelation} $\phi^k$ at lag $k$.
 \end{proposition}
 \begin{proof}
 Iterating \cref{eq:smooth} gives $R^*_t = (1-\phi)\sum_{j\ge0}\phi^jR_{t-j}$, whose mean is
@@ -822,25 +822,25 @@ $(1-\phi)^2\sigma^2\sum_j\phi^{2j} = (1-\phi)^2\sigma^2/(1-\phi^2) = \sigma^2(1-
 $R_t$ is independent of the past, so the autocovariance shrinks by a factor $\phi$ per lag.
 \end{proof}
 
-Smoothing leaves the mean return unchanged and hides volatility: the economic risk is still there,
+Smoothing\ix{Return smoothing} leaves the mean return unchanged and hides volatility: the economic risk is still there,
 but it no longer shows in the reported numbers. With $\phi = 0.6$, reported
-volatility is $\sqrt{0.4/1.6} = \smTheoryRatio\%$ of the true value. A simulation of 240 months, with economic
+volatility\ix{Measured volatility} is $\sqrt{0.4/1.6} = \smTheoryRatio\%$ of the true value. A simulation of 240 months, with economic
 returns drawn as $\N(0.8\%,\,(4\%)^2)$ from the chapter's shared generator, has sample economic volatility of \smTrueSD\% and reported volatility of \smObsSD\%, a ratio of \smRatioSample{}
 against the theoretical \smRatioTheory{} (\cref{fig:smoothing}). Annualised naively with $\sqrt{12}$, the
 reported series suggests \smAnnObs\% a year when the simulated economic series annualises to \smAnnTrue\%;
 the model value is \smAnnModel\%, and the gap between those two is sampling error in one finite path,
 separate from the bias that smoothing introduces. The estimated
-first-order autocorrelation is \smRhoOne, the Durbin-Watson statistic is \smDW{} and $2(1-\hat\rho_1)$ is
+first-order autocorrelation\ix{First-order autocorrelation} is \smRhoOne, the Durbin-Watson\ix{Durbin-Watson statistic} statistic is \smDW{} and $2(1-\hat\rho_1)$ is
 \smDWapprox. Inverting \cref{eq:smooth} recovers an estimate of the economic return,
 \begin{equation}\label{eq:unsmooth}
   \hat R_t = \frac{R^*_t - \phi R^*_{t-1}}{1-\phi},
 \end{equation}
-and here, inverting with the true $\phi=0.6$, the unsmoothed series has volatility \smUnSD\% and lag-one autocorrelation \smUnRho. In practice
+and here, inverting with the true $\phi=0.6$, the unsmoothed\ix{Unsmoothing} series has volatility \smUnSD\% and lag-one autocorrelation \smUnRho. In practice
 $\phi$ is unknown and is set to the estimated $\hat\rho_1$. That estimate identifies $\phi$ only under
 the smoothing model with serially independent economic returns; if the economic returns are
 themselves autocorrelated, it does not. \textcite{getmansky2004} develop a richer
-version for hedge funds holding illiquid assets. The same unsmoothing returns in Chapter~8 for risk
-measures and in Chapter~10 for real estate indices.
+version for hedge funds\ix{Hedge fund} holding illiquid assets. The same unsmoothing returns in Chapter~8 for risk
+measures\ix{Risk measure} and in Chapter~10 for real estate indices.
 
 \begin{figure}[t]
   \centering
@@ -854,24 +854,24 @@ measures and in Chapter~10 for real estate indices.
 
 \subsection{Scaling risk with the horizon}
 
-If one-period log returns, or additive changes such as yield changes, are independent and identically
-distributed with variance $\sigma^2$, the sum of $q$ of them has variance $q\sigma^2$, so volatility
-scales with $\sqrt q$. For simple returns, which compound, the rule holds only approximately. This is why monthly volatility is
+If one-period log returns\ix{Log return}, or additive changes such as yield changes, are independent and identically
+distributed\ix{Identically distributed} with variance\ix{Variance} $\sigma^2$, the sum of $q$ of them has variance $q\sigma^2$, so volatility
+scales with $\sqrt q$. For simple returns\ix{Simple return}, which compound, the rule holds only approximately. This is why monthly volatility is
 annualised by multiplying by $\sqrt{12}$ and why, in the continuous-time models of Chapter~3, the
-random part of a price change over a short interval $\delta t$ has size $\sqrt{\delta t}$ while the drift
+random part of a price change over a short interval $\delta t$ has size $\sqrt{\delta t}$ while the drift\ix{Drift}
 has size $\delta t$ \parencite{wilmott2006}. The simplest discrete model writes the log return, or additive change, over a step of length
 $\delta t$ as $R = \mu\,\delta t + \sigma Z\sqrt{\delta t}$ with $Z\sim\N(0,1)$, so that
 the mean scales with $\delta t$ and the standard deviation with $\sqrt{\delta t}$. Over short steps the random
-term dominates, which is why drift is so much harder to estimate than volatility. Autocorrelation breaks
+term dominates, which is why drift is so much harder to estimate than volatility. Autocorrelation\ix{Autocorrelation} breaks
 the square root rule.
 
 \begin{proposition}\label{prop:vr}
-For a stationary series with autocorrelations $\rho_k$, the variance of a $q$-period sum relative to $q$
+For a stationary\ix{Stationarity} series with autocorrelations $\rho_k$, the variance of a $q$-period sum relative to $q$
 times the one-period variance is
 \begin{equation}\label{eq:vr}
   VR(q) = \frac{\Var\bigl(\sum_{t=1}^q R_t\bigr)}{q\Var(R_t)} = 1 + 2\sum_{k=1}^{q-1}\Bigl(1-\frac kq\Bigr)\rho_k .
 \end{equation}
-For an AR(1) series with $\rho_k = \rho^k$ and $|\rho|<1$, $VR(q)\to(1+\rho)/(1-\rho)$ as $q\to\infty$.
+For an AR(1)\ix{Autoregressive model} series with $\rho_k = \rho^k$ and $|\rho|<1$, $VR(q)\to(1+\rho)/(1-\rho)$ as $q\to\infty$.
 \end{proposition}
 \begin{proof}
 $\Var(\sum_t R_t) = \sum_{s,t}\Cov(R_s,R_t) = \sigma^2\bigl[q + 2\sum_{k=1}^{q-1}(q-k)\rho_k\bigr]$, since
@@ -884,7 +884,7 @@ correlation,
 so the annual volatility implied by this stationary AR(1) model is \vrTwelveSixSqrt{} times the naive
 figure. As the horizon grows the ratio of variances approaches $(1+0.6)/(1-0.6)=\vrLimitSix$, a
 volatility multiplier of two. Applied to data, $\rho$ is estimated, so the correction carries its own
-sampling error. The variance ratio\index{variance ratio} is also the basis of a classic test of the random walk
+sampling error. The variance ratio\ix{Variance ratio}\index{Variance ratio} is also the basis of a classic test of the random walk
 hypothesis \parencite{lo1988}.
 
 \begin{figure}[t]
@@ -907,17 +907,17 @@ that adjust in jumps, and volatility that changes over time. Which way the skew 
 the tails are depends on the mechanism and its parameters. A written option, as in the put-writing
 example, gives a long left tail; a bought option or an incentive fee seen from the manager's side
 gives a long right one. A jump can be a market event or the moment a stale price is finally marked.
-A mixture of calm and turbulent periods is fat-tailed even when each period on its own is normal. Smoothing is a
+A mixture of calm and turbulent periods is fat-tailed even when each period on its own is normal. Smoothing\ix{Return smoothing} is a
 separate matter. A smoothed Gaussian series is still Gaussian, so smoothing alone cannot make returns non-normal. It does bias the measured variance and break the independence that the
 Jarque-Bera test assumes, so moments and tests computed from appraisal-based series can mislead.
 
 \subsection{The Jarque-Bera test}
 
-\textcite{jarque1987} combine sample skewness and excess kurtosis into one statistic,
+\textcite{jarque1987} combine sample skewness and excess kurtosis\ix{Kurtosis}\ix{Excess kurtosis} into one statistic\ix{Test statistic},
 \begin{equation}\label{eq:jb}
   \mathrm{JB} = \frac{n}{6}\left(\hat S^2 + \frac{\hat K_e^2}{4}\right).
 \end{equation}
-The weights $1/6$ and $1/24$ are the reciprocals of the asymptotic variances of $\sqrt n\,\hat S$ and
+The weights $1/6$ and $1/24$ are the reciprocals of the asymptotic variances\ix{Asymptotic variance} of $\sqrt n\,\hat S$ and
 $\sqrt n\,\hat K_e$ when the observations are independent and identically normal, the null under which
 the $\chi^2_2$ reference distribution applies.
 
@@ -934,8 +934,8 @@ Let $R_1,\dots,R_n$ be independent draws from $\N(\mu,\sigma^2)$. As $n\to\infty
 $\hat S$ and $\hat K_e$ do not change when every $R_i$ is shifted or rescaled by a positive constant, so we
 may work with $z_i=(R_i-\mu)/\sigma\sim\N(0,1)$. Write $\overline{z^k}=n^{-1}\sum_i z_i^k$. The standard
 normal moments are $\E[z^{2j}]=(2j-1)(2j-3)\cdots 1$, that is $1,3,15,105$ for $j=1,\dots,4$, and the odd
-moments are zero. By the central limit theorem $\bar z$, $\overline{z^2}-1$ and $\overline{z^3}$ are of order
-$n^{-1/2}$ in probability, written $O_p(n^{-1/2})$. Expanding the central moments of the sample,
+moments are zero. By the central limit theorem\ix{Central limit theorem} $\bar z$, $\overline{z^2}-1$ and $\overline{z^3}$ are of order
+$n^{-1/2}$ in probability, written $O_p(n^{-1/2})$. Expanding the central moments\ix{Central moments} of the sample,
 \begin{align*}
   m_2 &= \overline{z^2}-\bar z^2 = 1 + (\overline{z^2}-1) + O_p(n^{-1}),\\
   m_3 &= \overline{z^3} - 3\bar z\,\overline{z^2} + 2\bar z^3 = \overline{z^3} - 3\bar z + O_p(n^{-1}),\\
@@ -949,7 +949,7 @@ using $\bar z\,(\overline{z^2}-1)=O_p(n^{-1})$ in the second line. Since $m_2\to
    = \sqrt n\;\overline{z^4-6z^2+3} + o_p(1),
 \end{align*}
 where the second line uses $m_2^2 = 1 + 2(\overline{z^2}-1) + O_p(n^{-1})$. Both leading terms are scaled
-sample means of the i.i.d.\ variables $u=z^3-3z$ and $v=z^4-6z^2+3$, which have mean zero and
+sample means\ix{Sample mean} of the i.i.d.\ variables $u=z^3-3z$ and $v=z^4-6z^2+3$, which have mean zero and
 \begin{align*}
   \E[u^2] &= \E[z^6]-6\E[z^4]+9\E[z^2] = 15-18+9 = 6,\\
   \E[v^2] &= \E[z^8]-12\E[z^6]+42\E[z^4]-36\E[z^2]+9 = 105-180+126-36+9 = 24,\\
@@ -962,7 +962,7 @@ by the continuous mapping theorem it converges to the sum of two independent squ
 which is $\chi^2_2$.
 \end{proof}
 
-The $\chi^2_2$ distribution has survival function $\mathbb P(\chi^2_2>x)=e^{-x/2}$, so the 5\% critical value is
+The $\chi^2_2$ distribution has survival function $\mathbb P(\chi^2_2>x)=e^{-x/2}$, so the 5\% critical value\ix{Critical value} is
 $-2\ln 0.05 = \jbCrit$ and the null of normality is rejected when $\mathrm{JB} > \jbCrit$. The listing
 below computes the statistic and its asymptotic $p$-value:
 \Needspace*{15\baselineskip}
@@ -970,14 +970,14 @@ below computes the statistic and its asymptotic $p$-value:
 With seed 101 the normal sample gives $\mathrm{JB}=\jbSnipNorm$ ($p=\jbSnipNormP$), so normality is
 not rejected, and the $t_5$ sample gives $\mathrm{JB}=\jbSnipT$ ($p=\jbSnipTP$), so it is.
 
-The asymptotic approximation is poor in small samples, and alternative investment track records are
-usually small samples. \Cref{fig:jb} reports a Monte Carlo study with 20{,}000 samples at each size.
+The asymptotic approximation is poor in small samples, and alternative investment track records\ix{Track record} are
+usually small samples. \Cref{fig:jb} reports a Monte Carlo\ix{Monte Carlo simulation} study with 20{,}000 samples at each size.
 Under normal data the test rejects only \jbSizeTwenty\% of the time at $n=20$ and \jbSizeHundred\% at
 $n=100$, against a nominal 5\%: it is conservative. Against Student $t_5$ data, whose excess kurtosis is
 six, it rejects normality in \jbPowTwenty\% of samples at $n=20$, \jbPowHundred\% at $n=100$ and
 \jbPowTwoFifty\% at $n=250$. Five years of monthly data is $n=60$; a failure to reject normality from
 such a record says little about whether returns are normal, since at $n=60$ the test detects $t_5$ data in only \jbPowSixty\% of
-samples. \textcite{thadewald2007} compare the Jarque-Bera
+samples. \textcite{thadewald2007} compare the Jarque-Bera\ix{Jarque-Bera test}
 test with its competitors in more detail. The put-writing sample of 240 months, by contrast, gives
 $\mathrm{JB} = \pwJB$, far beyond any critical value.
 
@@ -998,13 +998,13 @@ $\mathrm{JB} = \pwJB$, far beyond any critical value.
 \subsection{Three measures of co-movement}
 
 The \emph{covariance} of returns $R_i$ and $R_j$ is $\sigma_{ij} = \E[(R_i-\mu_i)(R_j-\mu_j)]$, estimated
-by $s_{ij} = (n-1)^{-1}\sum_t (R_{i,t}-\bar R_i)(R_{j,t}-\bar R_j)$. The \emph{Pearson correlation}\index{Pearson correlation}
+by $s_{ij} = (n-1)^{-1}\sum_t (R_{i,t}-\bar R_i)(R_{j,t}-\bar R_j)$. The \emph{Pearson correlation\ix{Correlation}}\index{Pearson correlation}
 $\rho_{ij} = \sigma_{ij}/(\sigma_i\sigma_j)$ rescales covariance to $[-1,1]$ and measures the strength of
-a linear relation. The \emph{Spearman rank correlation}\index{Spearman rank correlation} \parencite{spearman1904} is the Pearson
+a linear relation. The \emph{Spearman\ix{Rank correlation} rank correlation}\index{Spearman rank correlation} \parencite{spearman1904} is the Pearson
 correlation of the ranks of the observations. It measures the strength of any monotone relation and is
 far less sensitive to a few extreme observations. When there are no ties it has the closed form
 $\rho_S = 1 - 6\sum_t d_t^2/\bigl(n(n^2-1)\bigr)$, where $d_t$ is the difference between the two ranks of
-observation $t$. The \emph{beta} of asset $i$ against a market $m$ is
+observation $t$. The \emph{beta\ix{Beta}} of asset $i$ against a market $m$ is
 the slope of the least squares regression of $R_i$ on $R_m$,
 \begin{equation}\label{eq:beta}
   \beta_i = \frac{\Cov(R_i,R_m)}{\Var(R_m)} = \rho_{im}\frac{\sigma_i}{\sigma_m} .
@@ -1022,7 +1022,7 @@ $Q(a,b)=\sum_t (R_{i,t}-a-bR_{m,t})^2$ is unique and equals
 \end{proposition}
 
 \begin{proof}
-$Q$ is a quadratic in $(a,b)$. Setting its partial derivatives to zero gives the normal equations
+$Q$ is a quadratic in $(a,b)$. Setting its partial derivatives to zero gives the normal equations\ix{Normal equations}
 \begin{align*}
   \frac{\partial Q}{\partial a} &= -2\sum_t (R_{i,t}-a-bR_{m,t}) = 0
   &&\Longrightarrow\quad a = \bar R_i - b\bar R_m,\\
@@ -1055,7 +1055,7 @@ correlation is \exSpear. The fund moves with the market almost perfectly, but by
 \Cref{fig:correlation} shows two clouds of 300 bivariate normal draws with correlations of $\pm 0.7$,
 and 60 points on the curve $y=e^{2.2x}$ with $x$ drawn uniformly on $[0,3]$, a relation that is
 perfectly monotone but convex. For the convex relation the Pearson coefficient is \convexPearson{}
-while Spearman's is \convexSpearman. A payoff that is nonlinear but monotone can have perfect rank
+while Spearman's is \convexSpearman. A payoff\ix{Payoff} that is nonlinear but monotone can have perfect rank
 correlation without perfect Pearson correlation; more complicated option payoffs need not be
 monotone at all.
 
@@ -1070,7 +1070,7 @@ monotone at all.
 \subsection{How far diversification goes}
 
 \begin{proposition}\label{prop:div}
-An equally weighted portfolio of $N$ assets, each with volatility $\sigma$ and pairwise correlation
+An equally weighted portfolio of $N$ assets, each with volatility $\sigma$ and pairwise correlation\ix{Correlation}
 $\rho$, where $-1/(N-1)\le\rho\le1$ so that the correlation matrix is valid, has volatility
 $\sigma_p = \sigma\sqrt{\rho + (1-\rho)/N}$. If $\rho\ge0$ is held fixed as $N\to\infty$, the volatility
 falls to $\sigma\sqrt\rho$.
@@ -1082,17 +1082,17 @@ correlation that is valid for every $N$ must be non-negative, and then $\sigma_p
 \end{proof}
 
 When the common correlation is non-negative and stays fixed as the portfolio grows, the floor
-$\sigma\sqrt\rho$ is the risk that diversification cannot remove (\cref{fig:diversification}).
+$\sigma\sqrt\rho$ is the risk that diversification\ix{Diversification} cannot remove (\cref{fig:diversification}).
 With $\sigma = 20\%$ and $\rho = 0.2$, ten assets bring volatility down to \divTenTwo\% and the floor is
 \divFloorTwo\%. The appeal of many alternatives rests on a low correlation with the rest of the portfolio, and
-smoothing makes that correlation look lower than it is. Take the smoothing model \cref{eq:smooth}
+smoothing\ix{Return smoothing} makes that correlation look lower than it is. Take the smoothing model \cref{eq:smooth}
 with true returns $R_t=\beta M_t+e_t$, where the market return $M_t$ and the noise $e_t$ are
 independent of each other and over time and the smoothing parameter is fixed.  Since $R^*_t=(1-\phi)\sum_{j\ge0}\phi^jR_{t-j}$ and only
-the $j=0$ term moves with $M_t$, $\Cov(R^*_t,M_t)=(1-\phi)\beta\Var M$, so the measured beta is
+the $j=0$ term moves with $M_t$, $\Cov(R^*_t,M_t)=(1-\phi)\beta\Var M$, so the measured beta\ix{Beta} is
 $(1-\phi)\beta$. Dividing by the standard deviations, with $\Var R^*=\Var R\,(1-\phi)/(1+\phi)$ from
 \cref{prop:smooth}, the measured correlation is the true one times
 $(1-\phi)\sqrt{(1+\phi)/(1-\phi)}=\sqrt{1-\phi^2}$. At $\phi=\smAlpha$ the factors are
-\smBetaFactor{} for beta and \smCorrFactor{} for correlation, and a simulation in the chapter's tests reproduces both. Other appraisal processes attenuate beta and
+\smBetaFactor{} for beta and \smCorrFactor{} for correlation, and a simulation in the chapter's tests reproduces both. Other appraisal\ix{Appraisal} processes attenuate beta and
 correlation by amounts that depend on how the appraisals are made.
 
 \begin{figure}[t]
@@ -1108,16 +1108,16 @@ correlation by amounts that depend on how the appraisals are made.
 \section{Case study: daily changes in the five year Government of Canada yield}
 \label{sec:case}
 
-This section applies the tools of the chapter to real data: the daily five year Government of Canada
-benchmark bond yield (series \texttt{BD.CDN.5YR.DQ.YLD}) from the Bank of Canada \parencite{boc_valet},
-taken from a public snapshot of Canadian policy rates and bond yields \parencite{khan2026policy} that
+This section applies the tools of the chapter to real data: the daily five year Government of Canada\ix{Government of Canada bond}
+benchmark bond yield\ix{Bond yield} (series \texttt{BD.CDN.5YR.DQ.YLD}) from the Bank of Canada \parencite{boc_valet},
+taken from a public snapshot of Canadian policy rates\ix{Overnight rate}\ix{Policy rate} and bond yields \parencite{khan2026policy} that
 also carries the target for the overnight rate (series \texttt{V39079}). The yields are the Bank's
 published values; everything else in this section is computed from them by \texttt{goc\_case.py}.
 The snapshot runs to \gocFileEnd, and the code cuts it at 30 September 2026, so the sample runs from
 \gocStart{} to \gocEnd, the last September date with a yield, with \gocN{} daily observations. The file is archived with the code as \texttt{data/daily\_policy\_bond.csv}; its
 SHA-256 digest is
 \begin{center}\small\texttt{\gocShaA\gocShaB}\end{center}
-and a test checks it, so the numbers below can be reproduced from exactly this file. Changes are measured between consecutive trading days, so a change across a weekend
+and a test checks it, so the numbers below can be reproduced from exactly this file. Changes are measured between consecutive trading days\ix{Trading days}, so a change across a weekend
 or holiday counts as one observation. The yield ranged from \gocYmin\% in \gocYminDate{} to
 \gocYmax\% in \gocYmaxDate{} (\cref{fig:gocseries}). The target overnight rate stood at \polNow\% at
 the end of the sample, the value the Bank's Valet service also reports for \gocEnd.
@@ -1133,11 +1133,11 @@ the end of the sample, the value the Bank's Valet service also reports for \gocE
 \end{figure}
 
 \paragraph{Moments and normality}
-The \gocDN{} daily changes have a mean of \gocDmean{} basis points and a standard deviation of \gocDsd{}
-basis points. Skewness is \gocDskew, close to zero, but excess kurtosis is \gocDexk. The Jarque-Bera
-statistic is \gocJB. Under the asymptotic $\chi^2_2$ calibration, which assumes independent,
-identically distributed normal changes, that is a clear rejection; volatility clustering or serial
-dependence would call for a different calibration of the test. The fat tails are visible in
+The \gocDN{} daily changes have a mean of \gocDmean{} basis points\ix{Basis point} and a standard deviation\ix{Standard deviation} of \gocDsd{}
+basis points. Skewness is \gocDskew, close to zero, but excess kurtosis\ix{Kurtosis}\ix{Excess kurtosis} is \gocDexk. The Jarque-Bera\ix{Jarque-Bera test}
+statistic\ix{Test statistic} is \gocJB. Under the asymptotic $\chi^2_2$ calibration, which assumes independent,
+identically distributed normal changes, that is a clear rejection; volatility clustering\ix{Conditional heteroskedasticity} or serial
+dependence\ix{Dependence} would call for a different calibration of the test. The fat tails\ix{Fat tails} are visible in
 \cref{fig:gocdist}: there are \gocBeyondFour{} days with moves beyond four standard deviations, where a
 normal distribution with the sample mean and standard deviation would expect \gocExpectFour. The largest rise was \gocMaxUp{} basis points on
 \gocMaxUpDate{} and the largest fall \gocMaxDn{} basis points on \gocMaxDnDate. Heavy tails at the daily frequency are one of the stylised facts that
@@ -1153,29 +1153,29 @@ normal distribution with the sample mean and standard deviation would expect \go
 \end{figure}
 
 \paragraph{From yields to returns}
-A yield change is not a return, but it maps into one. For a hypothetical five year par bond priced each day at that day's starting yield, the one day
+A yield change is not a return, but it maps into one. For a hypothetical five year par bond\ix{Par bond} priced each day at that day's starting yield, the one day
 total return is approximately
-$y\,\delta t - D\,\Delta y + \tfrac12 C(\Delta y)^2$: carry at the starting yield plus the duration
-and convexity terms of Chapter~6, ignoring roll-down and coupon reinvestment. Here $y$ is the yield at
-the start of the day, $\delta t$ the calendar time to the next observation in years (actual/365), $D$
-the modified duration and $C$ the convexity. Carry is interest accrued over calendar days, so a Friday to Monday step earns three days
-of it. The series is a hypothetical exposure, rebuilt each day as a new five year par bond priced from
+$y\,\delta t - D\,\Delta y + \tfrac12 C(\Delta y)^2$: carry at the starting yield plus the duration\ix{Duration}
+and convexity\ix{Convexity} terms of Chapter~6, ignoring roll-down and coupon reinvestment. Here $y$ is the yield at
+the start of the day, $\delta t$ the calendar time\ix{Calendar time} to the next observation in years (actual/365), $D$
+the modified duration\ix{Duration!modified} and $C$ the convexity. Carry is interest accrued over calendar days, so a Friday to Monday step earns three days
+of it. The series is a hypothetical exposure\ix{Exposure}, rebuilt each day as a new five year par bond priced from
 the observed yield; its returns approximate those of that exposure and are not the realised returns
 of a bond held continuously or of a traded strategy. Annualising
 treats each observation as one trading day, multiplying the mean by 252 and the standard deviation by
-$\sqrt{252}$. With a median modified duration of \gocDur{} years, the return series has an annualised mean of \gocRmean\% and an annualised volatility of
+$\sqrt{252}$. With a median modified duration of \gocDur{} years, the return series has an annualised mean of \gocRmean\% and an annualised volatility\ix{Annualised volatility} of
 \gocRsd\%, with excess kurtosis \gocRexk{} and a Jarque-Bera statistic of \gocRJB. The tails of the
-yield changes carry over almost unchanged to the bond returns.
+yield changes carry over almost unchanged to the bond returns\ix{Bond return}.
 
 \paragraph{Autocorrelation and the square root rule}
-The lag-one autocorrelation of daily changes is \gocRhoOne, inside the $\pm\gocBand$ band, and the
-Durbin-Watson statistic is \gocDW. Of the first ten lags only the tenth falls slightly outside the band
+The lag\ix{Lag}-one autocorrelation\ix{Autocorrelation} of daily changes is \gocRhoOne, inside the $\pm\gocBand$ band, and the
+Durbin-Watson\ix{Durbin-Watson statistic} statistic is \gocDW. Of the first ten lags only the tenth falls slightly outside the band
 (panel (b) of \cref{fig:gocscaling}), about what chance alone would produce in ten tests at the 5\%
 level. Unlike appraisal-based series, these daily yield changes show little sign of first-order serial
 dependence. Panel (a) of \cref{fig:gocscaling} checks the square
 root rule directly by comparing the standard deviation of non-overlapping $h$-day changes with
 $\sqrt h$ times the daily standard deviation. The ratio is \gocRatioWeek{} at one week, \gocRatioMonth{}
-at one month (standard error about \gocSeMonth) and \gocRatioQuarter{} at one quarter (standard error
+at one month (standard error\ix{Standard error} about \gocSeMonth) and \gocRatioQuarter{} at one quarter (standard error
 about \gocSeQuarter), all within two standard errors of one. These standard errors use the approximation for the sample
 standard deviation of independent normal block changes; the heavy tails of this series, and any
 dependence between blocks, make that approximation unreliable, and without further work they do not
@@ -1184,7 +1184,7 @@ Annualising daily volatility with $\sqrt{252}$ works for this series although th
 is far from normal. The two assumptions are separate. By \cref{eq:vr}, square root scaling holds exactly at every
 horizon only when the autocorrelation is zero at every lag, and normality plays no part in it.
 Autocorrelations that sum to zero are not enough: with $\rho_1=0.1$, $\rho_2=-0.1$ and none beyond,
-\cref{eq:vr} gives a variance ratio of \vrExTwo{} at two days, \vrExThree{} at three and \vrExTen{} at
+\cref{eq:vr} gives a variance ratio\ix{Variance ratio} of \vrExTwo{} at two days, \vrExThree{} at three and \vrExTen{} at
 ten, and it reaches one only in the limit.
 
 \begin{figure}[!htb]

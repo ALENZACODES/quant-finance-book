@@ -11,14 +11,14 @@ realised volatility of about \canRvDailyMed{} of a percentage point a year in th
 2001, built up from daily changes of a few basis points. A model that respects this has to be random, and for questions about hedging, valuation
 or the chance of crossing a covenant level between two observation dates it helps to work in
 continuous time. This chapter builds the calculus that such models need. It starts from a
-coin-tossing walk and takes a limit to reach Brownian motion\index{Brownian motion}. The limit has a property ordinary
+coin-tossing walk and takes a limit to reach Brownian motion. The limit has a property ordinary
 calculus never meets: each squared increment vanishes as the step shrinks, but their sum over finer
 and finer partitions converges to the elapsed time. Nearly every correction term in this chapter traces back to it.
 
 Once that property is in hand, the random walk leads directly to the continuous time tools used in pricing and risk management.
 It tells us how rough a yield path is and why, for a Brownian path, sampling more often sharpens the
 volatility estimate without changing what is being estimated
-(\cref{sec3:rw,sec3:bm,sec3:qv}), and through the reflection principle\index{reflection principle} how often a yield crosses a
+(\cref{sec3:rw,sec3:bm,sec3:qv}), and through the reflection principle how often a yield crosses a
 level between the month-end dates at which it is usually recorded. It forces a new integral for trading gains and a chain rule with
 an extra term, which is where a bond's convexity earns its keep (\cref{sec3:ito,sec3:lemma}). From
 there come stopping rules for barriers (\cref{sec3:mart}), simulation schemes (\cref{sec3:sde}), the
@@ -40,14 +40,14 @@ dependencies, seeds and verification details.
 \label{sec3:why}
 
 A discrete model with one step a month is often good enough to describe a fund. Monthly steps may be
-too coarse to assess the hedge error and transaction costs of an option that is rebalanced more
+too coarse to assess the hedge error and transaction costs\ix{Transaction costs} of an option that is rebalanced more
 often, because the hedge has to be adjusted as the price moves, and the cost of hedging
 depends on how much the price moves between adjustments. Shrinking the step does not make the problem
 go away. It changes it into a question about limits, and the limit turns out to have rules of its own.
 
-Alternative assets give several reasons to care. Commodity spreads, credit spreads and short rates
+Alternative assets give several reasons to care. Commodity spreads, credit spreads\ix{CDS spread}\ix{Credit spread} and short rates
 are often modelled as mean reverting, although the strength and stability of the reversion must be
-tested, and the case study tests it on the Canadian five year yield. If the pull exists, its speed helps frame how long a relative value position may need to be held. Barrier events matter to leveraged funds: a margin loan or a mark-to-market trigger acts the first
+tested, and the case study tests it on the Canadian five year yield. If the pull exists, its speed helps frame how long a relative value position may need to be held. Barrier events matter to leveraged funds: a margin loan or a mark-to-market\ix{Marking to market} trigger acts the first
 time a value crosses its level, even if the value has recovered by the next month end, while a
 covenant tested only on reporting dates is a barrier monitored on those dates alone. And the valuation of
 options, carried interest and risky debt, met in Chapter~2 and again in Chapters~5 and~6, rests on
@@ -61,7 +61,7 @@ two agree, and \cref{sec3:fk} proves that a smooth solution of the equation is t
 
 \begin{definition}\label{def3:srw}
 Let $\xi_1,\xi_2,\dots$ be independent with $\mathbb P(\xi_k=1)=\mathbb P(\xi_k=-1)=\tfrac12$. The \emph{simple
-random walk} is $S_0=0$ and $S_n=\xi_1+\dots+\xi_n$. Write $\mathcal F_n$ for the information in
+random walk\ix{Random walk}} is $S_0=0$ and $S_n=\xi_1+\dots+\xi_n$. Write $\mathcal F_n$ for the information in
 $\xi_1,\dots,\xi_n$.
 \end{definition}
 
@@ -76,7 +76,7 @@ $m$, independent of $S_m$ with mean zero, so $\Cov(S_m,S_n)=\Var[S_m]=m$. The sa
 $\E[S_n\mid\mathcal F_m] = S_m + \E[S_n-S_m] = S_m$.
 \end{proof}
 
-The last property makes $S$ a \emph{martingale}\index{martingale}: the best forecast of a future value, in mean square and given the path so far, is the present
+The last property makes $S$ a \emph{martingale}\index{Martingale}: the best forecast of a future value, in mean square and given the path so far, is the present
 value. The covariance $\min(m,n)$ will reappear unchanged in the continuous limit.
 
 To pass to that limit, speed the walk up and shrink its steps. With $n$ steps per unit of time and step
@@ -90,7 +90,7 @@ continuous functions on $[0,1]$ after linear interpolation, to a limit $W$ with 
 increments $W_t-W_s\sim\N(0,t-s)$.
 \end{theorem}
 
-We do not prove this here; \textcite{billingsley1999} gives the proof. Its one-dimensional shadow is the central limit theorem, and for this lattice distribution the largest gap from the normal distribution function can be
+We do not prove this here; \textcite{billingsley1999} gives the proof. Its one-dimensional shadow is the central limit theorem, and for this lattice distribution the largest gap from the normal distribution function\ix{Cumulative distribution function} can be
 computed exactly at each $n$. Panel (b)
 plots the largest gap between the exact distribution function of $S_n/\sqrt n$ and the normal one,
 computed from the binomial law. On log-log axes the fitted slope over $10\le n\le10{,}000$ is \rwKolSlope, an empirical value consistent
@@ -141,18 +141,18 @@ $\mathbb P(S_n\ge a)=\reflNaive\%$. Simulating 400{,}000 walks gives \reflMC\% w
 \label{sec3:bm}
 
 \begin{definition}\label{def3:bm}
-A \emph{standard Brownian motion}\index{standard Brownian motion} on a probability space $(\Omega,\mathcal F,\mathbb P)$ is a process
+A \emph{standard Brownian motion\ix{Brownian motion}}\index{Standard Brownian motion} on a probability space $(\Omega,\mathcal F,\mathbb P)$ is a process
 $W=(W_t)_{t\ge 0}$ with
 \begin{enumerate}[label=(\roman*)]
   \item $W_0=0$;
-  \item independent increments: for $0\le t_0<t_1<\dots<t_k$, the variables $W_{t_j}-W_{t_{j-1}}$ are independent;
+  \item independent increments\ix{Brownian increments}: for $0\le t_0<t_1<\dots<t_k$, the variables $W_{t_j}-W_{t_{j-1}}$ are independent;
   \item Gaussian increments: $W_t-W_s\sim\N(0,t-s)$ for $s<t$;
   \item continuous paths: with probability one, $t\mapsto W_t(\omega)$ is continuous.
 \end{enumerate}
 \end{definition}
 
 Properties (i) to (iii) fix all the finite-dimensional laws, and (iv) is what makes the object a
-random function rather than a family of random numbers. That all four can hold together is not
+random function rather than a family of random numbers\ix{Random numbers}. That all four can hold together is not
 obvious. The midpoint construction below proves existence and also provides a simulation algorithm.
 
 \subsection{L\'evy's construction}
@@ -166,13 +166,13 @@ Let $s<u$, $m=(s+u)/2$ and $h=u-s$. If $W$ has the finite-dimensional laws of
 \begin{equation}\label{eq3:bridge}
   W_m \sim \N\Bigl(\frac{x+y}{2},\ \frac h4\Bigr),
 \end{equation}
-and, conditional on both endpoint values, $W_m$ is independent of the path outside $[s,u]$. This is
+and, conditional on both endpoint values, $W_m$ is independent\ix{Independence} of the path outside $[s,u]$. This is
 the conditional independence property of the Brownian bridge.
 \end{lemma}
 
 \begin{proof}
 By (ii) and (iii), $A=W_m-W_s$ and $B=W_u-W_m$ are independent $\N(0,h/2)$ and independent of the
-increments outside $[s,u]$. Their sum $A+B=W_u-W_s$ and difference $A-B$ are jointly Gaussian with
+increments outside $[s,u]$. Their sum $A+B=W_u-W_s$ and difference $A-B$ are jointly Gaussian\ix{Gaussian process} with
 $\Cov(A+B,A-B)=\Var A-\Var B=0$, so they are independent. Hence
 $W_m = W_s + \tfrac12(A+B) + \tfrac12(A-B)$, and given $W_s=x$ and $W_u=y$ the first two terms equal
 $(x+y)/2$ while $\tfrac12(A-B)\sim\N(0,h/4)$ is untouched by the conditioning. The independence claim
@@ -190,7 +190,7 @@ $n\ge1$, keep the values on the grid $\{k2^{-(n-1)}\}$ and define each new midpo
   + 2^{-(n+1)/2} Z_{n,k} .
 \end{equation}
 Join the points of each level linearly. Then with probability one the functions $W^{(n)}$ converge
-uniformly on $[0,1]$, and the limit is a standard Brownian motion on $[0,1]$.
+uniformly on $[0,1]$, and the limit is a standard Brownian motion\ix{Brownian motion} on $[0,1]$.
 \end{theorem}
 
 \begin{proof}
@@ -203,7 +203,7 @@ they are independent. Different old intervals use different $Z$'s, which proves 
 dyadic grid of level $n$ the values have exactly the laws required by \cref{def3:bm}, and later levels
 never change them.
 
-\emph{Uniform convergence.} The function $W^{(n)}-W^{(n-1)}$ is a row of tents. The tent at the
+\emph{Uniform convergence\ix{Convergence}.} The function $W^{(n)}-W^{(n-1)}$ is a row of tents. The tent at the
 $k$th new point has height $2^{-(n+1)/2}|Z_{n,k}|$, so the sup norm is $2^{-(n+1)/2}\max_k|Z_{n,k}|$. For $c>0$ the Gaussian tail
 bound $\mathbb P(|Z|>x)\le e^{-x^2/2}$, valid for $x\ge1$, gives, for every $n$ with $c\sqrt n\ge1$,
 \begin{equation*}
@@ -220,12 +220,12 @@ so it has the right joint laws on all dyadic times. For general times $t_1<\dots
 $t_j^{(m)}\to t_j$; the vectors $(W_{t^{(m)}_j})_j$ are Gaussian with covariances
 $\min(t^{(m)}_i,t^{(m)}_j)$ and converge almost surely by continuity, and a limit of Gaussian vectors
 whose covariances converge is Gaussian with the limiting covariance $\min(t_i,t_j)$. A Gaussian process
-with mean zero and covariance $\min(s,t)$ has independent increments with the required variances.
+with mean zero and covariance $\min(s,t)$ has independent increments\ix{Brownian increments} with the required variances.
 \end{proof}
 
 \Cref{fig3:levy} shows one path at levels $0$, $1$, $3$ and $10$. Each level keeps the points of the
 previous one and adds detail between them, so a coarse simulation can be refined later without
-redrawing it, a property the next section uses. Over \levyPaths{} simulated paths the sample variances
+redrawing it, a property the next section uses. Over \levyPaths{} simulated paths\ix{Simulation} the sample variances
 of $W_{1/2}$ and $W_1$ are \levyVarHalf{} and \levyVarOne, the sample value of $\E[W_{1/4}W_{3/4}]$ is
 \levyCovQ{} against $\min(\tfrac14,\tfrac34)=0.25$, and the covariance of $W_1-W_{1/2}$ with $W_{1/2}$ is
 \levyIncCov.
@@ -247,7 +247,7 @@ independent of $(W_r)_{r\le s}$. Each of them, call it $B$, satisfies $\Cov(B_u,
 \begin{proof}
 Each transformed process starts at zero and has continuous paths. Each of its increments is plus or
 minus a scaled increment of $W$ over a corresponding interval, and disjoint intervals map to disjoint
-intervals, so the increments are Gaussian and independent. For scaling,
+intervals, so the increments are Gaussian and independent. For scaling\ix{Scaling},
 $\Var\bigl(c^{-1/2}(W_{ct}-W_{cs})\bigr)=c^{-1}c(t-s)=t-s$; the other two variances are immediate. The
 independence of $W_{s+\cdot}-W_s$ from the past is property (ii). For the covariance,
 $\Cov(B_u,B_v)=\Cov(B_u,B_u+(B_v-B_u))=\Var B_u=u$ for $u\le v$.
@@ -267,7 +267,7 @@ all is a stronger statement with a different proof \parencite[Chapter~1]{morters
 
 \begin{definition}\label{def3:qv}
 For a partition $\Pi=\{0=t_0<t_1<\dots<t_n=T\}$ with mesh $\lVert\Pi\rVert=\max_i(t_{i+1}-t_i)$, the
-\emph{quadratic variation}\index{quadratic variation} and \emph{total variation}\index{total variation} of a path $f$ along $\Pi$ are
+\emph{quadratic variation\ix{Quadratic variation}}\index{Quadratic variation} and \emph{total variation}\index{Total variation} of a path $f$ along $\Pi$ are
 \begin{equation}\label{eq3:qvdef}
   Q_\Pi(f)=\sum_{i=0}^{n-1}\bigl(f(t_{i+1})-f(t_i)\bigr)^2,\qquad
   V_\Pi(f)=\sum_{i=0}^{n-1}\bigl|f(t_{i+1})-f(t_i)\bigr| .
@@ -276,7 +276,7 @@ For a partition $\Pi=\{0=t_0<t_1<\dots<t_n=T\}$ with mesh $\lVert\Pi\rVert=\max_
 
 For a continuously differentiable $f$, $|f(t_{i+1})-f(t_i)|\le\lVert f'\rVert_\infty(t_{i+1}-t_i)$, so, using
 $\sum_i(t_{i+1}-t_i)^2\le\lVert\Pi\rVert\,T$,
-$Q_\Pi(f)\le\bigl(\lVert f'\rVert_\infty\bigr)^2\,T\,\lVert\Pi\rVert\to0$. Brownian motion behaves differently.
+$Q_\Pi(f)\le\bigl(\lVert f'\rVert_\infty\bigr)^2\,T\,\lVert\Pi\rVert\to0$. Brownian motion\ix{Brownian motion} behaves differently.
 
 \begin{theorem}\label{thm3:qv}
 For Brownian motion and any partition $\Pi$ of $[0,T]$,
@@ -284,7 +284,7 @@ For Brownian motion and any partition $\Pi$ of $[0,T]$,
   \E\bigl[Q_\Pi(W)\bigr]=T,\qquad
   \E\bigl[(Q_\Pi(W)-T)^2\bigr]=2\sum_{i}(t_{i+1}-t_i)^2\le 2T\lVert\Pi\rVert .
 \end{equation}
-Hence $Q_\Pi(W)\to T$ in mean square as $\lVert\Pi\rVert\to0$, and almost surely along the dyadic
+Hence $Q_\Pi(W)\to T$ in mean square as $\lVert\Pi\rVert\to0$, and almost surely\ix{Almost sure convergence} along the dyadic
 partitions $t_i=iT2^{-n}$.
 \end{theorem}
 
@@ -321,7 +321,7 @@ the quadratic variation is \qvPathFour{} with $2^4$ intervals, \qvPathEight{} wi
 with $2^{12}$ and \qvPathSixteen{} with $2^{16}$. The total variation over the same partitions is
 \tvPathFour, \tvPathEight, \tvPathTwelve{} and \tvPathSixteen; its expected value at $2^{16}$ intervals is
 $\sqrt{2n/\pi}=\tvMeanSixteen$, and it doubles every time $n$ is multiplied by four. Panel (b) checks
-\cref{eq3:qvmoments}: across simulated paths, the root mean square of $Q_n-1$ follows $\sqrt{2/n}$, with
+\cref{eq3:qvmoments}: across simulated paths\ix{Simulation}, the root mean square of $Q_n-1$ follows $\sqrt{2/n}$, with
 a fitted slope of \qvSlope{} and no point more than \qvMSEratio{} away from the formula in relative
 terms.
 
@@ -337,8 +337,8 @@ terms.
 \paragraph{Does the sampling frequency matter for the five year yield?}
 If the yield behaved like $\sigma W_t$ with constant $\sigma$, the sum of its squared changes over a
 year would estimate $\sigma^2$ without bias at any sampling frequency, daily, weekly or month-end,
-with less noise the finer the grid. \Cref{fig3:canqv} tests this on \canN{} daily observations of the five year Government
-of Canada yield from \canStart{} to \canEnd. Over the 25 complete calendar years the median realised
+with less noise\ix{Noise} the finer the grid. \Cref{fig3:canqv} tests this on \canN{} daily observations of the five year Government
+of Canada\ix{Government of Canada bond} yield from \canStart{} to \canEnd. Over the 25 complete calendar years the median realised
 volatility, the square root of the year's sum of squared changes, is \canRvDailyMed{} points from
 daily changes, \canRvWeeklyMed{} from weekly and \canRvMonthlyMed{} from month-end changes. Year by
 year the month-end estimate lies between \canRvRatioLo{} and \canRvRatioHi{} times the daily one in
@@ -368,7 +368,7 @@ partitions; no individual increment satisfies it.
 \begin{equation}\label{eq3:table}
   (dW_t)^2 = dt,\qquad dW_t\,dt = 0,\qquad (dt)^2 = 0 .
 \end{equation}
-The first entry says that summed over a fine partition, squared Brownian increments are no longer
+The first entry says that summed over a fine partition, squared Brownian increments\ix{Brownian increments} are no longer
 random. The other two say that products of higher order vanish faster than $dt$. The $-\tfrac12T$ in
 $\int W\,dW$, the $\tfrac12\sigma^2f_{xx}$ in It\^o's lemma\index{Itô's lemma} and the convexity term of a bond are all
 this entry at work.
@@ -377,7 +377,7 @@ this entry at work.
 
 The reflection argument of \cref{prop3:srwrefl} has a continuous version. Its proof needs the strong
 Markov property: if $\tau$ is a stopping time, then $(W_{\tau+t}-W_\tau)_{t\ge0}$ is again a Brownian
-motion independent of the path up to $\tau$. We take that property from \textcite[Section~2.6]{karatzas1998}.
+motion\ix{Brownian motion} independent of the path up to $\tau$. We take that property from \textcite[Section~2.6]{karatzas1998}.
 
 \begin{proposition}\label{prop3:bmrefl}
 Let $M_T=\max_{t\le T}W_t$ and $a>0$. Then $\mathbb P(M_T\ge a)=2\mathbb P(W_T\ge a)=2\bigl(1-\Phi(a/\sqrt T)\bigr)$, and
@@ -403,7 +403,7 @@ grid of $n$ dates will miss crossings between grid points and understate it; apa
 the reflection-principle value measures those missed crossings. That is the right answer
 for a contract that checks the barrier only on those dates (discrete monitoring), and the wrong one for
 a continuous barrier that is merely observed at those dates. Panel (b) of
-\cref{fig3:reflection} shows the bias: with 16 dates the simulated value is \bmMaxMCSixteen\%, and even
+\cref{fig3:reflection} shows the bias\ix{Bias}: with 16 dates the simulated value is \bmMaxMCSixteen\%, and even
 with 1{,}024 dates it is \bmMaxMCBig\%, with a standard error of \bmMaxSeBig{} points from 40{,}000 paths
 drawn afresh for each grid. \textcite{broadie1997} showed that for monitoring at the $n$ equally spaced dates
 $t_k=kT/n$, $k=1,\dots,n$, the discretely monitored probability $\mathbb P(\max_kW_{t_k}\ge a)$ of this
@@ -417,23 +417,23 @@ simulation is at most \bmMaxZmax{} standard errors, computed from the unrounded 
 for a fund closed at a loss limit that is checked once a month.
 
 The five year yield gives a market version of the question. How likely is it to rise half a
-percentage point above today's level at some point in the next year? With no drift a fall of the same
+percentage point above today's level at some point in the next year? With no drift\ix{Drift} a fall of the same
 size has the same answer, by symmetry. Pooling all daily changes since 2001 gives $\sigma=\canSigma$
 points a year. That is higher than the median year's \canRvDailyMed{} of \cref{sec3:qv}, because
 pooling gives the high-volatility years greater weight in the sum of squared changes. The
-reflection principle then gives $2\bigl(1-\Phi(0.5/\sigma)\bigr)=\canHitModel\%$ for one direction,
+reflection principle\ix{Reflection principle} then gives $2\bigl(1-\Phi(0.5/\sigma)\bigr)=\canHitModel\%$ for one direction,
 twice the \canEndModel\% chance of ending the year that far above. The chance of touching one level
 or the other is much higher, \canHitEitherModel\% in the model and \canHitEitherEmp\% in the data. Over
 \canStarts{} start dates with a full year of data ahead, the yield went at least half a point up at
 some point in \canHitUp\% of the windows and down in \canHitDn\%, an average of \canHitEmp\%. The two
 directions differ, plausibly because rates trended over the sample, although a gap of this size is
-also within the sampling error described below. Averaging them cancels a steady drift to
+also within the sampling error\ix{Sampling error} described below. Averaging them cancels a steady drift to
 first order but cannot remove a trend that changes, and the windows overlap almost completely, so the
-effective sample is far smaller than \canStarts{} windows. Its size depends on the serial dependence
+effective sample is far smaller than \canStarts{} windows. Its size depends on the serial dependence\ix{Dependence}
 of the yield; about \canYearsIndep{} non-overlapping years is only a rough guide, and each
 share carries several points of sampling error.
 
-Checking only every 21 trading days, roughly the month-ends, finds a touch in \canHitMonthEmp\% of the
+Checking only every 21 trading days\ix{Trading days}, roughly the month-ends, finds a touch in \canHitMonthEmp\% of the
 windows on average over the two directions, the discrete monitoring bias of panel (b) in data. The ratio of touching to ending beyond the
 level, averaged the same way, is \canHitRatio{} in the data against 2 in the model. Time-varying volatility, drift, mean
 reversion and dependence across the overlapping windows could each contribute to the gap, and these
@@ -453,14 +453,14 @@ observations do not separate their effects.
 \section{Trading gains: the It\^o integral}
 \label{sec3:ito}
 
-A trading gain is a sum of positions times price changes. If the position $\varphi_t$ is chosen using
+A trading gain is a sum of positions times price changes\ix{Price change}. If the position $\varphi_t$ is chosen using
 information up to $t$ and the price is $W$, the gain over $[0,T]$ should be
 $\int_0^T\varphi_t\,dW_t$. Because $W$ has infinite total variation, this cannot be a Stieltjes integral
 defined path by path. It\^o's construction uses the probability structure instead, and the left-point
 rule that comes with it is the natural one for trading: the position over $[t_i,t_{i+1})$ is fixed at
 $t_i$, before the price change is known.
 
-Fix a filtration $(\mathcal F_t)$ to which $W$ is adapted and such that $W_u-W_t$ is independent of
+Fix a filtration $(\mathcal F_t)$ to which $W$ is adapted\ix{Adapted process} and such that $W_u-W_t$ is independent of
 $\mathcal F_t$ for $u>t$. A process $\varphi$ is \emph{adapted} if $\varphi_t$ is
 $\mathcal F_t$-measurable for every $t$. Write $L^2_{\mathrm{ad}}$ for the progressively measurable processes (for each $t$ the map
 $(s,\omega)\mapsto\varphi_s(\omega)$ on $[0,t]\times\Omega$ is $\mathcal B([0,t])\otimes\mathcal F_t$-measurable) with $\E\int_0^T\varphi_t^2\,dt<\infty$, two of them
@@ -482,14 +482,14 @@ For a simple process $\varphi$,
   \E\bigl[I(\varphi)\bigr]=0,\qquad
   \E\bigl[I(\varphi)^2\bigr]=\E\Bigl[\int_0^T\varphi_t^2\,dt\Bigr],
 \end{equation}
-and $t\mapsto\int_0^t\varphi_s\,dW_s$ is a martingale.
+and $t\mapsto\int_0^t\varphi_s\,dW_s$ is a martingale\ix{Martingale}.
 \end{proposition}
 
 \begin{proof}
 Write $\Delta_i=W_{t_{i+1}}-W_{t_i}$ and $h_i=t_{i+1}-t_i$. Since $\varphi_i$ is known at $t_i$ and
 $\Delta_i$ is independent of $\mathcal F_{t_i}$,
 $\E[\varphi_i\Delta_i]=\E\bigl[\varphi_i\,\E[\Delta_i\mid\mathcal F_{t_i}]\bigr]=0$, which gives the mean.
-For the second moment,
+For the second moment\ix{Second moment},
 \begin{align*}
   \E\bigl[I(\varphi)^2\bigr]
   &= \sum_i\E\bigl[\varphi_i^2\Delta_i^2\bigr] + 2\sum_{i<j}\E\bigl[\varphi_i\varphi_j\Delta_i\Delta_j\bigr] .
@@ -511,16 +511,16 @@ and \cref{eq3:isometry} and the martingale property continue to hold.
 \end{theorem}
 
 \begin{proof}[Outline]
-The existence of approximations is a density statement about $L^2_{\mathrm{ad}}$, proved in
+The existence of approximations is a density\ix{Density} statement about $L^2_{\mathrm{ad}}$, proved in
 \textcite[Section~3.2]{karatzas1998}; for adapted $\varphi$ with continuous paths and $\E[\sup_{t\le T}\varphi_t^2]<\infty$
 the left-point step functions $\varphi_{t_i}$ on finer and finer partitions will do, by dominated
-convergence. For a general element of $L^2_{\mathrm{ad}}$ the density result needs a separate
+convergence\ix{Convergence}. For a general element of $L^2_{\mathrm{ad}}$ the density result needs a separate
 argument, which the reference gives. Given the approximations, linearity and
 \cref{prop3:isometry} give
 $\E[(I(\varphi^{(n)})-I(\varphi^{(m)}))^2]=\E\int_0^T(\varphi^{(n)}_t-\varphi^{(m)}_t)^2\,dt$, which tends to
 zero. So $(I(\varphi^{(n)}))$ is a Cauchy sequence in mean square and has a limit. Two approximating
 sequences can be interleaved into one, so the limit is unique. Means, second moments and conditional
-expectations pass to mean square limits, so the isometry and the martingale property survive.
+expectations pass to mean square limits, so the isometry\ix{Itô isometry} and the martingale property survive.
 \end{proof}
 
 \begin{proposition}\label{prop3:wdw}
@@ -553,12 +553,12 @@ Let $m_i=(t_i+t_{i+1})/2$. Along partitions with $\lVert\Pi\rVert\to0$,
 \begin{proof}
 Write $A_i=W_{m_i}-W_{t_i}$ and $B_i=W_{t_{i+1}}-W_{m_i}$, independent $\N(0,h_i/2)$. The midpoint sum
 equals the left-point sum plus $\sum_i A_i(A_i+B_i)=\sum_iA_i^2+\sum_iA_iB_i$. The first part is a
-quadratic variation over half intervals; as in \cref{thm3:qv} it has mean $\sum_ih_i/2=T/2$ and variance
+quadratic variation\ix{Quadratic variation} over half intervals; as in \cref{thm3:qv} it has mean $\sum_ih_i/2=T/2$ and variance
 $2\sum_i(h_i/2)^2\to0$. The second has mean zero and variance $\sum_i(h_i/2)^2\to0$. So the extra
 terms converge to $T/2$, and \cref{prop3:wdw} completes the proof.
 \end{proof}
 
-The limit in \cref{eq3:strat} is the \emph{Stratonovich}\index{Stratonovich} integral, written $\int_0^TW_t\circ dW_t$. It
+The limit in \cref{eq3:strat} is the \emph{Stratonovich\ix{Stratonovich integral}}\index{Stratonovich integral} integral, written $\int_0^TW_t\circ dW_t$. It
 obeys the ordinary chain rule. In this Brownian example it is not a martingale, and midpoint
 evaluation uses $W_{m_i}$, which is not yet known at $t_i$ when a trading position must be set. The
 left-point rule matches a position set before the price moves. Stratonovich integrals arise instead
@@ -603,7 +603,7 @@ convergence.
 \section{It\^o's lemma and what convexity earns}
 \label{sec3:lemma}
 
-It\^o's lemma is the chain rule for It\^o processes. Below it gives the convexity term in a bond's expected return, and
+It\^o's lemma is the chain rule\ix{Chain rule} for It\^o processes. Below it gives the convexity\ix{Convexity} term\ix{Convexity term} in a bond's expected return, and
 Chapter~5 uses it to derive the Black-Scholes equation.
 
 \begin{theorem}[It\^o's lemma]\label{thm3:itolemma}
@@ -619,7 +619,7 @@ The next lemma controls the accumulated error when squared Brownian increments a
 time, which is what \cref{eq3:table} abbreviates.
 
 \begin{lemma}\label{lem3:qvweighted}
-Let $g$ be adapted with continuous paths and $|g|\le C$. Along partitions with $\lVert\Pi\rVert\to0$,
+Let $g$ be adapted\ix{Adapted process} with continuous paths and $|g|\le C$. Along partitions with $\lVert\Pi\rVert\to0$,
 \begin{equation*}
   \sum_i g_{t_i}\bigl[(W_{t_{i+1}}-W_{t_i})^2-(t_{i+1}-t_i)\bigr]\ \longrightarrow\ 0
   \quad\text{in mean square.}
@@ -644,20 +644,20 @@ Taylor's theorem, applied first in $t$ and then in $x$, gives
   f(t,X_t)-f(0,X_0) = \sum_i\Bigl[f_t\,h_i + f_x\,\Delta X_i + \tfrac12 f_{xx}\,(\Delta X_i)^2\Bigr] + R_\Pi ,
 \end{equation*}
 with derivatives at $(t_i,X_{t_i})$ and a remainder $R_\Pi$ bounded at the end of the argument.
-Now take limits term by term. The first sum is a Riemann sum for $\int_0^tf_s\,ds$. The second is
+Now take limits term by term. The first sum is a Riemann sum\ix{Riemann sum} for $\int_0^tf_s\,ds$. The second is
 $\sum f_x\mu h_i+\sum f_x\sigma\Delta W_i$, which tends to $\int f_x\mu\,ds+\int f_x\sigma\,dW_s$, the
 first as a Riemann sum and the second by \cref{thm3:itoext}. In the third,
 $(\Delta X_i)^2=\sigma^2\Delta W_i^2+2\mu\sigma h_i\Delta W_i+\mu^2h_i^2$; the last two pieces sum to
 something that tends to zero in mean square, and by \cref{lem3:qvweighted}
 $\sum\tfrac12f_{xx}\sigma^2\Delta W_i^2$ has the same limit as $\sum\tfrac12f_{xx}\sigma^2h_i$, namely
 $\int_0^t\tfrac12\sigma^2f_{xx}\,ds$. Finally $|R_\Pi|\le\varepsilon_\Pi\sum_i\bigl(h_i+(\Delta X_i)^2\bigr)$, where $\varepsilon_\Pi$ is the largest
-modulus of continuity of $f_t$ and $f_{xx}$ over the increments, which tends to zero almost surely by
-uniform continuity, since the largest increment of the continuous path tends to zero. The sum converges to $t+\sigma^2t$ in
-probability, so $R_\Pi\to0$ in probability. Every other term converges in mean square, hence in
+modulus of continuity of $f_t$ and $f_{xx}$ over the increments, which tends to zero almost surely\ix{Almost sure convergence} by
+uniform continuity, since the largest increment of the continuous path tends to zero. The sum converges\ix{Convergence} to $t+\sigma^2t$ in
+probability\ix{Probability}, so $R_\Pi\to0$ in probability. Every other term converges in mean square, hence in
 probability, so for each $t$ the identity holds with probability one, by passing to a subsequence
 along which all the convergences are almost sure. Both sides are continuous in $t$, so it holds for
-all rational $t$ at once and then for every $t$. Now return to $f$. On the event $\{\max_{s\le t}\lvert X_s\rvert< K\}$ the time and drift integrals
-for $f_K$ and for $f$ coincide, and so do the stochastic integrals, because their integrands agree
+all rational $t$ at once and then for every $t$. Now return to $f$. On the event $\{\max_{s\le t}\lvert X_s\rvert< K\}$ the time and drift\ix{Drift} integrals
+for $f_K$ and for $f$ coincide, and so do the stochastic integrals\ix{Stochastic integral}, because their integrands agree
 up to the time $X$ first reaches $\pm K$ and an integral stopped at that time depends only on the
 integrand before it. The path is continuous, so this event has probability tending to one as
 $K\to\infty$, and letting $K\to\infty$ removes the localisation. For
@@ -669,26 +669,36 @@ integrands after localisation; we do not carry this out \parencite[Section~3.3]{
 The extra term $\tfrac12\sigma^2f_{xx}\,dt$ is the whole difference from ordinary calculus. The first
 use is a bond.
 
-\begin{example}{What convexity earns a five year bond}\label{ex3:convexity}
-Let a five year zero coupon bond trade at $P=e^{-5y}$, with $y$ its continuously compounded yield
-in decimal, and suppose over a short horizon $dy=\sigma_y\,dW$. It\^o's lemma with $f(y)=e^{-5y}$ gives
-$dP/P=-5\,dy+\tfrac12\cdot25\,\sigma_y^2\,dt$. A holder earns the second term on average even when
-the yield does not move on average, because a fall in yield raises the price by more than an equal rise
-lowers it. Take the annualised volatility of the five year Government of Canada yield's daily changes since
-2001, $\canSigma$ points, so that $\sigma_y=0.0082$ in decimal. The convexity term is then
-$12.5\,\sigma_y^2=\canConvex\%$ a year, about \canConvexBp{} basis points. The benchmark is a
-semi-annually compounded par yield, so this is a model-implied figure for an idealised zero coupon
-bond of the same volatility, an order of magnitude for the convexity contribution and no promise of
-what a holder earns. Chapter~6 returns to convexity in bond prices and in the term structure.
+\begin{example}{What carry and convexity earn a five year bond}\label{ex3:convexity}
+Let a zero coupon\ix{Coupon} bond\ix{Zero-coupon bond} that matures at $T$ trade at $P_t=e^{-(T-t)y_t}$, with $y_t$ its continuously
+compounded\ix{Compounding} yield in decimal and five years left to run today, and suppose over a short horizon
+$dy=\sigma_y\,dW$. It\^o's lemma with $f(t,y)=e^{-(T-t)y}$, for which $f_t=yf$, $f_y=-(T-t)f$ and
+$f_{yy}=(T-t)^2f$, gives at $T-t=5$
+\[
+\frac{dP}{P}=y\,dt-5\,dy+\tfrac12\cdot25\,\sigma_y^2\,dt .
+\]
+The first term is the carry: a bond whose yield does not change still earns its yield as it ages. If the
+curve itself stays put and slopes, the yield of the bond slides along it as its maturity shortens,
+$dy=-y'(\tau)\,dt+\sigma_y\,dW$ with $\tau=T-t$, and the term $5\,y'(5)\,dt$, the roll-down, joins the carry.
+The last term is the convexity: a holder earns it on average even when the yield does not move on
+average, because a fall in yield raises the price by more than an equal rise lowers it. Take the
+annualised volatility\ix{Annualised volatility} of the five year Government of Canada\ix{Government of Canada bond} yield's daily changes since 2001,
+$\canSigma$ points, so that $\sigma_y=0.0082$ in decimal. The convexity term is then
+$12.5\,\sigma_y^2=\canConvex\%$ a year, about \canConvexBp{} basis points. On \canYieldEndDate{} the
+five year yield was \canYieldEnd\% compounded half-yearly\ix{Compounding!semi-annual}, \canYieldEndCc\% continuously, so the carry
+was about \canCarryBp{} basis points a year and convexity was \canConvexShare\% of carry and convexity
+together. The benchmark is a par yield, so these are model figures for an idealised zero coupon bond of
+the same yield and volatility, orders of magnitude and no promise of what a holder earns. Chapter~6
+returns to convexity in bond prices\ix{Bond price} and in the term structure\ix{Term structure}.
 \end{example}
 
-The next three examples apply the formula to familiar functions of Brownian motion alone, to show what its second derivative term does before the lemma meets more general models.
+The next three examples apply the formula to familiar functions of Brownian motion\ix{Brownian motion} alone, to show what its second derivative term does before the lemma meets more general models.
 
 \begin{example}{Powers of Brownian motion}\label{ex3:powers}
 With $f(x)=x^3$ and $X=W$, \cref{eq3:itolemma} gives $d(W_t^3)=3W_t^2\,dW_t+3W_t\,dt$, that is
 $W_T^3=\int_0^T3W_t^2\,dW_t+3\int_0^TW_t\,dt$. Taking expectations, $\E[W_T^3]=0$, as symmetry requires.
 With $f(x)=x^2$, $d(W_t^2)=2W_t\,dW_t+dt$, which is \cref{prop3:wdw} again, and shows that $W_t^2-t$ is a
-martingale.
+martingale\ix{Martingale}.
 \end{example}
 
 \begin{example}{The exponential martingale}\label{ex3:expmart}
@@ -736,8 +746,8 @@ $3\int_0^1W_t\,dt$, path by path, and on the 4,096-interval grid the two have co
 \label{sec3:mart}
 
 \begin{definition}\label{def3:mart}
-An adapted process $M$ with $\E|M_t|<\infty$ is a \emph{martingale} if $\E[M_t\mid\mathcal F_s]=M_s$ for
-all $s\le t$. A random time $\tau$ is a \emph{stopping time} if $\{\tau\le t\}\in\mathcal F_t$ for every
+An adapted process $M$ with $\E|M_t|<\infty$ is a \emph{martingale\ix{Martingale}} if $\E[M_t\mid\mathcal F_s]=M_s$ for
+all $s\le t$. A random time $\tau$ is a \emph{stopping time\ix{Stopping time}} if $\{\tau\le t\}\in\mathcal F_t$ for every
 $t$: whether it has happened by $t$ is known at $t$.
 \end{definition}
 
@@ -754,8 +764,8 @@ $\E[e^{\theta D}]=e^{\theta^2(t-s)/2}$.
 \end{proof}
 
 A martingale has constant mean, which is easy to check by simulation and easy to get wrong. Over
-\mgPaths{} draws of $W_1$, the sample means of $W_1^2-1$ and of $e^{W_1-1/2}$ are \mgSq{} and \mgExp, as
-they should be. For $\theta=3$ the sample mean of $Z_1$ is \mgExpThree{} with a sample standard error of
+\mgPaths{} draws of $W_1$, the sample means\ix{Sample mean} of $W_1^2-1$ and of $e^{W_1-1/2}$ are \mgSq{} and \mgExp, as
+they should be. For $\theta=3$ the sample mean of $Z_1$ is \mgExpThree{} with a sample standard error\ix{Standard error} of
 \mgExpThreeSE. That looks like a clean confirmation, but the standard error is the weak point. The true
 standard deviation of $Z_1$ is $\sqrt{e^9-1}=\mgExpThreeSD$, so the true standard error is
 \mgExpThreeTrueSE, \mgSERatio{} times the estimate; only \mgExpThreeShare\% of the draws exceed one, and
@@ -767,9 +777,9 @@ right tails make the sample standard error itself unreliable, a warning that app
 simulation of likelihood ratios or of leveraged payoffs.
 
 Stopping a martingale at a stopping time leaves its mean unchanged only under conditions, and without
-them it can fail. The optional stopping\index{optional stopping} theorem gives two sufficient sets: if
+them it can fail. The optional stopping\ix{Optional stopping theorem}\index{Optional stopping} theorem gives two sufficient sets: if
 $M$ is a martingale with continuous paths and $\tau$ is a stopping time, then $\E[M_\tau]=\E[M_0]$ when
-$\tau$ is bounded, and also when $\tau<\infty$ almost surely and the stopped process $M_{t\wedge\tau}$
+$\tau$ is bounded, and also when $\tau<\infty$ almost surely\ix{Almost sure convergence} and the stopped process $M_{t\wedge\tau}$
 is bounded by a constant \parencite[Section~1.3]{karatzas1998}. A doubling strategy that quits at its first
 gain beats a fair game only with unlimited credit, and no lender offers that.
 
@@ -784,8 +794,8 @@ with the limits $p=b/(a+b)$ and $\E[\tau]=ab/\sigma^2$ when $\mu=0$.
 \end{proposition}
 
 \begin{proof}
-\emph{The exit time is finite.} On each interval $[j,j+1]$ the increment of $X$ exceeds $a+b$ with a
-probability $q>0$ that does not depend on $j$, and if that happens the process cannot have stayed
+\emph{The exit time\ix{First passage time} is finite.} On each interval $[j,j+1]$ the increment of $X$ exceeds $a+b$ with a
+probability\ix{Probability} $q>0$ that does not depend on $j$, and if that happens the process cannot have stayed
 inside $(-b,a)$. The increments over disjoint intervals are independent, so $\mathbb P(\tau>n)\le(1-q)^n$, and
 $\E[\tau]=\int_0^\infty \mathbb P(\tau>t)\,dt<\infty$.
 
@@ -795,7 +805,7 @@ $\tfrac12k^2\sigma^2=k\mu$. So $Y$ is a martingale, and $Y_{t\wedge\tau}$ lies b
 Optional stopping gives $1=Y_0=\E[Y_\tau]=pe^{-ka}+(1-p)e^{kb}$, which solves to \cref{eq3:exit}.
 
 \emph{The expected exit time.} $X_t-\mu t=\sigma W_t$ is a martingale. At $t\wedge\tau$,
-$\E[X_{t\wedge\tau}]=\mu\E[t\wedge\tau]$. As $t\to\infty$ the left side converges to $\E[X_\tau]=ap-b(1-p)$
+$\E[X_{t\wedge\tau}]=\mu\E[t\wedge\tau]$. As $t\to\infty$ the left side converges\ix{Convergence} to $\E[X_\tau]=ap-b(1-p)$
 by bounded convergence, and the right side to $\mu\E[\tau]$ by monotone convergence. For $\mu=0$ use
 the martingales $X_t$ and $X_t^2-\sigma^2t$ in the same way: $0=ap-b(1-p)$ gives $p=b/(a+b)$, and
 $\E[X_\tau^2]=\sigma^2\E[\tau]$ gives $a^2p+b^2(1-p)=ab=\sigma^2\E[\tau]$.
@@ -822,8 +832,8 @@ crossings between steps. At $\mu=10\%$ the simulation gives \exitPupMC\% and \ex
 \section{Simulating prices and rates: stochastic differential equations}
 \label{sec3:sde}
 
-A stochastic differential equation $dX_t=a(t,X_t)\,dt+b(t,X_t)\,dW_t$ with $X_0=x_0$ is shorthand for
-the integral equation $X_t=x_0+\int_0^ta(s,X_s)\,ds+\int_0^tb(s,X_s)\,dW_s$. A \emph{strong solution}\index{strong solution} is
+A stochastic differential equation\ix{Stochastic differential equation}\ix{Differential equation} $dX_t=a(t,X_t)\,dt+b(t,X_t)\,dW_t$ with $X_0=x_0$ is shorthand for
+the integral equation $X_t=x_0+\int_0^ta(s,X_s)\,ds+\int_0^tb(s,X_s)\,dW_s$. A \emph{strong solution}\index{Strong solution} is
 an adapted continuous process that satisfies it on the given probability space. If $a$ and $b$ are
 jointly measurable, Lipschitz in $x$ uniformly in $t$, and grow at most linearly, and $x_0$ is a
 constant, there is exactly one strong solution with $\E\int_0^T X_t^2\,dt<\infty$; the proof is a Picard iteration in mean square
@@ -838,7 +848,7 @@ The equation $dS_t=\mu S_t\,dt+\sigma S_t\,dW_t$ with $S_0>0$ has the unique sol
   S_t = S_0\exp\Bigl(\bigl(\mu-\tfrac12\sigma^2\bigr)t+\sigma W_t\Bigr).
 \end{equation}
 Hence $\ln S_t\sim\N\bigl(\ln S_0+(\mu-\tfrac12\sigma^2)t,\ \sigma^2t\bigr)$, $\E[S_t]=S_0e^{\mu t}$,
-the median of $S_t$ is $S_0e^{(\mu-\sigma^2/2)t}$ and $\mathbb P(S_t<S_0)=\Phi\bigl(-(\mu-\tfrac12\sigma^2)\sqrt t/\sigma\bigr)$.
+the median\ix{Median} of $S_t$ is $S_0e^{(\mu-\sigma^2/2)t}$ and $\mathbb P(S_t<S_0)=\Phi\bigl(-(\mu-\tfrac12\sigma^2)\sqrt t/\sigma\bigr)$.
 \end{proposition}
 
 \begin{proof}
@@ -853,27 +863,27 @@ $\ln S_t$ is read off \cref{eq3:gbm}, and the mean, median and loss probability 
 the lognormal moments derived in Chapter~1.
 \end{proof}
 
-The drift of the logarithm is $\mu-\tfrac12\sigma^2$, not $\mu$. That correction is the gap between the
-arithmetic and geometric mean returns met in Chapter~1. The median of $S_T$ grows at the rate $\mu-\tfrac12\sigma^2$
-while its mean grows at $\mu$, so over long horizons the typical path falls far below the expected
+The drift\ix{Drift} of the logarithm is $\mu-\tfrac12\sigma^2$, not $\mu$. That correction is the gap between the
+arithmetic and geometric mean\ix{Geometric mean} returns\ix{Mean} met in Chapter~1. The median of $S_T$ grows at the rate $\mu-\tfrac12\sigma^2$
+while its mean grows at $\mu$, so over long horizons\ix{Horizon} the typical path falls far below the expected
 value.
 
 \begin{proposition}\label{prop3:gbmlong}
-Let $\sigma>0$. If $\mu<\tfrac12\sigma^2$, then $S_t\to0$ almost surely. If in addition $\mu>0$, then at the same
+Let $\sigma>0$. If $\mu<\tfrac12\sigma^2$, then $S_t\to0$ almost surely\ix{Almost sure convergence}. If in addition $\mu>0$, then at the same
 time $\E[S_t]=S_0e^{\mu t}\to\infty$: almost every path vanishes while the average over paths grows.
 \end{proposition}
 
 \begin{proof}
 By \cref{eq3:gbm}, $\ln S_t=\ln S_0+t\bigl(\mu-\tfrac12\sigma^2+\sigma W_t/t\bigr)$, so it is enough to show
 $W_t/t\to0$ almost surely. On integer times $W_n=\sum_{k\le n}(W_k-W_{k-1})$ is a sum of independent
-standard normals, so $W_n/n\to0$ by the strong law of large numbers. Between integers, by
+standard normals, so $W_n/n\to0$ by the strong law of large numbers\ix{Law of large numbers}. Between integers, by
 \cref{prop3:bmrefl} applied to $W$ and $-W$,
 $\mathbb P\bigl(\max_{n\le t\le n+1}|W_t-W_n|\ge n^{2/3}\bigr)\le4\bigl(1-\Phi(n^{2/3})\bigr)$, which is summable. By
 Borel-Cantelli the oscillation over $[n,n+1]$ is below $n^{2/3}$ for all large $n$, and dividing by
 $n$ gives the claim.
 \end{proof}
 
-\Cref{fig3:gbm} shows the two regimes over thirty years with $S_0=100$ and $\mu=8\%$. With
+\Cref{fig3:gbm} shows the two regimes\ix{Regime} over thirty years with $S_0=100$ and $\mu=8\%$. With
 $\sigma=25\%$ the log drift is \gbmGrowthLow\% a year and the median path grows to \gbmMedianLow. With
 $\sigma=50\%$ the log drift is \gbmGrowthHigh\% and the median falls to \gbmMedianHigh, while the mean is
 \gbmMeanHigh{} in both cases. In the second case the probability of ending below the start is
@@ -892,8 +902,8 @@ geometric mean is the better guide to what a single investor will see.
 
 \subsection{Two numerical schemes}
 
-Most stochastic differential equations have no closed form, and the standard way to simulate them is
-to step forward on a grid $t_k=kh$. For one Brownian driver, the \emph{Euler-Maruyama}\index{Euler-Maruyama} scheme and the scalar-noise \emph{Milstein}\index{Milstein} scheme are
+Most stochastic differential equations\ix{Differential equation} have no closed form, and the standard way to simulate them is
+to step forward on a grid $t_k=kh$. For one Brownian driver, the \emph{Euler-Maruyama\ix{Euler scheme}}\index{Euler scheme} scheme and the scalar-noise \emph{Milstein}\index{Milstein} scheme are
 \begin{align}
   \hat X_{k+1} &= \hat X_k + a(\hat X_k)h + b(\hat X_k)\Delta W_k, \label{eq3:euler}\\
   \hat X_{k+1} &= \hat X_k + a(\hat X_k)h + b(\hat X_k)\Delta W_k + \tfrac12 b(\hat X_k)b'(\hat X_k)\bigl(\Delta W_k^2-h\bigr), \label{eq3:milstein}
@@ -904,16 +914,16 @@ average is zero but its size is not. Two notions of accuracy matter. The \emph{s
 $\E|X_T-\hat X_T|$ measures how close simulated paths are to true paths driven by the same noise, which
 matters for hedging simulations. The \emph{weak} error $|\E g(X_T)-\E g(\hat X_T)|$ measures how close
 expectations are, which is what pricing needs. If $a$ and $b$ are globally Lipschitz with linear growth
-and the starting value has a finite second moment, the Euler scheme has strong order $\tfrac12$. The
+and the starting value has a finite second moment\ix{Second moment}, the Euler scheme has strong order\ix{Strong convergence} $\tfrac12$. The
 Milstein scheme has strong order $1$ if, in addition, $a$ and $b$ are smooth enough for the terms below to
 exist, $bb'$ is globally Lipschitz, and $bb'$ and the coefficients of the next terms of the It\^o-Taylor
 expansion, such as $ab'+\tfrac12b^2b''$ and $b(bb')'$, grow at most linearly. A bounded $b'$ alone is not
-enough. The Euler scheme has weak order $1$ if, besides the Lipschitz and growth conditions, $a$, $b$
+enough. The Euler scheme has weak order\ix{Weak convergence} $1$ if, besides the Lipschitz and growth conditions, $a$, $b$
 and the payoff $g$ are four times continuously differentiable with derivatives of polynomial growth
 \parencite{kloeden1992,higham2001}. Geometric Brownian motion, with $a(x)=\mu x$ and $b(x)=\sigma x$,
 meets all of these conditions except the smoothness of a payoff with a kink, such as a call.
 
-For geometric Brownian motion\index{geometric Brownian motion} the Euler mean can be computed exactly, which gives a clean check.
+For geometric Brownian motion\index{Brownian motion!geometric} the Euler mean can be computed exactly, which gives a clean check.
 
 \begin{proposition}\label{prop3:eulerweak}
 For the Euler scheme applied to $dS=\mu S\,dt+\sigma S\,dW$ with $n$ steps of size $h=T/n$,
@@ -949,8 +959,8 @@ exact weak errors of \cref{eq3:eulermean}, with fitted slopes \weakSlopeMean{} a
 
 \subsection{The Ornstein-Uhlenbeck process}
 
-Interest rates, credit spreads and the basis between related commodities are frequently modelled as
-mean reverting, although they can shift and trend for years, as Canadian yields did from 2001 to
+Interest rates\ix{Interest rate}, credit spreads\ix{CDS spread}\ix{Credit spread} and the basis between related commodities are frequently modelled as
+mean reverting\ix{Mean reversion}, although they can shift and trend for years, as Canadian yields did from 2001 to
 2020. The simplest mean-reverting model is due to
 \textcite{uhlenbeck1930}, and \textcite{vasicek1977} used it for the short rate:
 \begin{equation}\label{eq3:ou}
@@ -1004,13 +1014,13 @@ Apply \cref{prop3:ou} over one interval starting from $X_k$, using the independe
 Brownian increments after time $k\delta$.
 \end{proof}
 
-The corollary gives an exact simulation method with no discretisation error, and it is the link to
+The corollary gives an exact simulation\ix{Exact simulation} method with no discretisation error, and it is the link to
 the smoothing models of Chapter~1, where appraisal-based returns were modelled as autoregressions. It
 also gives an estimator: regress $X_{k+1}$ on $X_k$ and set $\hat\kappa=-\ln\hat\phi/\delta$. The listing
 below does this on fifty years of simulated monthly data with $\kappa=1.2$.
 \lstinputlisting[language=Python]{code/ch03/snippets/ou_fit.py}
-It prints $\hat\kappa=\snipKappa$ and a half-life of \snipHalf{} years, against true values of $1.2$ and
-\ouHalfLife. The estimate is \snipExcess{} too high. About \ouKendallKappa{} of that excess is the small-sample bias described next; the remaining
+It prints $\hat\kappa=\snipKappa$ and a half-life\ix{Half-life} of \snipHalf{} years, against true values of $1.2$ and
+\ouHalfLife. The estimate is \snipExcess{} too high. About \ouKendallKappa{} of that excess is the small-sample bias\ix{Bias} described next; the remaining
 \snipExcessRest{} is small beside the sampling noise, and another sample could miss in either direction. \textcite{kendall1954} showed (with the mean
 estimated) that the least squares estimate of an autoregressive coefficient is biased towards zero by
 about $(1+3\phi)/n$ in a sample of $n$, a first-order approximation for a Gaussian first order
@@ -1025,7 +1035,7 @@ as in the case study, the factor is about \caseAmp.
 mean is \ouMeanOne\% after one year, and the half-life is \ouHalfLife{} years. The stationary standard
 deviation is \ouSdInf{} points, so the model gives a negative value \ouProbNeg\% of the time in the long
 run. Until 2012 that was counted against the model; once Denmark, then the euro area, Switzerland and
-Sweden set negative policy rates, it looked more like a feature. That the Gaussian model allows
+Sweden set negative policy rates\ix{Policy rate}, it looked more like a feature. That the Gaussian model\ix{Gaussian model} allows
 negative values does not show that it describes how rates behave near or below zero.
 
 \begin{figure}[t]
@@ -1041,13 +1051,13 @@ negative values does not show that it describes how rates behave near or below z
 \section{Changing the odds: Girsanov's theorem}
 \label{sec3:girsanov}
 
-Two probability measures $\mathbb P$ and $Q$ on $\mathcal F_T$ are \emph{equivalent} if they agree on which
-events are impossible. Then there is a positive random variable $Z_T=dQ/d\mathbb P$, the Radon-Nikodym
-density, with $\E_Q[Y]=\E_{\mathbb P}[YZ_T]$ for every integrable $Y$. Changing measure reweights the paths
+Two probability measures\ix{Probability measure} $\mathbb P$ and $Q$ on $\mathcal F_T$ are \emph{equivalent} if they agree on which
+events are impossible. Then there is a positive random variable $Z_T=dQ/d\mathbb P$, the Radon-Nikodym\ix{Radon-Nikodym derivative}
+density\ix{Density}, with $\E_Q[Y]=\E_{\mathbb P}[YZ_T]$ for every integrable $Y$. Changing measure reweights the paths
 without changing which paths can occur. The question is what happens to a Brownian motion under the
 new weights.
 
-\begin{theorem}[Girsanov\index{Girsanov}, constant drift]\label{thm3:girsanov}
+\begin{theorem}[Girsanov\index{Girsanov theorem}, constant drift]\label{thm3:girsanov}
 Let $W$ be a $\mathbb P$-Brownian motion on $[0,T]$, let $\theta$ be a constant and define $Q$ by
 \begin{equation}\label{eq3:girsanov}
   \frac{dQ}{d\mathbb P}=Z_T=\exp\Bigl(-\theta W_T-\tfrac12\theta^2T\Bigr).
@@ -1080,7 +1090,7 @@ condition $\E[\exp(\tfrac12\int_0^T\theta_t^2dt)]<\infty$ is enough \parencite{g
 Its main use in this book is risk-neutral pricing. Under $\mathbb P$ a stock follows
 $dS=\mu S\,dt+\sigma S\,dW$. In a frictionless market with constant $r$, $\mu$ and $\sigma$ and the money
 market account as numeraire, take $\theta=(\mu-r)/\sigma$, the market price of risk; under $Q$ the same
-stock follows $dS=rS\,dt+\sigma S\,d\tilde W$. The drift changes and the volatility does not. Girsanov's
+stock follows $dS=rS\,dt+\sigma S\,d\tilde W$. The drift\ix{Drift} changes and the volatility does not. Girsanov\ix{Girsanov theorem}'s
 theorem supplies the change of drift; that this $Q$ is the measure to price with is an argument about
 replication, which Chapter~5 makes.
 
@@ -1133,7 +1143,7 @@ estimates are \isPlainBig{} and \isBig, with standard errors \isPlainBigSE{} and
   \centering
   \includegraphics[width=\textwidth]{ch03/fig11_girsanov}
   \caption{(a) The law of $W_1$ under $\mathbb P$ and under the tilted measure $Q$; the shaded area is
-  $\mathbb P(W_1>3)$. (b) Estimates of $\mathbb P(W_1>3)$ by plain simulation and by importance sampling\index{importance sampling}, with two
+  $\mathbb P(W_1>3)$. (b) Estimates of $\mathbb P(W_1>3)$ by plain simulation and by importance sampling\index{Importance sampling}, with two
   standard errors; the dashed line is the exact value.}
   \label{fig3:girsanov}
 \end{figure}
@@ -1145,10 +1155,10 @@ estimates are \isPlainBig{} and \isBig, with standard errors \isPlainBigSE{} and
 
 Many quantities in finance are discounted expectations of a function of a diffusion at a future date.
 \textcite{kac1949}, building on Feynman's path integrals, showed that such expectations solve a
-parabolic partial differential equation. That gives two independent ways to compute a price, averaging simulated payoffs or solving the
+parabolic partial differential equation\ix{Partial differential equation}. That gives two independent ways to compute a price, averaging simulated payoffs\ix{Payoff} or solving the
 equation on a grid, and \cref{sec3:cn} does both for a call.
 
-\begin{theorem}[Feynman-Kac\index{Feynman-Kac}]\label{thm3:fk}
+\begin{theorem}[Feynman-Kac\index{Feynman-Kac formula}]\label{thm3:fk}
 Let $dX_s=a(X_s)\,ds+b(X_s)\,dW_s$ have a unique strong solution, let $r\ge0$ be a constant, and let
 $u(t,x)$ be continuously differentiable once in $t$ and twice in $x$ on $[0,T]\times\mathbb R$ with
 \begin{equation}\label{eq3:fkpde}
@@ -1184,7 +1194,7 @@ converge in $L^1$ to the payoff, which justifies passing to the limit under the 
 
 Two cases can be checked by hand. For Brownian motion ($a=0$, $b=1$, $r=0$) and $g(x)=x^2$, the PDE
 $u_t+\tfrac12u_{xx}=0$ is solved by $u=x^2+(T-t)$, and indeed $\E[(x+W_{T-t})^2]=x^2+T-t$. For the
-Ornstein-Uhlenbeck\index{Ornstein-Uhlenbeck} process with $g(x)=x^2$, \cref{eq3:oumoments} gives
+Ornstein-Uhlenbeck\index{Ornstein-Uhlenbeck process} process with $g(x)=x^2$, \cref{eq3:oumoments} gives
 $u(t,x)=\bigl(\theta+(x-\theta)e^{-\kappa\tau}\bigr)^2+\sigma^2(1-e^{-2\kappa\tau})/(2\kappa)$ with $\tau=T-t$.
 Writing $m=\theta+(x-\theta)e^{-\kappa\tau}$, the derivatives are $u_\tau=-2\kappa m(x-\theta)e^{-\kappa\tau}+\sigma^2e^{-2\kappa\tau}$,
 $u_x=2me^{-\kappa\tau}$ and $u_{xx}=2e^{-2\kappa\tau}$, so
@@ -1200,7 +1210,7 @@ The case that matters most for this book is geometric Brownian motion under the 
 and \cref{eq3:fkrep} says the price is the discounted $Q$-expectation of the payoff, once Chapter~5
 has shown by replication that $Q$ is the measure to price with (the kink at
 $s=K$ and the state space $(0,\infty)$ are covered by the remark after \cref{thm3:fk}). Chapter~5 derives
-\cref{eq3:bs} a second way, by hedging, and solves it in closed form. Here we solve it numerically.
+\cref{eq3:bs} a second way, by hedging, and solves it in closed form. Here we solve it numerically\ix{Numerical methods}.
 
 \subsection{A Crank-Nicolson solver}
 \label{sec3:cn}
@@ -1213,7 +1223,7 @@ interior node, the operator
   (\mathcal Lu)_i=\Bigl(\frac{b^2}{2\Delta x^2}-\frac a{2\Delta x}\Bigr)u_{i-1}
   -\Bigl(\frac{b^2}{\Delta x^2}+r\Bigr)u_i+\Bigl(\frac{b^2}{2\Delta x^2}+\frac a{2\Delta x}\Bigr)u_{i+1},
 \end{equation*}
-and the Crank-Nicolson step averages the explicit and implicit schemes:
+and the Crank-Nicolson\ix{Crank-Nicolson scheme} step averages the explicit and implicit schemes:
 \begin{equation}\label{eq3:cn}
   \bigl(I-\tfrac12\Delta\tau\,\mathcal L\bigr)u^{k+1}=\bigl(I+\tfrac12\Delta\tau\,\mathcal L\bigr)u^k ,
 \end{equation}
@@ -1224,7 +1234,7 @@ damps the oscillations the kink would otherwise cause. The grid in $x=\ln s$ is 
 $s=1{,}000$, with boundary values $0$ at the bottom and $s-Ke^{-r\tau}$ at the top.
 
 With $K=100$, $r=3\%$, $\sigma=20\%$ and one year to expiry, the solver gives \fkPDE{} at $s=100$,
-equal to the closed form \fkBS{} to four decimals. A simulation of \fkPaths{} terminal values under $Q$,
+equal to the closed form\ix{Closed form} \fkBS{} to four decimals. A simulation of \fkPaths{} terminal values under $Q$,
 drawn as 500{,}000 antithetic pairs, gives \fkMC{} with a standard error of \fkMCse. For the Ornstein-Uhlenbeck second moment with
 $\kappa=1.5$, $\theta=0.2$, $\sigma=0.5$, $T=2$ and $x=1$, the solver gives \fkOUPDE, the closed form
 \fkOUExact{} and simulation \fkOUMC. Panel (b) of \cref{fig3:fk} shows second order convergence for this grid, boundary and
@@ -1245,34 +1255,34 @@ with rougher data or other boundaries the order would have to be checked again.
 \section{Case study: is the five year yield mean reverting?}
 \label{sec3:case}
 
-Mean reversion is often assumed for rates, spreads, cap rates and valuation multiples, and a fitted
-half-life is quoted as if it were a measured property of the market. This case study fits
+Mean reversion\ix{Mean reversion} is often assumed for rates, spreads, cap rates\ix{Capitalisation rate} and valuation multiples\ix{Valuation multiple}, and a fitted
+half-life\ix{Half-life} is quoted as if it were a measured property of the market. This case study fits
 \cref{eq3:ou} to the month-end five year Government of Canada benchmark yield from \caseStart{} to
 \caseEnd, \caseN{} observations from the archived snapshot used in Chapter~1, and asks how much the fit can
-be trusted. The snapshot starts in April 2009 because it pairs the yield with the policy rate
+be trusted. The snapshot starts in April 2009 because it pairs the yield with the policy rate\ix{Policy rate}
 target, whose series in the file begins then; the sample ends at the last complete month-end in the
 data. Refitting on the longer Valet series of \cref{sec3:qv}, \caseLongN{} month-ends from
 \caseLongStart, gives $\hat\kappa=\caseLongKappa$, a half-life of \caseLongHalf{} years and a
-Dickey-Fuller $p$-value of \caseLongADFp, lower than on the shorter sample but still far from rejecting a random walk, and the checks below
+Dickey-Fuller $p$-value of \caseLongADFp, lower than on the shorter sample but still far from rejecting a random walk\ix{Random walk}, and the checks below
 come out the same way.
 
 Regressing each month-end yield on the previous one gives $\hat\phi=\casePhi$. By \cref{cor3:ar1} this
 means $\hat\kappa=\caseKappa$ a year, a long-run level of $\hat\theta=\caseTheta\%$, a volatility of
 $\hat\sigma=\caseSigma$ points a year and a half-life of \caseHalf{} years. The last observation is
 \caseLast\%. Panel (a) of \cref{fig3:yieldou} shows the series against the fitted level and the
-stationary band $\hat\theta\pm1.96\,\hat\sigma/\sqrt{2\hat\kappa}$, which reaches \caseBand{} points either side of $\hat\theta$ because the stationary standard deviation is \caseSdInf.
+stationary\ix{Stationarity} band $\hat\theta\pm1.96\,\hat\sigma/\sqrt{2\hat\kappa}$, which reaches \caseBand{} points either side of $\hat\theta$ because the stationary standard deviation is \caseSdInf.
 
 Three checks make the numbers look much less solid. First, the Dickey-Fuller statistic (with a
-constant and no lagged differences) for the null hypothesis $\phi=1$, a random walk with no reversion
+constant and no lagged differences) for the null hypothesis\ix{Hypothesis test} $\phi=1$, a random walk with no reversion
 at all, is \caseADF, against a 5\% critical value of \caseADFcrit{} \parencite{dickey1979}; the
 $p$-value is \caseADFp, so the data cannot reject a random walk. With \caseN{} monthly points the test has little power
 against a half-life of three years, so failing to reject is weak evidence either way. Second, a parametric bootstrap that
 simulates \caseBoot{} samples of the same length from the fitted model and refits each one finds an
 average $\hat\kappa$ of \caseKappaBootMean, \caseBiasRatio{} times the value used to simulate (panel b).
-In simulations calibrated to this fitted model the estimator is badly biased upwards at this sample
-size; the ratio belongs to this experiment and would differ at another sample size or speed. Third, under the
+In simulations calibrated to this fitted model the estimator\ix{Estimation} is badly biased\ix{Bias} upwards at this sample
+size\ix{Sample size}; the ratio belongs to this experiment and would differ at another sample size or speed. Third, under the
 fitted model, 90\% of the half-lives estimated from samples this long lie between \caseHalfLo{} and
-\caseHalfHi{} years. That is the spread of the estimator in simulation, not a confidence interval for
+\caseHalfHi{} years. That is the spread of the estimator in simulation, not a confidence interval\ix{Confidence interval} for
 the true half-life, and it shows that even if the model were right the estimate would be imprecise.
 
 Seventeen years of monthly data are consistent with slow mean reversion but do not establish it. A

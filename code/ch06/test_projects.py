@@ -19,3 +19,17 @@ def test_project_2():
 def test_project_3():
     r = P.project_3()
     assert r["rmse_convexity"] < 0.1 * r["rmse_duration"]
+
+
+def test_project_4():
+    r = P.project_4()
+    assert len(r) >= 15
+    for t, v in r.items():
+        assert v["quarters"] >= 8 and v["vol"] > 0
+        assert -1 < v["phi"] < 1 and v["vol_desmoothed"] > 0
+    # the de-smoothed series of one lender, rebuilt by hand from its returns
+    import direct_lending as DL
+    g = DL.bdc_panel(DL.load_bdc()); r = g[g.ticker == "ARCC"].roe.dropna().values
+    phi = float(np.corrcoef(r[:-1], r[1:])[0, 1])
+    ds = (r[1:] - phi * r[:-1]) / (1 - phi) if phi > 0 else r
+    assert abs(2 * np.std(ds, ddof=1) - P.project_4()["ARCC"]["vol_desmoothed"]) < 1e-12

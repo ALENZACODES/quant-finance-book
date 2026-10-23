@@ -55,7 +55,8 @@ to the drills follow the exercises, and each project is solved by a function in
 
 \paragraph{The code repository}
 Every number in the text is computed by a script and every figure is drawn by one, so a reader can
-change an assumption and see what moves. The repository has one folder per chapter under
+change an assumption and see what moves. The repository is public at
+\url{https://github.com/ALENZACODES/quant-finance-book}. It has one folder per chapter under
 \texttt{code/}, with its scripts, a library module, unit tests, and checks in R and GNU Octave that
 recompute the main results by other methods. To set it up, create a Python environment and install the
 pinned requirements:
@@ -79,3 +80,12 @@ The notation that holds throughout the book, the compounding conventions of each
 letters that change meaning between chapters are collected under Notation and conventions, just
 before Chapter~1.
 Results are numbered by chapter, proofs follow the statements, and every simulation names its seed.
+
+From Chapter~6 on, every figure and table carries a tag that says where its numbers come from, and so
+do the case studies and the results of the direct lending section of Chapter~6. \kind{exact} marks a closed form or a deterministic calculation from
+stated inputs, so a rerun with the same inputs gives the same answer to the last digit.
+\kind{simulation} marks a Monte Carlo estimate, which carries sampling error and is reported with its
+seed and, where it matters, its standard error. \kind{historical} marks an estimate or a backtest on
+the data in the repository, which describes one sample of history and would change with another.
+A tag that names two kinds, such as \kind{exact and simulation}, means that the result is shown both
+ways, as when a formula is checked against a simulation.

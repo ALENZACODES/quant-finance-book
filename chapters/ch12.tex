@@ -13,17 +13,17 @@ sentences will usually find structure in a sample of returns too, whether or not
 there. This chapter is about telling the two apart.
 
 It takes six questions in turn. Why does a biased estimator often predict better than an unbiased one,
-and how do ridge\index{ridge} regression and the lasso\index{lasso} decide how much bias to take on? How should a model be validated when the
+and how do ridge regression and the lasso decide how much bias to take on? How should a model be validated when the
 observations are ordered in time and their labels overlap? What do trees, forests and boosting add to
-a linear model, and what limits each of them? How is a neural network\index{neural network} trained, and can such models learn
+a linear model, and what limits each of them? How is a neural network trained, and can such models learn
 a price, its delta and a hedge when trading is costly? Can any of these methods forecast the equity premium out of
 sample, and what would a small forecasting gain be worth to an investor? And how much of a good
 backtest is the search that produced it?
 
 Several earlier chapters are used without being repeated. The standard error of a Sharpe ratio, with
 its corrections for skewness and kurtosis, is derived in Chapter~8, and screening many managers with
-false discovery control is in Chapter~7; \cref{sec12:overfit} builds the deflated Sharpe ratio\index{deflated Sharpe ratio},
-Holm\index{Holm}'s procedure and the bootstrap tests of data snooping on top of them. The discrete hedging error of a Black-Scholes delta is in Chapter~5,
+false discovery control is in Chapter~7; \cref{sec12:overfit} builds the deflated Sharpe ratio,
+Holm's procedure and the bootstrap tests of data snooping on top of them. The discrete hedging error of a Black-Scholes delta is in Chapter~5,
 and \cref{sec12:hedge} uses it as the benchmark a learned hedge has to match.
 
 \begin{keybox}[How to read this chapter]
@@ -31,10 +31,10 @@ The numbers in the text are computed by nine scripts in \texttt{code/ch12/} (\te
 \texttt{cv\_time}, \texttt{trees}, \texttt{neural}, \texttt{equity\_premium}, \texttt{hedging},
 \texttt{overfit}, \texttt{snooping} and \texttt{exercises}). Every method is written out in the chapter's library
 \texttt{ch12lib.py} with NumPy and SciPy: ridge through the singular value decomposition, the lasso by
-coordinate descent\index{coordinate descent}, regression trees, bagging\index{bagging}, forests and boosting, a feed-forward network with its
+coordinate descent, regression trees, bagging, forests and boosting, a feed-forward network with its
 backward pass and the Adam optimiser, the out-of-sample statistics, the learned hedges and the
 overfitting statistics. The tests in \texttt{code/ch12/test\_*.py} check the library against closed
-forms, finite differences and identities, and compare the lasso and the regression tree\index{regression tree} with
+forms, finite differences and identities, and compare the lasso and the regression tree with
 scikit-learn \parencite{sklearn2011}, which is used for that comparison only; ridge is checked against
 the normal equations. An independent R script
 rebuilds the fourteen predictors from the data file and recomputes every least squares forecast, the
@@ -74,7 +74,7 @@ ratio estimated from $T$ observations, $\theta^*$ a benchmark for it and $N$ a n
 \label{sec12:reg}
 
 A forecast is judged on new data. Suppose $y=f(x)+\varepsilon$ with $\E\varepsilon=0$ and
-$\operatorname{Var}\varepsilon=\sigma^2$, and a method fitted to a training sample $\mathcal D$ returns a
+$\operatorname{Var}\varepsilon=\sigma^2$, and a method fitted to a training sample\ix{Training set} $\mathcal D$ returns a
 function $\hat f$. The training sample is random, so $\hat f(x_0)$ at a fixed point $x_0$ is a random
 variable, and its error splits into three parts.
 
@@ -95,15 +95,15 @@ of the other two. Squaring and taking expectations, every cross product vanishes
 The noise $\sigma^2$ is beyond any method. The other two terms trade against each other. Least
 squares on the correct linear model is unbiased, so all of its excess error is variance, and with many
 predictors and few observations that variance is large. A method that shrinks the coefficients towards
-zero adds bias and removes variance, and the sum can fall.
+zero adds bias\ix{Bias} and removes variance, and the sum can fall.
 
 \subsection{Ridge regression}
 
-Ridge regression \parencite{hoerl1970} adds a penalty on the squared size of the coefficients:
+Ridge\ix{Ridge regression} regression\ix{Linear regression} \parencite{hoerl1970} adds a penalty on the squared size of the coefficients:
 \begin{equation}\label{eq12:ridge}
   \hat\beta_\lambda=\arg\min_\beta\ \|y-X\beta\|_2^2+\lambda\|\beta\|_2^2=(X^\top X+\lambda I)^{-1}X^\top y .
 \end{equation}
-The inverse exists for every $\lambda>0$, even when $p>n$ and least squares has no unique solution.
+The inverse exists for every $\lambda>0$, even when $p>n$ and least squares\ix{Least squares} has no unique solution.
 
 \begin{proposition}[What ridge does]\label{prop12:ridge}
 Let $X=UDV^\top$ and $y=X\beta+\varepsilon$ with $\E\varepsilon=0$ and $\operatorname{Var}\varepsilon=\sigma^2I$,
@@ -126,7 +126,7 @@ $X=UDV^\top$ gives the sum. (ii) In the rotated coordinates $\hat\alpha=V^\top\h
 components $\hat\alpha_j=d_j(u_j^\top y)/(d_j^2+\lambda)$, and $u_j^\top y=d_j\alpha_j+u_j^\top\varepsilon$
 with $\operatorname{Var}(u_j^\top\varepsilon)=\sigma^2$. So $\E\hat\alpha_j-\alpha_j=-\lambda\alpha_j/(d_j^2+\lambda)$
 and $\operatorname{Var}\hat\alpha_j=\sigma^2d_j^2/(d_j^2+\lambda)^2$. The rotation preserves length, and the sum
-of squared bias and variance\index{bias and variance} over $j$ is \cref{eq12:ridgemse}. (iii) The derivative of the $j$th term is
+of squared bias and variance\ix{Bias-variance trade-off}\index{Bias-variance trade-off} over $j$ is \cref{eq12:ridgemse}. (iii) The derivative of the $j$th term is
 \[
   \frac{2\lambda\alpha_j^2(d_j^2+\lambda)-2(\sigma^2d_j^2+\lambda^2\alpha_j^2)}{(d_j^2+\lambda)^3},
 \]
@@ -134,24 +134,24 @@ which at $\lambda=0$ is $-2\sigma^2/d_j^4$. The derivative is continuous, so $M(
 enough $\lambda>0$.
 \end{proof}
 
-The listing below computes ridge from the thin singular value decomposition of part (i), without
+The listing below computes ridge from the thin singular value decomposition\ix{Singular value decomposition} of part (i), without
 forming an inverse. It is written for a predictor matrix of full column rank. Singular values below a
 relative tolerance are treated as zero and given a factor of zero, so a rank-deficient matrix at
 $\lambda=0$ gives the minimum-norm solution instead of dividing by a rounding error. It returns the factor $d_j^2/(d_j^2+\lambda)$ by which each singular direction is
-shrunk and their sum, the effective degrees of freedom, and checks the coefficients against the normal
-equations on a small simulated sample: with six predictors the degrees of freedom fall from 6 at
+shrunk and their sum, the effective degrees of freedom\ix{Degrees of freedom}\ix{Effective degrees of freedom}, and checks the coefficients against the normal
+equations\ix{Normal equations} on a small simulated sample: with six predictors the degrees of freedom fall from 6 at
 $\lambda=0$ to 4.76 at $\lambda=25$ and 1.72 at $\lambda=250$.
 \Needspace*{22\baselineskip}
 \lstinputlisting[language=Python]{code/ch12/snippets/ridge_svd.py}
 
 Part (iii) is the existence result of \textcite{hoerl1970}. It does not say which $\lambda$ to use, and
-the best one depends on the unknown $\alpha$; in practice $\lambda$ is chosen by cross-validation\index{cross-validation}. The
+the best one depends on the unknown $\alpha$; in practice $\lambda$ is chosen by cross-validation\index{Cross-validation}. The
 trace of the hat matrix, $\sum_jd_j^2/(d_j^2+\lambda)$, falls from $p$ to zero as $\lambda$ grows and is
 called the effective degrees of freedom of the fit.
 
 \subsection{The lasso}
 
-The lasso \parencite{tibshirani1996} replaces the squared penalty by the absolute value:
+The lasso\ix{Lasso} \parencite{tibshirani1996} replaces the squared penalty by the absolute value:
 \begin{equation}\label{eq12:lasso}
   \hat\beta=\arg\min_\beta\ \frac1{2n}\|y-X\beta\|_2^2+\lambda\|\beta\|_1 .
 \end{equation}
@@ -198,18 +198,18 @@ checks it against scikit-learn.
 
 \subsection{A simulation}
 
-The script \texttt{regularise} draws \bvReps{} training samples of $n=\bvN$ observations on $p=\bvP$
+The script \texttt{regularise} draws \bvReps{} training samples\ix{Training set} of $n=\bvN$ observations on $p=\bvP$
 predictors. The predictors are normal with correlation $\bvRho^{|j-k|}$ between columns $j$ and $k$, five
-coefficients are nonzero, and the noise has standard deviation \bvSig, so that the signal variance is
-\bvSnr{} of the noise variance. Each sample is fitted by least squares and along a grid of penalties for ridge
-and the lasso, and every fit predicts the same \bvNte{} test points. Averaging over the samples splits the
-excess test error, the part above $\sigma^2$ in \cref{eq12:bv}, into squared bias and variance
+coefficients are nonzero, and the noise\ix{Noise} has standard deviation \bvSig, so that the signal variance is
+\bvSnr{} of the noise variance. Each sample is fitted by least squares\ix{Least squares} and along a grid of penalties for ridge\ix{Ridge regression}
+and the lasso\ix{Lasso}, and every fit predicts the same \bvNte{} test points. Averaging over the samples splits the
+excess test error, the part above $\sigma^2$ in \cref{eq12:bv}, into squared bias\ix{Bias} and variance\ix{Bias-variance trade-off}
 (\cref{fig12:bv}).
 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig01_bias_variance}
-  \caption{Excess test error of ridge (left) and the lasso (right) against the penalty, split into squared
+  \caption{\kind{simulation} Excess test error of ridge (left) and the lasso (right) against the penalty, split into squared
   bias and variance, averaged over \bvReps{} simulated training samples of \bvN{} observations on \bvP{}
   correlated predictors. The horizontal line is least squares.}
   \label{fig12:bv}
@@ -217,7 +217,7 @@ excess test error, the part above $\sigma^2$ in \cref{eq12:bv}, into squared bia
 
 Least squares has an excess error of \bvOlsErr, of which \bvOlsVar{} is variance and \bvOlsBias{} the
 simulation's estimate of a bias that is zero. Ridge at the penalty that is best in hindsight, $\lambda=\bvRidgeLam$ (an oracle choice that
-cross-validation can only approximate), cuts the
+cross-validation\ix{Cross-validation} can only approximate), cuts the
 excess error to \bvRidgeErr, \bvRidgeCut\% less, with squared bias \bvRidgeBias{} and variance
 \bvRidgeVar; its effective degrees of freedom are about \bvRidgeDf{} of the \bvP. Even the smallest
 penalty on the grid, $\lambda=\bvRidgeSmallLam$, lowers the error a little, to \bvRidgeSmall, consistent with
@@ -231,7 +231,7 @@ path. Ridge moves every coefficient smoothly towards zero; the lasso drops them 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig02_paths}
-  \caption{Coefficient paths for one simulated sample. The five coefficients that are nonzero in the true
+  \caption{\kind{simulation} Coefficient paths for one simulated sample. The five coefficients that are nonzero in the true
   model are drawn in red. The lasso sets coefficients to zero one at a time as $\lambda$ grows; ridge only
   shrinks them.}
   \label{fig12:paths}
@@ -252,7 +252,7 @@ gives away a little of the gain, and keeps most of it.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig15_cv_oracle}
-  \caption{Simulation, random stream 13: \cvK-fold cross-validation against the excess error of the
+  \caption{\kind{simulation} Random stream 13: \cvK-fold cross-validation against the excess error of the
   fit for ridge (left) and the lasso (right), averaged over \cvReps{} training samples of the model of
   \cref{fig12:bv}. The cross-validation estimate is the out-of-fold mean squared error less the noise
   variance. The dotted line is the penalty with the smallest average excess error, and the shaded band
@@ -268,9 +268,9 @@ gives away a little of the gain, and keeps most of it.
 A penalty, a tree depth or a number of boosting rounds is chosen by estimating the test error of each
 candidate. $K$-fold cross-validation splits the sample into $K$ folds, fits on $K-1$ of them and
 predicts the one left out, in turn, and pools the errors. Its usual justification is that the left-out fold
-behaves like new data, independent of the fitting sample. Financial data break that in two ways. Observations close in time
-are dependent, and a label often spans several periods: a twelve month return starting in January
-shares eleven months with the one starting in February.
+behaves like new data, independent\ix{Independence} of the fitting sample. Financial data break that in two ways. Observations close in time
+are dependent\ix{Dependence}, and a label often spans several periods: a twelve month return starting in January
+shares\ix{Stock} eleven months with the one starting in February.
 
 \begin{proposition}[Overlapping labels]\label{prop12:overlap}
 Let $r_1,r_2,\dots$ be independent with common variance $s^2$, and let $y_t=r_{t+1}+\dots+r_{t+h}$.
@@ -290,8 +290,8 @@ and the test labels together use $r_{a+1},\dots,r_{b+h}$. The two sets are disjo
 $s+1\ge b+h+1$. Labels built from disjoint sets of independent returns are independent.
 \end{proof}
 
-Removing the overlapping labels is called purging\index{purging}, and dropping a further stretch after each test block,
-to allow for dependence in the predictors, is called an embargo\index{embargo} \parencite{lopezdeprado2018}. The
+Removing the overlapping labels is called purging\ix{Cross-validation!purged}\index{Cross-validation!purged}, and dropping a further stretch after each test block,
+to allow for dependence in the predictors, is called an embargo\index{Cross-validation!purged} \parencite{lopezdeprado2018}. The
 simulated correlations of twelve month labels one, six and eleven months apart are \kfCorrOne, \kfCorrSix{}
 and \kfCorrEleven, against \kfCorrThOne, \kfCorrThSix{} and \kfCorrThEleven{} from part (i).
 \Cref{fig12:folds} shows the scheme.
@@ -320,7 +320,7 @@ The script \texttt{cv\_time} builds a world with nothing to find. Monthly return
 with mean \kfMu\% and volatility \kfVol\%, and a predictor follows an autoregression with coefficient
 \kfPhi, independent of the returns, like a valuation ratio. The label is the sum of the next \kfH{}
 returns, and \kfT{} months give \kfN{} labels. A regression of the label on the predictor is scored by
-three \kfK-fold schemes: folds drawn at random, contiguous blocks, and contiguous blocks purged and
+three \kfK-fold schemes: folds drawn at random, contiguous blocks\ix{Block bootstrap}, and contiguous blocks purged\ix{Cross-validation!purged} and
 embargoed. The fit from the whole sample is also scored on a fresh sample from the same model, which is
 what the cross-validation is meant to estimate. Each scheme reports the pooled out-of-sample $R^2$, one
 minus the ratio of the squared errors to those of the training mean.
@@ -329,7 +329,7 @@ minus the ratio of the squared errors to those of the training mean.
 dividend-price ratio of \cref{sec12:premium}, monthly from \dpFrom{} to \dpTo, has a first-order
 autocorrelation of \dpRho, and its median monthly change is \dpMoveMed\% of its standard deviation, so
 it drifts far from its mean and stays there for decades. One simulated path of the autoregression with
-coefficient \kfPhi, scaled to the same mean and standard deviation, is less persistent: its coefficient
+coefficient \kfPhi, scaled to the same mean and standard deviation, is less persistent\ix{Persistence}: its coefficient
 gives a half-life of about \dpSimHalf{} years against about \dpHalf{} for the data, so it crosses its mean
 several times a decade. The experiment below therefore understates the problem: a predictor as
 persistent as the real ratio leaves even fewer independent observations in a sample.
@@ -337,7 +337,7 @@ persistent as the real ratio leaves even fewer independent observations in a sam
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig19_dp}
-  \caption{Left: the log dividend-price ratio of the US market, monthly, \dpFrom{} to \dpTo, from the
+  \caption{\kind{historical} Left: the log dividend-price ratio of the US market, monthly, \dpFrom{} to \dpTo, from the
   data of \textcite{welch2008}, updated by \textcite{goyalch12} and pulled by \texttt{scripts/pull\_ch12.py}. Right: simulation, random
   stream 51: one path of the autoregression with coefficient \kfPhi{} used by \texttt{cv\_time}, scaled
   to the mean and standard deviation of the data.}
@@ -355,7 +355,7 @@ edges of each block overlap, and purging removes the rest.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.86\textwidth]{ch12/fig04_cv_leak}
-  \caption{Out-of-sample $R^2$ of a predictor with no power over twelve month returns, in \kfReps{}
+  \caption{\kind{simulation} Out-of-sample $R^2$ of a predictor with no power over twelve month returns, in \kfReps{}
   simulated samples: \kfK-fold cross-validation with shuffled folds, with purged and embargoed blocks, and
   the full-sample fit scored on a fresh sample.}
   \label{fig12:leak}
@@ -377,7 +377,7 @@ procedure only when the whole procedure is repeated inside each fold.
 \section{What do trees, forests and boosting add?}
 \label{sec12:trees}
 
-A regression tree \parencite{breiman1984} splits the predictor space into rectangles and predicts the
+A regression tree\ix{Decision tree} \parencite{breiman1984} splits the predictor space into rectangles and predicts the
 mean response in each. It is grown greedily: at each node, every predictor $j$ and every threshold $t$
 between adjacent values is tried, and the split that most reduces the sum of squared errors is kept,
 until a depth or a minimum leaf size is reached.
@@ -406,7 +406,7 @@ answer with a brute force search over all cuts on simulated data with a step at 
 
 \subsection{Averaging and boosting}
 
-Bagging \parencite{breiman1996} fits trees to bootstrap samples and averages them. A random forest\index{random forest}
+Bagging \parencite{breiman1996} fits trees\ix{Decision tree} to bootstrap samples and averages them. A random forest\ix{Random forest}\index{Random forest}
 \parencite{breiman2001} also lets each split consider only a random subset of $m$ of the $p$ predictors, which
 makes the trees less alike. The next result says why that helps.
 
@@ -420,16 +420,16 @@ $\operatorname{Var}\bigl(\tfrac1B\sum_b\hat f_b\bigr)=\tfrac1{B^2}\bigl(Bs^2+B(B
 \end{proof}
 
 More trees remove the second term and leave the first, so the variance of a forest is limited by how
-correlated its trees are, and the averaging does nothing for bias. Boosting attacks the bias instead.
+correlated its trees are, and the averaging does nothing for bias\ix{Bias}. Boosting\ix{Gradient boosting} attacks the bias instead.
 For squared loss $\tfrac12(y-F)^2$, the negative gradient with respect to the current fit $F(x_i)$ is the
-residual $y_i-F(x_i)$, and gradient boosting\index{gradient boosting} \parencite{friedman2001} fits a small tree to the residuals,
-adds a fraction $\nu$ of it to $F$, and repeats. Each step is a step of gradient descent in the space of
+residual\ix{Residual} $y_i-F(x_i)$, and gradient boosting\index{Gradient boosting} \parencite{friedman2001} fits a small tree to the residuals,
+adds a fraction $\nu$ of it to $F$, and repeats. Each step is a step of gradient descent\ix{Gradient descent} in the space of
 functions, taken along the direction that a small tree can represent.
 
 \begin{proposition}[Boosting a linear smoother]\label{prop12:boost}
 Suppose every round fits the residuals with the same linear smoother, fitted values $Ay$ for responses $y$,
 starting from $F_0=0$. After $M$ rounds with step $\nu$, $F_M=\bigl(I-(I-\nu A)^M\bigr)y$. If $A$ is
-symmetric with eigenvalues $s_i\in[0,1]$ and $0<\nu\le1$, the fit multiplies the $i$th eigencomponent of $y$ by
+symmetric with eigenvalues\ix{Eigenvalue} $s_i\in[0,1]$ and $0<\nu\le1$, the fit multiplies the $i$th eigencomponent of $y$ by
 $1-(1-\nu s_i)^M$, which rises to one as $M$ grows whenever $s_i>0$.
 \end{proposition}
 
@@ -440,7 +440,7 @@ follows from diagonalising $A$; $0\le1-\nu s_i\le1$.
 
 \Textcite{buhlmann2003} use this form to analyse boosting. Each extra round lowers the bias of every
 component the smoother can see and raises the variance, so the number of rounds plays the part of the
-penalty in ridge, and a small $\nu$ makes the path finer. With trees the smoother changes from round to round
+penalty in ridge\ix{Ridge regression}, and a small $\nu$ makes the path finer. With trees the smoother changes from round to round
 and the formula is only a guide, but the trade-off is the same.
 
 \Cref{fig12:shrink} draws the trade-off for one eigencomponent. With $\nu=0.1$ boosting fits half of a
@@ -451,7 +451,7 @@ $d_j$; with $\nu=1$ every curve rises faster and the choice of when to stop is c
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig16_shrink}
-  \caption{Left: the share $1-(1-\nu s)^M$ of an eigencomponent with eigenvalue $s$ fitted after $M$
+  \caption{\kind{exact} Left: the share $1-(1-\nu s)^M$ of an eigencomponent with eigenvalue $s$ fitted after $M$
   rounds of boosting a linear smoother at rate $\nu$. Right: the ridge factor $d^2/(d^2+\lambda)$ for
   three singular values. Both are exact formulas; no data or simulation is involved.}
   \label{fig12:shrink}
@@ -461,16 +461,16 @@ $d_j$; with $\nu=1$ every curve rises faster and the choice of when to stop is c
 
 The script \texttt{trees} uses the test function of \textcite{friedman1991},
 $f(x)=10\sin(\pi x_1x_2)+20(x_3-\tfrac12)^2+10x_4+5x_5$, with \tbP{} predictors uniform on $[0,1]$, of which
-five do not enter, noise of variance one, \tbN{} training points and \tbNte{} test points. The variance of
+five do not enter, noise\ix{Noise} of variance\ix{Variance} one, \tbN{} training points and \tbNte{} test points. The variance of
 $f$ is \tbVarFPop, and \tbVarF{} over these test points. Errors below are mean squared errors against $f$ itself, so the
 noise is excluded.
 
 Linear regression has an error of \tbOls, since it cannot represent the sine or the square. A single tree
 with its depth chosen by five-fold cross-validation, \tbDepth{} levels and \tbTreeLeaves{} leaves, does worse at
-\tbTree; it can represent anything, but at this sample size the price is variance. Bagging \tbB{} trees cuts
+\tbTree; it can represent anything, but at this sample size the price is variance. Bagging\ix{Bagging} \tbB{} trees\ix{Decision tree} cuts
 the error to \tbBag{} and a forest with \tbMtry{} of the \tbP{} predictors per split to \tbRf. The forest
 is behind bagging here because half the predictors are noise, so about one split in twelve sees none of
-the five useful predictors, and many see only the weaker ones. Boosting trees of depth three with $\nu=\tbNu$ has its lowest test error,
+the five useful predictors, and many see only the weaker ones. Boosting\ix{Gradient boosting} trees of depth three with $\nu=\tbNu$ has its lowest test error,
 \tbBoostBest, after \tbBoostAt{} rounds, a minimum read off the test curve and so slightly flattering,
 and is still at \tbBoost{} after \tbM. With $\nu=1$ it reaches only \tbBoostOne, after \tbBoostOneAt{} rounds,
 and then gets worse (\cref{fig12:ens}). \Cref{fig12:treeboost} shows both effects in one dimension: a
@@ -487,7 +487,7 @@ directions where $f$ curves.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.9\textwidth]{ch12/fig06_ensembles}
-  \caption{Test error against the true function, by number of trees, for bagging, a random forest and
+  \caption{\kind{simulation} Test error against the true function, by number of trees, for bagging, a random forest and
   boosting with two step sizes, on Friedman's benchmark with \tbN{} training points. The dotted lines are a
   single tree of cross-validated depth and linear regression.}
   \label{fig12:ens}
@@ -496,7 +496,7 @@ directions where $f$ curves.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig05_tree_boost}
-  \caption{One predictor and 200 noisy points. Left: trees of depth 2 and 5. Right: boosting trees of depth
+  \caption{\kind{simulation} One predictor and 200 noisy points. Left: trees of depth 2 and 5. Right: boosting trees of depth
   one with $\nu=\tbNu$, after 10 and 200 rounds.}
   \label{fig12:treeboost}
 \end{figure}
@@ -544,7 +544,7 @@ One backward pass therefore costs a small constant multiple of one forward pass,
 there are,
 which is why networks with many parameters can be trained at all \parencite{rumelhart1986}. The library
 implements \cref{eq12:backprop} in a dozen lines, and a test compares every type of gradient with central
-finite differences. Training uses mini-batches and the Adam update of \textcite{kingma2015}, which divides a
+finite differences\ix{Finite differences}. Training uses mini-batches and the Adam update of \textcite{kingma2015}, which divides a
 running mean of each gradient component by a running estimate of its root mean square.
 
 The listing below writes \cref{eq12:backprop} out for one hidden layer of $\tanh$ units and the squared
@@ -557,14 +557,14 @@ units it compares each of the 33 gradient components with a central finite diffe
 \subsection{Learning the Black-Scholes price}
 
 Can a network learn a pricing function from examples? \Textcite{hutchinson1994} asked this with simulated
-and traded options. At a zero rate the call price per unit of strike depends only on the moneyness $m=S/K$
+and traded options. At a zero rate the call price\ix{Call price} per unit of strike\ix{Strike} depends only on the moneyness\ix{Moneyness} $m=S/K$
 and the total volatility $v=\sigma\sqrt T$, through the formula of Chapter~5. The script \texttt{neural}
 draws \nnNtr{} training pairs uniformly on $m\in[\nnMlo,\nnMhi]$ and $v\in[\nnVlo,\nnVhi]$, scales both
 inputs to $[-1,1]$, and trains a network with two hidden layers of \nnHid{} units, \nnParams{} parameters in
 all, for \nnEpochs{} passes through the data in batches of \nnBatch, \nnSteps{} steps, with a step size
 falling from \nnLr{} to \nnLrEnd.
 
-On a grid of test points the root mean square error is \nnRmse{} basis points of the strike, and the
+On a grid of test points the root mean square\ix{Mean squared error} error is \nnRmse{} basis points of the strike, and the
 largest error is \nnMax, found where $v$ is small and the price has a sharp bend at the money
 (\cref{fig12:nnerr}). A polynomial of degree \nnPolyDeg{} in the two scaled inputs, \nnPolyTerms{} terms fitted
 by least squares on the same points, has errors of \nnPolyRmse{} and \nnPolyMax{}. The network's delta,
@@ -578,7 +578,7 @@ small delta error over most of the range, but nothing guarantees it, and the edg
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.96\textwidth]{ch12/fig07_nn_error}
-  \caption{Error of the fitted call price per unit of strike, in basis points of the strike, over moneyness
+  \caption{\kind{simulation} Error of the fitted call price per unit of strike, in basis points of the strike, over moneyness
   and total volatility: the network with \nnParams{} parameters (left) and a polynomial of degree
   \nnPolyDeg{} with \nnPolyTerms{} terms (right).}
   \label{fig12:nnerr}
@@ -587,22 +587,22 @@ small delta error over most of the range, but nothing guarantees it, and the edg
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.96\textwidth]{ch12/fig08_nn_training}
-  \caption{Left: mean squared error of the network on the training and validation points during training.
-  Right: the network's delta, from backpropagation\index{backpropagation} to the inputs, at two total volatilities, with the
+  \caption{\kind{simulation} Left: mean squared error of the network on the training and validation points during training.
+  Right: the network's delta, from backpropagation\index{Backpropagation} to the inputs, at two total volatilities, with the
   Black-Scholes delta.}
   \label{fig12:nntrain}
 \end{figure}
 
 Two cautions apply. The fitted price is not guaranteed to respect no-arbitrage: its second difference in
-moneyness is negative at \nnConvex\% of the grid points, violations of the convexity a call price
-must have, concentrated at the in-the-money edge, and a network used for pricing needs such constraints built in or checked. And the formula was
+moneyness is negative at \nnConvex\% of the grid points, violations of the convexity\ix{Convexity} a call price
+must have, concentrated\ix{Concentration} at the in-the-money edge, and a network used for pricing needs such constraints built in or checked. And the formula was
 known, so the exercise measures the method, not the market. Its use in practice is to replace a slow pricer,
 a Monte Carlo or a finite difference scheme, by a fast approximation trained on its output, and the errors
 above are the kind of price that approximation costs.
 
 \Cref{fig12:gamma} shows where the convexity fails. It compares a numerical second derivative of the
 normalised call price $c=C/K$ with respect to moneyness $m=S/K$ against $K\Gamma$, where
-$\Gamma=\partial^2C/\partial S^2$ is the Black-Scholes gamma, along two lines of total volatility. At
+$\Gamma=\partial^2C/\partial S^2$ is the Black-Scholes\ix{Black-Scholes formula} gamma\ix{Gamma}, along two lines of total volatility. At
 $\sigma\sqrt T=0.1$ the network follows the peak of \gmPeakLow{} near the money with a root mean
 square error of \gmErrLow; at $\sigma\sqrt T=0.4$, where the gamma never exceeds \gmPeakHigh, the
 error is \gmErrHigh{} and the network's curve oscillates around it. On both lines the negative values,
@@ -616,7 +616,7 @@ network's gamma would inherit this curvature error at the edge of the range.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig17_nn_gamma}
-  \caption{Numerical differentiation of the trained network: the second derivative of its normalised
+  \caption{\kind{simulation} Numerical differentiation of the trained network: the second derivative of its normalised
   call price with respect to moneyness (solid), compared with $K$ times the Black-Scholes gamma (dotted),
   at two total volatilities. Negative second derivatives, marked, are failures of call-price convexity.}
   \label{fig12:gamma}
@@ -628,14 +628,14 @@ network's gamma would inherit this curvature error at the edge of the range.
 \label{sec12:premium}
 
 A long literature reports variables that predict stock market returns in sample: valuation ratios,
-interest rates, spreads, volatility and issuance. \Textcite{welch2008} asked whether any of them would
+interest rates\ix{Interest rate}, spreads, volatility and issuance. \Textcite{welch2008} asked whether any of them would
 have helped an investor who had to estimate the forecasting regression with data available at the time,
 and found that almost none did; \textcite{goyal2024} repeat the exercise with later data and more
 variables. This section runs that test on the monthly data to December 2025 and adds the methods of the
 previous sections.
 
 \begin{definition}[Out-of-sample $R^2$]\label{def12:r2os}
-For forecasts $\hat r_{t+1}$ and the historical mean $\bar r_t$, both formed with data through month $t$,
+For forecasts $\hat r_{t+1}$ and the historical mean\ix{Historical mean} $\bar r_t$, both formed with data through month $t$,
 over an evaluation period $\mathcal T$,
 \[
   R^2_{\mathrm{OS}}=1-\frac{\sum_{t\in\mathcal T}(r_{t+1}-\hat r_{t+1})^2}{\sum_{t\in\mathcal T}(r_{t+1}-\bar r_t)^2}.
@@ -643,9 +643,9 @@ over an evaluation period $\mathcal T$,
 \end{definition}
 
 The statistic of \textcite{campbell2008} is positive when the model beats the historical mean in mean
-squared error. It is the right comparison because the historical mean is what an investor with no model
+squared error\ix{Mean squared error}. It is the right comparison because the historical mean is what an investor with no model
 would use. Testing whether it is significantly positive needs care, because the model nests the
-benchmark: if the predictor is useless, the model still estimates a slope, and the noise in that estimate
+benchmark\ix{Benchmark}: if the predictor is useless, the model still estimates a slope, and the noise in that estimate
 makes the model's errors larger than the benchmark's on average, so a plain comparison of mean squared
 errors is biased against the model.
 
@@ -665,11 +665,11 @@ which gives both identities. Both forecasts are known at $t$, so $\E_t[e_{t+1}(\
 
 The proposition is an idealised case: in practice $\bar r_t$ is an estimated historical mean, which the
 test below allows for. \Textcite{clark2007} propose the $t$-statistic of the mean of $d_{t+1}$, compared with one-sided normal
-critical values, as an approximately correctly sized test of the hypothesis that the predictor is useless. The
+critical values\ix{Critical value}, as an approximately correctly sized test of the hypothesis that the predictor is useless. The
 approximation is derived for nested linear models; estimated means, expanding windows and serial
 dependence affect its size in finite samples.
 
-The R listing below runs the test for the Treasury bill rate alone. It rebuilds the predictors from
+The R listing below runs the test for the Treasury bill\ix{Treasury bill} rate alone. It rebuilds the predictors from
 the data file so that its sample is that of the Python code, forms an expanding-window least squares
 forecast for each month from January 1965 using only the pairs known before it, and computes
 $R^2_{\mathrm{OS}}$, the terms $d_{t+1}$, their $t$-statistic and the one-sided $p$ value. It prints
@@ -685,7 +685,7 @@ A monthly $R^2$ of half a percent sounds negligible. \Textcite{campbell2008} sho
 \begin{proposition}[The value of a small $R^2$]\label{prop12:ct}
 Let $r_{t+1}=\mu+x_t+\varepsilon_{t+1}$, where $x_t$ is known at $t$, $\E x_t=0$, $\operatorname{Var}x_t=R^2s^2$, and
 $\varepsilon_{t+1}$ has mean zero and variance $(1-R^2)s^2$ given $x_t$. Let $\mathit{SR}_m=\mu/s$, with $\mu\ne0$ so that the ratio below is defined. A mean-variance investor
-with risk aversion $\gamma$ who knows $x_t$ holds $w_t=(\mu+x_t)/(\gamma(1-R^2)s^2)$ in the market; one who
+with risk aversion\ix{Risk aversion} $\gamma$ who knows $x_t$ holds $w_t=(\mu+x_t)/(\gamma(1-R^2)s^2)$ in the market; one who
 does not holds $w=\mu/(\gamma s^2)$. The ratio of their average excess returns is
 \begin{equation}\label{eq12:ct}
   \frac{\E[w_tr_{t+1}]}{\E[wr_{t+1}]}=\frac{\mathit{SR}_m^2+R^2}{\mathit{SR}_m^2(1-R^2)}=1+\frac{R^2}{\mathit{SR}_m^2}\,\frac{1+\mathit{SR}_m^2}{1-R^2}.
@@ -711,7 +711,7 @@ linear, with exact initial slope $(1+\mathit{SR}_m^2)/\mathit{SR}_m^2$, so the s
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.84\textwidth]{ch12/fig21_ct}
-  \caption{The proportional rise in a mean-variance timer's average excess return, \cref{eq12:ct},
+  \caption{\kind{exact} The proportional rise in a mean-variance timer's average excess return, \cref{eq12:ct},
   against the monthly $R^2$ of the predictor, for four monthly Sharpe ratios of the market. The mark
   is at $R^2=0.5\%$ for the sample's \eqS. The curves are exact; no data or
   simulation is involved.}
@@ -720,10 +720,10 @@ linear, with exact initial slope $(1+\mathit{SR}_m^2)/\mathit{SR}_m^2$, so the s
 
 \subsection{The data and the forecasts}
 
-The fourteen predictors follow \textcite{welch2008}: the dividend-price ratio and the dividend yield (the
+The fourteen predictors follow \textcite{welch2008}: the dividend\ix{Dividends}-price ratio\ix{Dividend-price ratio} and the dividend yield (the
 latter on last month's price), the earnings-price ratio, the payout ratio, stock variance, the book to
-market ratio, net equity expansion, the Treasury bill rate, the long-term yield and return, the term spread,
-the default yield spread, the default return spread and inflation, lagged a month further because it is
+market ratio, net equity expansion, the Treasury bill\ix{Treasury bill} rate, the long-term yield and return, the term spread,
+the default\ix{Default} yield spread\ix{Yield spread}, the default return spread and inflation, lagged a month further because it is
 published late. The target is the monthly log return of the S\&P 500 with dividends less the log Treasury
 bill rate. Two of the predictors are exact combinations of others (the payout ratio is the
 dividend-price ratio less the earnings-price ratio, and the term spread the long yield less the bill rate),
@@ -734,22 +734,22 @@ two combinations hold exactly out of sample too, any other solution gives the sa
 every predictor is in \eqFirst. Forecasts start in January \eqOosFrom{} and run to December \eqOosTo,
 \eqOosN{} months, each made with an expanding window of the data available at the time.
 
-The models are the historical mean; each predictor alone; all fourteen by least squares, with and without
+The models are the historical mean\ix{Historical mean}; each predictor alone; all fourteen by least squares, with and without
 flooring the forecast at zero as \textcite{campbell2008} suggest; the mean of the fourteen single-predictor
 forecasts \parencite{rapach2010}; ridge and the lasso on standardised predictors, with the penalty chosen
 each January to minimise the squared error, over the last \eqValid{} months of the window, of
-forecasts from a fit on the months before them; a random forest of \eqForestB{} trees, each split choosing among
+forecasts from a fit on the months before them; a random forest\ix{Random forest} of \eqForestB{} trees\ix{Decision tree}, each split choosing among
 \eqForestMtry{} predictors, with at most eight levels and at least \eqLeaf{} months in each leaf; and boosting with trees of
 depth two, $\nu=\eqBoostNu$ and \eqBoostM{} rounds. The trees are refitted each January. The investor has
 risk aversion \eqGamma, estimates the variance from the previous \eqVarWin{} months, and holds between 0 and
 \eqWhi{} times wealth in the market; the certainty equivalent gain is the annualised mean less $\tfrac{\gamma}{2}$ times the annualised
 variance of the model's portfolio, minus the same quantity for the portfolio of the historical mean.
 Standardisation, lags and the choice of penalty use only data available at each forecast date, and
-the economic results exclude transaction costs.
+the economic results exclude transaction costs\ix{Transaction costs}.
 
 \begin{table}[!tb]
 \centering
-\caption{Monthly forecasts of the US equity premium, January \eqOosFrom{} to December \eqOosTo, against the
+\caption{\kind{historical} Monthly forecasts of the US equity premium, January \eqOosFrom{} to December \eqOosTo, against the
 historical mean. Three of the fourteen single predictors are shown; $R^2_{\mathrm{OS}}$ for all fourteen is in \cref{fig12:r2os}.
 $R^2_{\mathrm{OS}}$ over the whole period and before and after 2000, in percent; the Clark and
 West statistic and its one-sided $p$-value, a formal test for the nested linear forecasts and a
@@ -782,19 +782,19 @@ boosting                & \eqRtwoBoost & \eqRtwoABoost & \eqRtwoBBoost & \eqCwBo
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.86\textwidth]{ch12/fig10_r2os}
-  \caption{Out-of-sample $R^2$ against the historical mean, January \eqOosFrom{} to December \eqOosTo, for each
+  \caption{\kind{historical} Out-of-sample $R^2$ against the historical mean, January \eqOosFrom{} to December \eqOosTo, for each
   predictor alone (above the dotted line) and for the combined models (below). Blue bars are positive; no
   model is significant at 5\% by the Clark and West test. Bars beyond $-4\%$ are cut and labelled.}
   \label{fig12:r2os}
 \end{figure}
 
-Only one of the fourteen single predictors beats the historical mean over the whole period, the
-\eqBestUni, with $R^2_{\mathrm{OS}}=\eqBestUniRtwo\%$, and none is significant at 5\% by the Clark and West test;
-the worst, the \eqWorstUni, has \eqWorstUniRtwo\% (\cref{fig12:r2os}). Least squares on all fourteen has
+Only one of the fourteen single predictors beats the historical mean\ix{Historical mean} over the whole period, the
+\eqBestUni, with $R^2_{\mathrm{OS}}=\eqBestUniRtwo\%$, and none is significant at 5\% by the Clark and West\ix{Clark-West test} test;
+the worst, the \eqWorstUni, has \eqWorstUniRtwo\% (\cref{fig12:r2os}). Least squares\ix{Least squares} on all fourteen has
 $R^2_{\mathrm{OS}}=\eqRtwoOls\%$, the variance of twelve estimated slopes at work, and flooring the forecast at
 zero cuts the loss to \eqRtwoOlsct\% without removing it (\cref{tab12:premium}). The mean of the fourteen forecasts is the one combined
 model that is positive over the whole period, \eqRtwoComb\%, with a Clark and West $p$-value of \eqPComb, because
-averaging shrinks each forecast towards the historical mean, much as ridge shrinks coefficients, and
+averaging shrinks each forecast towards the historical mean, much as ridge\ix{Ridge regression} shrinks coefficients, and
 diversifies the errors of the single models. Ridge itself is positive before 2000, \eqRtwoARidge\%, and negative after, \eqRtwoBRidge\%; the
 lasso keeps \eqLassoNz{} predictors on average and does no better. The forest and boosting, which can fit
 nonlinear and interacting effects, do worst of the regularised methods, at \eqRtwoForest\% and
@@ -815,7 +815,7 @@ gained a little back, with its worst years in \eqOlsWorstYear{} and \eqOlsSecond
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.9\textwidth]{ch12/fig09_cum_sse}
-  \caption{Cumulative squared forecast error of the historical mean less that of each model. The line rises
+  \caption{\kind{historical} Cumulative squared forecast error of the historical mean less that of each model. The line rises
   in months where the model forecasts better.}
   \label{fig12:cumsse}
 \end{figure}
@@ -835,18 +835,18 @@ because the cap at zero already floors the investor's weight. Forecast accuracy 
 
 \Cref{sec12:nn} fitted a network to prices. A different use of the same tools is to learn the hedge itself:
 choose a rule that maps what the hedger knows to a position, and train it on simulated paths to minimise a
-measure of the hedger's loss. \Textcite{buehler2019} call this deep hedging and use it where no formula
+measure of the hedger's loss. \Textcite{buehler2019} call this deep hedging\ix{Deep hedging}\ix{Hedge} and use it where no formula
 exists, with costs, many instruments and constraints. This section applies it where the answer is known,
 a call on a lognormal stock, so that the learned hedge can be checked, and then adds costs, where it is not.
 
 \begin{proposition}[Quadratic hedging is a regression]\label{prop12:qhedge}
-Let $S_0,\dots,S_n$ be a martingale under the probability measure of the simulation, with finite second moments, and let the hedge ratio be $\Delta_k=\phi(S_k,t_k)^\top\theta$ for a
+Let $S_0,\dots,S_n$ be a martingale\ix{Martingale} under the probability measure of the simulation, with finite second moments\ix{Second moment}, and let the hedge ratio be $\Delta_k=\phi(S_k,t_k)^\top\theta$ for a
 vector of features $\phi$ with finite second moments of $\phi_j(S_k,t_k)(S_{k+1}-S_k)$. Write
 $G_j=\sum_{k<n}\phi_j(S_k,t_k)(S_{k+1}-S_k)$ for the gain of feature $j$, so the hedge gains $G^\top\theta$.
 \begin{enumerate}[label=(\roman*)]
 \item $\E G_j=0$ for every $j$, so $\E[G^\top\theta]=0$ for every $\theta$.
 \item The pair $(p,\theta)$ that minimises $\E\bigl[(H-p-G^\top\theta)^2\bigr]$ for a claim $H$ with finite variance
-is the population least squares regression of $H$ on a constant and $G$. Its intercept is $p=\E H$, and $\theta$
+is the population least squares\ix{Least squares} regression\ix{Linear regression} of $H$ on a constant and $G$. Its intercept is $p=\E H$, and $\theta$
 minimises $\operatorname{Var}(H-G^\top\theta)$.
 \item On a sample of paths, ordinary least squares of $H$ on a constant and $G$ gives the sample analogue,
 with $\hat p=\bar H-\bar G^\top\hat\theta$.
@@ -861,15 +861,15 @@ $\operatorname{Var}(H-G^\top\theta)$. (iii) The same normal equations with sampl
 \end{proof}
 
 The paths here are simulated with zero drift and a zero interest rate, so the simulation's measure is
-itself a risk-neutral (martingale) measure and $\E H$ is the risk-neutral price; the regression then
+itself a risk-neutral\ix{Risk-neutral pricing} (martingale) measure and $\E H$ is the risk-neutral price; the regression then
 learns both the price and the hedge. Under a physical measure with a drift, the same regression would
 give an expectation under that measure, not a price. Under the risk-neutral measure the regression is the discrete form of the replication in Chapter~5, where the
-discrete hedging error had mean zero and a variance proportional to the time step.
+discrete hedging\ix{Discrete hedging} error had mean zero and a variance proportional to the time step.
 
 \subsection{Without costs}
 
 The stock starts at \hdSZero, has volatility \hdSig\% and zero drift, and the call has strike \hdK{} and
-three months to run, rebalanced daily over \hdSteps{} steps. The Black and Scholes price is \hdBs. Since
+three months to run, rebalanced daily\ix{Discrete hedging} over \hdSteps{} steps. The Black and Scholes price is \hdBs. Since
 $d_1=z/\sigma+\sigma\sqrt\tau/2$ with $z=\ln(S/K)/\sqrt\tau$, the delta is a function of $z$ and $\sqrt\tau$ only,
 and the features are chosen to let a linear rule reach it: a constant, \hdBumps{} logistic steps
 $1/(1+e^{-(z-c)/w})$ with centres $c$ from $-\hdCentre$ to \hdCentre{} and width $w=\hdWidth$, and the same steps
@@ -887,7 +887,7 @@ choice of features, which used the form of $d_1$; the same code applies to paths
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.92\textwidth]{ch12/fig11_hedge_ratio}
-  \caption{The learned hedge ratio without costs and the Black and Scholes delta after 20 and 55 of the
+  \caption{\kind{simulation} The learned hedge ratio without costs and the Black and Scholes delta after 20 and 55 of the
   \hdSteps{} trading days, with the learned no-trade band for costs of \hdKappa\%. The two hedge ratios are
   hard to tell apart.}
   \label{fig12:hedge}
@@ -899,14 +899,14 @@ Now every trade costs \hdKappa\% of its value, including setting up the hedge an
 \Cref{prop12:qhedge} no longer applies: the cost depends on the trades, and so on $\theta$, which makes the
 loss non-quadratic in $\theta$, and a regression that ignores it chooses its weights as if trading
 were free. Write $\mathcal L=H-G^\top\theta+C$ for the hedger's loss with costs $C$, and price by the
-mean-variance rule $\E\mathcal L+\tfrac\gamma2\operatorname{Var}\mathcal L$ with $\gamma=\hdGamma$. Under the delta the expected
-cost is \hdCostBs, and the price is \hdPriceBs, against the Black and Scholes price of \hdBs; without
+mean-variance\ix{Mean-variance optimisation} rule $\E\mathcal L+\tfrac\gamma2\operatorname{Var}\mathcal L$ with $\gamma=\hdGamma$. Under the delta the expected
+cost\ix{Expected cost} is \hdCostBs, and the price is \hdPriceBs, against the Black and Scholes price of \hdBs; without
 costs the same rule would give \hdPriceFree.
 The weights learned without costs do no better, at \hdPriceZero.
 
 Re-optimising the \hdParams{} weights for the mean-variance price, with L-BFGS on a smoothed
-cost (the code checks the gradient against finite differences), lowers the price to \hdPriceCost{} after
-\hdIters{} iterations: it trims the expected cost to \hdCostCost{} and the turnover from \hdTurnBs{} to
+cost (the code checks the gradient against finite differences\ix{Finite differences}), lowers the price to \hdPriceCost{} after
+\hdIters{} iterations: it trims the expected cost to \hdCostCost{} and the turnover\ix{Turnover} from \hdTurnBs{} to
 \hdTurnCost{} shares per share hedged, and cuts the markup over the Black and Scholes price by \hdPriceCutCost\%.
 The gain is small for a reason. A rule that depends only on the current price and date must trade whenever
 the price moves, because its target moves; what saves costs is not trading when the position is close
@@ -914,7 +914,7 @@ enough to the target, and that needs to know the current position.
 
 The policy of \textcite{whalley1997} has that memory. It holds the position while it lies within a band
 around the delta and otherwise trades to the nearer edge. For small proportional costs, exponential
-utility and a zero interest rate their asymptotic analysis gives the half-width
+utility\ix{Utility} and a zero interest rate their asymptotic analysis gives the half-width
 \begin{equation}\label{eq12:ww}
   \Bigl(\frac{3\kappa S\Gamma^2}{2\gamma}\Bigr)^{1/3},
 \end{equation}
@@ -930,7 +930,7 @@ constant half-width \hdBandFlat{} gives \hdPriceFlat. Here a narrower band does 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.82\textwidth]{ch12/fig12_hedge_pnl}
-  \caption{The hedger's loss at expiry, costs included, on \hdNte{} fresh paths: the delta rebalanced daily
+  \caption{\kind{simulation} The hedger's loss at expiry, costs included, on \hdNte{} fresh paths: the delta rebalanced daily
   and the no-trade band with the learned width. The band shifts the distribution to the left and widens it.}
   \label{fig12:hedgepnl}
 \end{figure}
@@ -944,7 +944,7 @@ fresh paths.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.88\textwidth]{ch12/fig18_hedge_path}
-  \caption{Simulation: one fresh path of the hedging experiment with costs of \hdKappa\%. The shaded
+  \caption{\kind{simulation} One fresh path of the hedging experiment with costs of \hdKappa\%. The shaded
   region is the learned no-trade band, \hdBandWw{} times \cref{eq12:ww} around the Black-Scholes delta;
   the step line is the band policy's position, and the marks are its trades.}
   \label{fig12:hedgepath}
@@ -953,7 +953,7 @@ fresh paths.
 \begin{table}[!tb]
   \centering
   \small
-  \caption{The six hedging policies with proportional costs of \hdKappa\%, on the same
+  \caption{\kind{simulation} The six hedging policies with proportional costs of \hdKappa\%, on the same
   \hdNte{} fresh simulated paths: the mean-variance price, its markup over the Black-Scholes value of
   \hdBs, the expected cost, the turnover in shares and the standard deviation of the hedger's loss.}
   \label{tab12:hedge}
@@ -971,7 +971,7 @@ fresh paths.
   \end{tabular}
 \end{table}
 
-The lesson for learned hedges is about the state, more than the approximator: a network of any size fed
+The lesson for learned hedges is about the state, more than the approximator: a network of any size fed\ix{Federal Reserve}
 only the price and the date could not have found the band. When there are costs, the networks of
 \textcite{buehler2019} take the previous position as an input.
 
@@ -1013,33 +1013,33 @@ tested over \ovYears{} years, has an expected annual Sharpe ratio of \ovMaxSrHun
 The Octave listing below recomputes the three columns in base Octave: the exact value by adaptive
 quadrature of $x\,N\varphi(x)\Phi(x)^{N-1}$, the approximation through $\Phi^{-1}(p)=-\sqrt2\,
 \mathrm{erfcinv}(2p)$, and the bound. It prints the values above and, for \cref{exr12:nine}, the
-expected maximum of 100 trials and the expected best annual Sharpe ratio over five years.
+expected maximum\ix{Expected maximum} of 100 trials and the expected best annual Sharpe ratio over five years.
 \Needspace*{17\baselineskip}
 \lstinputlisting[language=Octave]{code/ch12/snippets/expected_max.m}
 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.82\textwidth]{ch12/fig13_expected_max}
-  \caption{The expected maximum of $N$ independent standard normals, in units of the standard error of each
+  \caption{\kind{exact} The expected maximum of $N$ independent standard normals, in units of the standard error of each
   trial: exact, the approximation of \textcite{bailey2014}, simulation, and the bound of \cref{prop12:emax}.}
   \label{fig12:emax}
 \end{figure}
 
 \subsection{A search on noise}
 
-Simulate \ovT{} months of returns with a volatility of \ovVol\% a month and no predictability at all, and
-search \ovRules{} trading rules: be long, or long and short, when the price is above its moving average over
+Simulate \ovT{} months of returns with a volatility of \ovVol\% a month and no predictability\ix{Return predictability} at all, and
+search \ovRules{} trading rules\ix{Trading rule}: be long, or long and short, when the price is above its moving average over
 2 to 51 months, and the two contrarian versions. Choose the rule with the best Sharpe ratio in the
 first \ovHalf{} months after the longest average is available, and test it on the remaining \ovHalf. Over
 \ovReps{} repetitions the chosen rule's annual Sharpe ratio averages \ovBestIs{} in sample and \ovBestOos{}
-out of sample, with a standard error of \ovBestOosSe. The rules are correlated, with a median absolute
+out of sample\ix{Out-of-sample}, with a standard error of \ovBestOosSe. The rules are correlated, with a median absolute
 correlation of \ovCorr, and by \cref{prop12:emax} the in-sample maximum is about what \ovNeff{} independent trials
 would give, a descriptive effective count and not a separately estimated number of tests.
 
-\Textcite{bailey2017} turn the split into a statistic. Cut the sample into an even number $Q$ of blocks, and for each of the
+\Textcite{bailey2017} turn the split into a statistic. Cut the sample into an even number $Q$ of blocks\ix{Block bootstrap}, and for each of the
 $\binom{Q}{Q/2}$ ways of choosing half of them as the training set, pick the best rule in the training blocks
 and find its relative rank $\omega\in(0,1)$ among all rules in the other half. The probability of backtest
-overfitting is the share of splits in which the chosen rule ranks at or below the median out of sample, that is
+overfitting\ix{Overfitting} is the share of splits in which the chosen rule ranks at or below the median out of sample, that is
 with logit $\ln(\omega/(1-\omega))\le0$. With no skill anywhere the chosen rule is a random draw out of sample,
 and the probability should be near one half. With $Q=\ovSRep$ it averages \ovPbo{} over \ovPboRuns{}
 repetitions. \Cref{fig12:pbo} shows one run with $Q=\ovSFig$ and \ovSplits{} splits: the probability there is
@@ -1052,21 +1052,21 @@ every case.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch12/fig14_pbo}
-  \caption{Combinatorially symmetric cross-validation of \ovRules{} rules on one simulated price with no
+  \caption{\kind{simulation} Combinatorially symmetric cross-validation of \ovRules{} rules on one simulated price with no
   predictability, with \ovSFig{} blocks and \ovSplits{} splits. Left: in-sample and out-of-sample annual Sharpe
   ratios of the chosen rule. Right: the logit of its relative rank out of sample; the share at or left of
-  zero is the probability of backtest overfitting\index{backtest overfitting}.}
+  zero is the probability of backtest overfitting\index{Overfitting}.}
   \label{fig12:pbo}
 \end{figure}
 
 \subsection{Deflating a Sharpe ratio}
 
-The probabilistic Sharpe ratio\index{probabilistic Sharpe ratio} of \textcite{bailey2012} is
+The probabilistic Sharpe ratio\ix{Sharpe ratio}\ix{Probabilistic Sharpe ratio}\index{Probabilistic Sharpe ratio} of \textcite{bailey2012} is
 $\Phi\bigl((\hat\theta-\theta^*)/\hat\sigma(\hat\theta)\bigr)$, a normal-approximation score for the evidence
 that the underlying ratio exceeds a benchmark $\theta^*$, and not a literal posterior probability, which
-would need a Bayesian model; with $\hat\sigma(\hat\theta)$ the standard error of Chapter~8 that allows for skewness and
-kurtosis \parencite{lo2002,opdyke2007}. The deflated Sharpe ratio of \textcite{bailey2014} sets $\theta^*$ to the
-expected maximum of $N$ trials with no skill, the approximation above times the standard deviation of the
+would need a Bayesian\ix{Bayes' rule} model; with $\hat\sigma(\hat\theta)$ the standard error of Chapter~8 that allows for skewness\ix{Skewness} and
+kurtosis\ix{Kurtosis} \parencite{lo2002,opdyke2007}. The deflated Sharpe ratio\ix{Deflated Sharpe ratio} of \textcite{bailey2014} sets $\theta^*$ to the
+expected maximum\ix{Expected maximum} of $N$ trials with no skill, the approximation above times the standard deviation of the
 Sharpe ratios across the trials; for correlated trials chosen adaptively that adjustment is a heuristic.
 
 Apply it to \cref{sec12:premium}. Each of the \ovEqModels{} models defines a timing portfolio, and its gain
@@ -1079,7 +1079,7 @@ of \ovEqSrSd, so the benchmark is \ovEqBench, and the deflated Sharpe ratio is \
 with the spread over the distinct series, gives \ovEqDsrDistinct; the conclusion does not change. Once the search is counted, the
 diagnostic falls well below 0.95. The models are correlated, so \ovEqModels{} overstates the number of independent trials, but the
 count leaves out the searches that produced the list of predictors in the first place; the deflated
-ratio is therefore a sensitivity measure and not an exact probability after selection.
+ratio is therefore a sensitivity\ix{Sensitivity analysis} measure and not an exact probability after selection.
 
 \Cref{fig12:dsr} is that sensitivity. With the same Sharpe ratio, moments and cross-trial spread, the
 deflated ratio is \dsTwo{} for two trials, falls below 0.95 from $N=\dsCross$, is \dsAtModels{} at the
@@ -1089,7 +1089,7 @@ whether there were more than a handful of trials, and there were.
 \begin{figure}[!hb]
   \centering
   \includegraphics[width=0.84\textwidth]{ch12/fig20_dsr}
-  \caption{The deflated Sharpe ratio of the best timing portfolio, the \ovEqBest, against the assumed
+  \caption{\kind{historical} The deflated Sharpe ratio of the best timing portfolio, the \ovEqBest, against the assumed
   number of independent trials $N$, with the observed Sharpe ratio, skewness, excess kurtosis and cross-trial
   standard deviation held at their sample values. The dashed line is 0.95; the dotted line marks the
   \ovEqModels{} models.}
@@ -1100,11 +1100,11 @@ whether there were more than a handful of trials, and there were.
 
 The single-predictor tests of \cref{sec12:premium} are fourteen tests of the same question. Chapter~7 used
 the rule of \textcite{benjamini1995}, which controls the expected share of false discoveries. The rule of
-\textcite{holm1979} controls the familywise error, the probability of any false rejection, and rejects every hypothesis that the
+\textcite{holm1979} controls the familywise error\ix{Family-wise error rate}, the probability of any false rejection, and rejects every hypothesis that the
 Bonferroni test rejects, often more.
 
 \begin{proposition}[Holm's procedure]\label{prop12:holm}
-Sort the $m$ p-values as $p_{(1)}\le\dots\le p_{(m)}$, find the smallest $k$ with $p_{(k)}>\alpha/(m-k+1)$, and
+Sort the $m$ p-values\ix{p value} as $p_{(1)}\le\dots\le p_{(m)}$, find the smallest $k$ with $p_{(k)}>\alpha/(m-k+1)$, and
 reject the hypotheses with the $k-1$ smallest p-values (all of them if there is no such $k$). If each p-value of a
 true hypothesis is uniform or stochastically larger, the probability of rejecting any true hypothesis is
 at most $\alpha$, whatever the dependence between the tests.
@@ -1118,7 +1118,7 @@ some $p_i$ with $i\in I_0$ is at most $\alpha/m_0$. By the union bound this has 
 $m_0\cdot\alpha/m_0=\alpha$.
 \end{proof}
 
-At 10\% one predictor passes on its own, the Treasury bill rate with $p=\ovPmin$. Holm's first threshold is
+At 10\% one predictor passes on its own, the Treasury bill\ix{Treasury bill} rate with $p=\ovPmin$. Holm's first threshold is
 $0.10/14=\ovHolmFirst$, so Holm rejects \ovHolmTen, Bonferroni \ovBonfTen{} and the rule of
 \textcite{benjamini1995} \ovBhTen. At 5\% no test passes even alone. Corrections for multiple tests cannot
 create evidence; here the single-predictor results do not meet the corrected thresholds, which does
@@ -1128,45 +1128,45 @@ not show that no predictor has genuine forecasting power.
 \subsection{Testing the best of many rules}
 \label{sec12:snoop}
 
-Holm's procedure and the rule of \textcite{benjamini1995} take the p-values as given. When the tests are
-of trading rules run over one shared history, the p-values are strongly dependent, and a test built on
+Holm\ix{Family-wise error rate}'s procedure and the rule of \textcite{benjamini1995} take the p-values\ix{p value} as given. When the tests are
+of trading rules\ix{Trading rule} run over one shared history, the p-values are strongly dependent\ix{Dependence}, and a test built on
 their joint distribution can keep its error rate while rejecting more. Let $d_{k,t}$ be the return of
-rule $k=1,\dots,m$ in month $t=1,\dots,n$ over a benchmark, here cash, with mean $\mu_k$ and sample mean
-$\bar d_k$. The question is whether any rule beats the benchmark, so the overall null hypothesis is
+rule $k=1,\dots,m$ in month $t=1,\dots,n$ over a benchmark\ix{Benchmark}, here cash, with mean $\mu_k$ and sample mean\ix{Sample mean}
+$\bar d_k$. The question is whether any rule beats the benchmark, so the overall null hypothesis\ix{Hypothesis test} is
 $H_0:\max_k\mu_k\le0$, and the hypothesis for rule $k$ is $H_k:\mu_k\le0$.
 
 Each procedure below resamples the $n\times m$ matrix of the $d_{k,t}$ by whole months, which keeps the
-dependence across rules, and in blocks, which keeps some of the dependence over time. The stationary
-bootstrap\index{stationary bootstrap} of \textcite{politis1994} draws blocks that start at random months and have geometric lengths with mean $b$,
+dependence across rules, and in blocks\ix{Block bootstrap}, which keeps some of the dependence over time. The stationary\ix{Stationarity}
+bootstrap\ix{Bootstrap}\ix{Stationary bootstrap}\index{Stationary bootstrap} of \textcite{politis1994} draws blocks that start at random months and have geometric lengths with mean $b$,
 wrapping round the end of the sample. With $B$ resamples it gives bootstrap means $\bar d^{*}_{k,j}$,
 $j=1,\dots,B$, and the bootstrap standard deviation $\hat\omega_k$ of $\sqrt n\,\bar d_k$.
 
 \paragraph{The reality check}
-\textcite{white2000} tests $H_0$ with $V=\max_k\sqrt n\,\bar d_k$\index{reality check}. Its bootstrap values are
+\textcite{white2000} tests $H_0$ with $V=\max_k\sqrt n\,\bar d_k$\index{Reality check}. Its bootstrap values are
 $V^{*}_j=\max_k\sqrt n\,(\bar d^{*}_{k,j}-\bar d_k)$; centring each rule at its own sample mean imposes the
 case $\mu_k=0$ for every rule, the least favourable one for the test. The p-value is the share of the
 $V^{*}_j$ at or above $V$. \textcite{sullivan1999} applied the test to thousands of technical rules on a century of
 US stock prices.
 
 \paragraph{Superior predictive ability}
-\textcite{hansen2005} changes two things\index{superior predictive ability}. He studentizes, with $t_k=\sqrt n\,\bar d_k/\hat\omega_k$ and
+\textcite{hansen2005} changes two things\index{Superior predictive ability}. He studentizes, with $t_k=\sqrt n\,\bar d_k/\hat\omega_k$ and
 $T=\max(\max_kt_k,0)$, so that a volatile rule does not dominate the maximum, and he centres the bootstrap
 at $\hat\mu_k=\bar d_k\mathbf 1\{t_k\ge-\sqrt{2\ln\ln n}\}$, so that a rule that is clearly worse than the
-benchmark no longer raises the critical value. The bootstrap statistic is
+benchmark no longer raises the critical value\ix{Critical value}. The bootstrap statistic\ix{Test statistic} is
 $T^{*}_j=\max\bigl(\max_k\sqrt n\,(\bar d^{*}_{k,j}-\hat\mu_k)/\hat\omega_k,\,0\bigr)$, and its p-value is the share of
 the $T^{*}_j$ at or above $T$. Centring at $\bar d_k$ instead gives his upper p-value, and centring at
 $\max(\bar d_k,0)$ his lower one.
 
 \paragraph{Stepwise testing}
-The reality check and the SPA test ask whether the best rule beats the benchmark. The StepM\index{StepM} of
+The reality check\ix{Reality check} and the SPA test\ix{Superior predictive ability} ask whether the best rule beats the benchmark. The StepM\ix{Stepwise multiple testing}\index{Stepwise multiple testing} of
 \textcite{romano2005} asks which rules do, and controls the familywise error. With
 $t^{*}_{k,j}=\sqrt n\,(\bar d^{*}_{k,j}-\bar d_k)/\hat\omega_k$, its first step rejects every $H_k$ whose $t_k$
-exceeds $c_1$, the $1-\alpha$ quantile over $j$ of $\max_kt^{*}_{k,j}$. Each later step recomputes the
+exceeds $c_1$, the $1-\alpha$ quantile\ix{Quantile} over $j$ of $\max_kt^{*}_{k,j}$. Each later step recomputes the
 quantile over the rules not yet rejected, rejects those above it, and the procedure stops at the first
 step that rejects nothing.
 
 \paragraph{False discoveries under any dependence}
-The rule of \textcite{benjamini1995} controls the false discovery rate for independent tests and for some
+The rule of \textcite{benjamini1995} controls the false discovery rate\ix{False discovery rate} for independent tests and for some
 forms of positive dependence. \textcite{benjamini2001} show that running the same rule at level $q/c(m)$,
 with $c(m)=\sum_{i=1}^m1/i$, controls the false discovery rate at $q$ whatever the dependence between the
 tests. The price is power: for $m=\mtRules$, $c(m)=\mtCm$.
@@ -1189,8 +1189,8 @@ stop rejects at least one new hypothesis, which bounds the number of steps.
 \end{proof}
 
 \paragraph{Trend rules in managed futures}
-Take the six markets of the trend programme of Chapter~9 whose data the repository ships: WTI crude oil,
-the US and Canadian 10 year government bonds, and the euro, the yen and the Canadian dollar against the
+Take the six markets of the trend programme of Chapter~9 whose data the repository ships: WTI\ix{Crude oil}\ix{WTI crude oil} crude oil,
+the US and Canadian 10 year government bonds\ix{Sovereign bond}, and the euro, the yen and the Canadian dollar against the
 US dollar. Returns are monthly, from month-end prices, in excess of the bill rate, from \mtFirst{} to
 \mtLast, \mtN{} months. The oil and currency returns are spot returns, without the roll yield or the
 interest differential that a futures position would earn, so they differ from what a programme would
@@ -1212,7 +1212,7 @@ StepM is \mtCrit, against 1.645 for a single one-sided test at 5\% (\cref{fig12:
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\textwidth]{ch12/fig22_snooping}
-  \caption{Studentized mean returns $t_k$ of the \mtRules{} trend rules, \mtFirst{} to \mtLast, by market and
+  \caption{\kind{historical} Studentized mean returns $t_k$ of the \mtRules{} trend rules, \mtFirst{} to \mtLast, by market and
   moving average length. Dotted line: 1.645, the 5\% critical value of one test. Dashed line: \mtCrit,
   the first-step critical value of the StepM at 5\%.}
   \label{fig12:snoop}

@@ -5,7 +5,7 @@ import numpy as np
 
 
 def ridge_svd(X, y, lam):
-    """Minimise ||y - Xb||^2 + lam ||b||^2 for centred X of full column rank and centred y."""
+    """Minimise ||y - Xb||^2 + lam ||b||^2 for centred X and centred y."""
     if lam < 0:
         raise ValueError("lambda must be nonnegative")
     U, d, Vt = np.linalg.svd(X, full_matrices=False)

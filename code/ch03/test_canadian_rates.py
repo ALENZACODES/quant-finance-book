@@ -55,3 +55,18 @@ def test_either_level_probability(RAW):
     sim = np.mean(np.abs(W).max(axis=1) >= b)
     assert RAW["canHitEitherModel"] > RAW["canHitModel"]
     assert abs(RAW["canHitEitherModel"] / 100 - sim) < 0.02   # the discrete grid misses a few touches
+
+
+def test_carry_and_convexity_drift_of_an_aging_zero(RAW):
+    # generator of f(t, y) = exp(-(T - t) y) under dy = sigma dW, by finite differences at T - t = 5:
+    # (f_t + sigma^2 f_yy / 2) / f = y + 12.5 sigma^2, the carry plus the convexity term of Example 3.1
+    y, s, h = RAW["canYieldEndCc"] / 100, RAW["canSigma"] / 100, 1e-5
+    f = lambda tau, yy: math.exp(-tau * yy)
+    ft = (f(5 - h, y) - f(5 + h, y)) / (2 * h)
+    fyy = (f(5, y + h) - 2 * f(5, y) + f(5, y - h)) / h ** 2
+    close((ft + 0.5 * s ** 2 * fyy) / f(5, y), y + 12.5 * s ** 2, 1e-6)
+    close(RAW["canYieldEndCc"] / 100, 2 * math.log1p(RAW["canYieldEnd"] / 200), 1e-12)
+    close(RAW["canCarryBp"], 1e4 * RAW["canYieldEndCc"] / 100, 1e-9)
+    close(RAW["canConvexShare"] / 100, 12.5 * s ** 2 / (y + 12.5 * s ** 2), 1e-9)
+    y_end = C.load()
+    assert abs(y_end.iloc[-1] - RAW["canYieldEnd"]) < 1e-12

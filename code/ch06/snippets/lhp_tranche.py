@@ -3,7 +3,7 @@ from scipy import integrate
 from scipy.stats import norm
 
 def tranche_el(p, rho, R, a, d):
-    """Expected loss of the tranche (a, d] of a large pool, as a fraction of its size."""
+    """Expected loss of the tranche (a, d] of a large pool, as a share of its size."""
     c = norm.ppf(p)
     def loss(m):
         L = (1 - R) * norm.cdf((c - np.sqrt(rho) * m) / np.sqrt(1 - rho))

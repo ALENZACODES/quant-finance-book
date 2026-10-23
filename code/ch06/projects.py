@@ -64,8 +64,28 @@ def project_3():
                 worst_month=str(months[int(np.argmax(np.abs(e1)))]))
 
 
+def project_4():
+    """Smoothing lender by lender: for each business development company in data/bdc_quarterly.csv, the
+    number of quarters, the annualised mean and volatility of its return on net assets, its first
+    autocorrelation, the volatility after de-smoothing with that autocorrelation (when it is positive),
+    and the slope of its income yield on the one month bill rate."""
+    import direct_lending as DL
+    p = DL.bdc_panel(DL.load_bdc()); bills = DL.bill_quarterly(); out = {}
+    for t, g in p.groupby("ticker"):
+        r = g.roe.dropna()
+        if len(r) < 8:
+            continue
+        phi = float(np.corrcoef(r.values[:-1], r.values[1:])[0, 1])
+        ds = DL.desmooth(r.values, phi) if phi > 0 else r.values
+        y = g["yield"].dropna(); b = bills.reindex(y.index)
+        slope = float(np.polyfit(b.values, y.values, 1)[0]) if len(y) >= 8 else None
+        out[t] = dict(quarters=len(r), mean=4 * float(r.mean()), vol=2 * float(r.std(ddof=1)), phi=phi,
+                      vol_desmoothed=2 * float(np.std(ds, ddof=1)), pass_through=slope)
+    return out
+
+
 def main():
-    for f in (project_1, project_2, project_3):
+    for f in (project_1, project_2, project_3, project_4):
         print(f.__name__, f())
 
 

@@ -88,6 +88,12 @@ def main():
     D = 5.0; s = sig / 100
     pct("canConvex", 0.5 * D ** 2 * s ** 2, 3)
     put("canConvexBp", 1e4 * 0.5 * D ** 2 * s ** 2, "{:.1f}")
+    # carry: with P = exp(-(T - t) y) the drift also has the term y dt, the yield earned as the bond ages
+    y_end = float(y.iloc[-1]); N["canYieldEndDate"] = y.index[-1].strftime("%-d %B %Y")
+    y_cc = 2 * math.log1p(y_end / 200)                    # semi-annual par yield to continuous, decimal
+    put("canYieldEnd", y_end, "{:.2f}"); pct("canYieldEndCc", y_cc, 2)
+    put("canCarryBp", 1e4 * y_cc, "{:.0f}")
+    pct("canConvexShare", 0.5 * D ** 2 * s ** 2 / (y_cc + 0.5 * D ** 2 * s ** 2), 1)
     # check by simulation of the exact identity on the data: sum of 0.5 D^2 (dy)^2 per year (median year)
     pct("canConvexRealMed", 0.5 * D ** 2 * (rv["daily"].median() / 100) ** 2, 3)
     # figure

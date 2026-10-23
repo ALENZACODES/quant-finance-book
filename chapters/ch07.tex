@@ -12,14 +12,14 @@ the plan could not get more cheaply by holding index funds, which is a statement
 beta. Both claims rest on the same algebra, and both are much harder to verify from data than the
 algebra suggests. This chapter builds the algebra, measures how far the data can be trusted, and
 ends with a test on more than half a century of returns: would an investor who estimated the
-mean-variance frontier\index{mean-variance frontier} from the previous five years have done better than one who simply held equal
+mean-variance frontier from the previous five years have done better than one who simply held equal
 weights?
 
 The first half is portfolio choice. Diversification by equal weights has a floor set by the average covariance. The
 frontier of portfolios with the least variance for a given mean has a closed form, and adding a
-riskless asset picks out one portfolio on it, the tangency portfolio\index{tangency portfolio}, which every mean-variance
+riskless asset picks out one portfolio on it, the tangency portfolio, which every mean-variance
 investor with the same means and covariances holds in some proportion when all can borrow and lend
-at the riskless rate. The CAPM\index{capital asset pricing model} is the statement that the market is that portfolio, and
+at the riskless rate. The CAPM is the statement that the market is that portfolio, and
 it turns out to be equivalent to a linear relation between expected returns and betas. Factor models
 generalise the relation and give a covariance matrix that can be estimated. The second half is
 measurement. Alpha is the intercept of a regression, and its standard error, the number of years it
@@ -27,7 +27,7 @@ takes to detect, the joint test across many assets and the problem of screening 
 once all follow from least squares. Returns of illiquid assets are smoothed, which hides beta and
 manufactures alpha, and option-like strategies produce alpha in a linear regression that is only a
 premium for selling insurance. Attribution splits a manager's active return into decisions, the
-Black-Litterman\index{Black-Litterman} model blends equilibrium returns with views, and risk budgets allocate volatility
+Black-Litterman model blends equilibrium returns with views, and risk budgets allocate volatility
 instead of capital.
 
 \begin{keybox}[How to read this chapter]
@@ -36,7 +36,7 @@ The numbers in the text are computed by ten scripts in \texttt{code/ch07/} (\tex
 \texttt{attribution}, \texttt{black\_litterman}, \texttt{allocation}, \texttt{case\_oos} and
 \texttt{exercises}); the tests in \texttt{code/ch07/test\_*.py} check them. An independent R script
 recomputes the frontier, searches for the long-only tangency portfolio on its own, reruns every
-regression with \texttt{lm}, the Newey-West errors and the joint test, applies the false discovery\index{false discovery}
+regression with \texttt{lm}, the Newey-West errors and the joint test, applies the false discovery
 rule with \texttt{p.adjust}, smooths and unsmooths the returns, reprices the put-writing fund, rebuilds
 the attribution, the Black-Litterman posterior and the risk budgets, and recomputes the case study.
 GNU Octave solves the long-only problems with its quadratic programming solver and the risk budget
@@ -55,7 +55,7 @@ annualised the same way.
 Random draws come from NumPy's default generator with base seed \texttt{707} and a stream number
 fixed in each script. The seed is an arbitrary label that makes the runs repeatable; it carries no
 date or other meaning. Simulated samples are drawn from normal distributions with the moments of the
-data, so they show what estimation error\index{estimation error} does when the model is exactly right.
+data, so they show what estimation error does when the model is exactly right.
 
 Notation. There are $N$ risky assets with return vector $R$, mean $\mu$ and covariance matrix
 $\Sigma$, which is always assumed positive definite. $x=R-r_f\mathbf 1$ is the vector of excess
@@ -89,10 +89,10 @@ factors, not indices.
 \section{How much risk does holding more assets remove?}
 \label{sec7:diversify}
 
-A portfolio $w$ of assets with mean vector $\mu$ and covariance matrix $\Sigma$ has mean return
-$w^\top\mu$ and variance $w^\top\Sigma w=\sum_i\sum_j w_iw_j\Sigma_{ij}$. Of the $N^2$ terms in the
+A portfolio $w$ of assets with mean vector $\mu$ and covariance matrix\ix{Covariance matrix} $\Sigma$ has mean return
+$w^\top\mu$ and variance\ix{Variance} $w^\top\Sigma w=\sum_i\sum_j w_iw_j\Sigma_{ij}$. Of the $N^2$ terms in the
 double sum only $N$ are variances, so as a portfolio spreads over more assets the covariances take
-over. The equally weighted portfolio makes the point exactly.
+over. The equally weighted\ix{Equally weighted portfolio} portfolio makes the point exactly.
 
 \begin{proposition}[The floor under diversification]\label{prop7:diversify}
 Let $\bar v=\frac1N\sum_i\Sigma_{ii}$ be the average variance and $\bar c=\frac{2}{N(N-1)}\sum_{i<j}\Sigma_{ij}$
@@ -117,7 +117,7 @@ second $n(n-1)\bar c$, and dividing by $n^2$ gives \cref{eq7:diversify}.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.84\textwidth]{ch07/fig01_diversify}
-  \caption{Volatility of equal-weighted portfolios of $n$ of the ten industries, \fqFirst{} to
+  \caption{\kind{historical} Volatility of equal-weighted portfolios of $n$ of the ten industries, \fqFirst{} to
   \fqLast. The line is the square root of the average variance over all subsets of size $n$,
   given by \cref{eq7:diversify}; by Jensen's inequality it lies above the average of the subsets'
   volatilities. The band runs from the least to the most volatile subset. The dashed line is the floor
@@ -125,12 +125,12 @@ second $n(n-1)\bar c$, and dividing by $n^2$ gives \cref{eq7:diversify}.
   \label{fig7:diversify}
 \end{figure}
 
-The ten industry portfolios of the data library are themselves diversified portfolios of hundreds of
+The ten industry portfolios\ix{Industry portfolio}\ix{Portfolio} of the data library\ix{Data library} are themselves diversified\ix{Diversification} portfolios of hundreds of
 stocks, so they are a demanding test. Over \fqFirst{} to \fqLast{} the square root of the average variance of a
 single industry is \dvOne\% a year and the average correlation between two industries is \dvRhoBar. Equal
 weights in all ten bring the volatility down to \dvTen\%, removing \dvShare\% of the average
 variance, and the floor $\sqrt{\bar c}$ is \dvLimit\%. \Cref{fig7:diversify} shows the average over
-subsets, which matches \cref{eq7:diversify} to rounding error, and the range across subsets, which is
+subsets, which matches \cref{eq7:diversify} to rounding error\ix{Rounding error}, and the range across subsets, which is
 wide for small $n$: two industries can diversify each other well or hardly at all. The lesson for an
 allocator is that the second and third assets do most of the work, and that an asset whose
 correlation with the rest is high adds little however many others there are.
@@ -141,9 +141,9 @@ correlation with the rest is high adds little however many others there are.
 \section{Which portfolios are efficient?}
 \label{sec7:frontier}
 
-\textcite{markowitz1952} asked which portfolios an investor who cares only about the mean and the
-variance of the return would choose. For each target mean $m$ the answer is the fully invested
-portfolio with the least variance, and the set of these portfolios is the minimum-variance frontier.
+\textcite{markowitz1952} asked which portfolios\ix{Portfolio} an investor who cares only about the mean and the
+variance\ix{Variance} of the return would choose. For each target mean $m$ the answer is the fully invested
+portfolio with the least variance, and the set of these portfolios is the minimum-variance\ix{Minimum variance} frontier\ix{Efficient frontier}.
 Write
 \begin{equation}\label{eq7:abcd}
   A=\mathbf 1^\top\Sigma^{-1}\mathbf 1,\qquad B=\mathbf 1^\top\Sigma^{-1}\mu,\qquad C=\mu^\top\Sigma^{-1}\mu,
@@ -163,7 +163,7 @@ portfolio is $w_g=\Sigma^{-1}\mathbf 1/A$, with mean $B/A$ and variance $1/A$.
 
 \begin{proof}
 The problem is to minimise $\frac12w^\top\Sigma w$ subject to $\mathbf 1^\top w=1$ and $\mu^\top w=m$.
-The objective is strictly convex and the constraints are linear, so the stationary point of the
+The objective is strictly convex and the constraints are linear, so the stationary\ix{Stationarity} point of the
 Lagrangian $\frac12w^\top\Sigma w-\lambda(\mathbf 1^\top w-1)-\gamma(\mu^\top w-m)$ is the unique
 minimum. Stationarity gives $\Sigma w=\lambda\mathbf 1+\gamma\mu$, and the two constraints become
 $A\lambda+B\gamma=1$ and $B\lambda+C\gamma=m$, whose solution is the pair in \cref{eq7:frontier}.
@@ -182,17 +182,17 @@ the same variance. \Cref{cor7:twofund} is the first appearance of an idea that r
 chapter: when everyone uses the same moments, the choice of portfolio collapses to a choice among a
 few funds.
 
-\Cref{fig7:weights} draws the weights of the ten industries along the frontier, with means and
+\Cref{fig7:weights} draws the weights of the ten industries\ix{Ten industries}\ix{Industry} along the frontier, with means and
 covariances estimated from \fqFirst{} to \fqLast. Each weight is a straight line in
 $m$, as the corollary says, so a target mean far from that of the minimum-variance portfolio is reached
-only with large positions on both sides. At twice the mean of the tangency portfolio introduced below,
+only with large positions on both sides. At twice the mean of the tangency portfolio\ix{Tangency portfolio} introduced below,
 \fwDoubleMu\% a year, the frontier portfolio sells short \fwDoubleShort\% of its capital in
 \fwDoubleShortName{} and holds gross positions of \fwDoubleGross{} times its capital.
 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.92\textwidth]{ch07/fig13_weights}
-  \caption{Weights of the ten industries in the frontier portfolio with excess mean $m$, from the
+  \caption{\kind{historical} Weights of the ten industries in the frontier portfolio with excess mean $m$, from the
   full-sample moments, \fqFirst{} to \fqLast. The dotted lines mark the means of the global
   minimum-variance and tangency portfolios, and each line is named at its right end. Away from the
   tangency portfolio the short positions and the gross leverage grow quickly: at \fwDoubleMu\% a year
@@ -202,14 +202,14 @@ only with large positions on both sides. At twice the mean of the tangency portf
 
 
 \paragraph{Adding a riskless asset.}
-With a riskless asset paying $r_f$, an investor can combine any risky portfolio with lending or
+With a riskless asset\ix{Riskless asset} paying $r_f$, an investor can combine any risky portfolio with lending or
 borrowing, and the mean and volatility of the combination lie on a straight line from $(0,r_f)$
 \parencite{tobin1958}. The best line is the steepest, so the question becomes which portfolio has
-the highest Sharpe ratio $\theta(w)=w^\top\mu_x/\sqrt{w^\top\Sigma w}$.
+the highest Sharpe ratio\ix{Sharpe ratio} $\theta(w)=w^\top\mu_x/\sqrt{w^\top\Sigma w}$.
 
 \begin{proposition}[The tangency portfolio]\label{prop7:tangency}
 Among portfolios with $w^\top\mu_x>0$ the Sharpe ratio is largest for $w\propto\Sigma^{-1}\mu_x$, and
-the largest squared Sharpe ratio is
+the largest squared Sharpe ratio\ix{Squared Sharpe ratio} is
 \begin{equation}\label{eq7:theta}
   \theta^2=\mu_x^\top\Sigma^{-1}\mu_x .
 \end{equation}
@@ -227,15 +227,15 @@ and $\gamma>0$ is the condition for the efficient branch, since $\gamma=(Am-B)/D
 \end{proof}
 
 \Cref{fig7:frontier} shows the frontier of the ten industries, with means and covariances estimated
-over the whole sample, in excess returns so that the riskless rate is zero. The global
+over the whole sample, in excess returns so that the riskless rate\ix{Risk-free rate} is zero. The global
 minimum-variance portfolio has an excess mean of \frGmvMu\% and a volatility of \frGmvVol\%. The
 tangency portfolio has a mean of \frTanMu\%, a volatility of \frTanVol\% and a Sharpe ratio of
-\frTanSR, against \frMktSR{} for the market factor. To get there it sells short \frShortMax\% of its
+\frTanSR, against \frMktSR{} for the market factor\ix{Market factor}. To get there it sells short \frShortMax\% of its
 capital in \frShortName{} and holds gross positions of \frGross{} times its capital
 (\cref{tab7:weights}). These are in-sample numbers: the same data chose the weights and judged them,
 a point taken up in \cref{sec7:estimation}.
 The listing below computes $A$, $B$ and $C$ from the data files and the two portfolios of
-\cref{tab7:weights} from their closed forms; its last line checks that the minimum-variance mean is
+\cref{tab7:weights} from their closed forms\ix{Closed form}; its last line checks that the minimum-variance mean is
 $B/A$ and that the tangency Sharpe ratio is $\sqrt{12\,C}$ a year when the riskless rate is zero.
 \Needspace*{21\baselineskip}
 \lstinputlisting[language=Python]{code/ch07/snippets/closed_form.py}
@@ -243,7 +243,7 @@ $B/A$ and that the tangency Sharpe ratio is $\sqrt{12\,C}$ a year when the riskl
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.86\textwidth]{ch07/fig02_frontier}
-  \caption{Minimum-variance frontier of the ten industry portfolios in excess returns, \fqFirst{}
+  \caption{\kind{historical} Minimum-variance frontier of the ten industry portfolios in excess returns, \fqFirst{}
   to \fqLast, with short sales allowed and with weights restricted to be nonnegative, the capital
   market line through the tangency portfolio, and the market factor. Only the efficient part of the
 long-only frontier is drawn. It ends at
@@ -255,7 +255,7 @@ long-only frontier is drawn. It ends at
 
 \begin{table}[t]
 \centering
-\caption{Weights in percent of five portfolios of the ten industries, with means and covariances
+\caption{\kind{historical} Weights in percent of five portfolios of the ten industries, with means and covariances
 estimated from \fqFirst{} to \fqLast. Market weights are those of \fqLast. The last three rows use
 the full-sample moments for every column.}
 \label{tab7:weights}
@@ -272,19 +272,19 @@ the full-sample moments for every column.}
 \end{table}
 
 \paragraph{Long-only portfolios.}
-Most allocators cannot sell short, and many cannot borrow. Adding $w\ge0$ removes the closed form but
+Most allocators cannot sell short\ix{Short selling}, and many cannot borrow\ix{Borrowing constraint}. Adding $w\ge0$ removes the closed form but
 keeps the problem convex.
 
 \begin{proposition}[Long-only portfolios]\label{prop7:longonly}
 Let $M$ be a matrix with full row rank and $b$ a vector such that some $w\ge0$ satisfies $Mw=b$. The
 problem of minimising $\frac12w^\top\Sigma w$ subject to $Mw=b$ and $w\ge0$ has a unique solution,
-and $w$ is that solution exactly when there are multipliers $\lambda$ and $\nu$ with
+and $w$ is that solution exactly when there are multipliers\ix{Multiplier} $\lambda$ and $\nu$ with
 \begin{equation}\label{eq7:kkt}
   \Sigma w=M^\top\lambda+\nu,\qquad \nu\ge0,\qquad \nu_iw_i=0\ \text{for every } i .
 \end{equation}
 On the set of assets it holds, the solution solves the equality-constrained problem for those assets
 alone, and when $M$ stacks $\mathbf 1^\top$ and $\mu^\top$ it is a frontier portfolio of those assets. If some
-asset has a positive excess mean, the long-only portfolio with the largest Sharpe ratio is $y/\mathbf 1^\top y$,
+asset has a positive excess mean, the long-only\ix{Long-only portfolio} portfolio with the largest Sharpe ratio is $y/\mathbf 1^\top y$,
 where $y$ solves the problem with $M=\mu_x^\top$ and $b=1$.
 \end{proposition}
 
@@ -306,7 +306,7 @@ nonnegative; the multipliers $\lambda$ of the equality constraints have no sign 
 supports, and \texttt{ch07lib.qp\_enum} tries them all. The R script runs its own search over supports
 and Octave's \texttt{qp} solves the same problems by an active-set method; all three agree. The
 long-only tangency portfolio holds \frLoNword{} industries and has a Sharpe ratio of \frLoSR, so in
-sample the short positions raise the Sharpe ratio from \frLoSR{} to \frTanSR. The long-only frontier in
+sample the short positions\ix{Short position} raise the Sharpe ratio from \frLoSR{} to \frTanSR. The long-only frontier in
 \cref{fig7:frontier} lies inside the unconstrained one and touches it only where the unconstrained
 weights happen to be nonnegative.
 The Octave version uses the scaling in the proof of \cref{prop7:longonly}: minimise
@@ -320,13 +320,13 @@ the Sharpe ratio of \frLoSR{} and the \frLoNword{} industries held.
 \section{What estimation error does to the frontier}
 \label{sec7:estimation}
 
-The frontier needs $\mu$ and $\Sigma$, and both are estimated. Covariances are estimated far more
-precisely than means, though with many assets and few years of monthly data the sample covariance
-matrix is noisy too and can be close to singular. The means are much harder: with a volatility of 15\% a year, the
+The frontier\ix{Efficient frontier} needs $\mu$ and $\Sigma$, and both are estimated. Covariances are estimated far more
+precisely than means, though with many assets and few years of monthly data the sample covariance\ix{Sample covariance}
+matrix is noisy\ix{Noise} too and can be close to singular. The means are much harder: with a volatility of 15\% a year, the
 standard error of a mean estimated from five years is about $15/\sqrt5\approx6.7$ points, as large as
-the means themselves. An optimiser treats estimates as truth and leans hardest on the assets whose
+the means themselves. An optimiser\ix{Optimisation} treats estimates as truth and leans hardest on the assets whose
 means are most overstated, which led \textcite{michaud1989} to call mean-variance optimisers error
-maximisers. The bias in the maximum Sharpe ratio can be computed exactly for normal returns.
+maximisers. The bias in the maximum Sharpe ratio\ix{Sharpe ratio} can be computed exactly for normal returns.
 
 \begin{lemma}[Moments of the sample mean and covariance]\label{lem7:wishart}
 Let $x_1,\dots,x_T$ be independent $\N(\mu_x,\Sigma)$ vectors of dimension $N$, with sample mean
@@ -341,7 +341,7 @@ This is a standard property of the Wishart distribution, since $(T-1)\hat\Sigma$
 $T-1$ degrees of freedom; \textcite{muirhead1982} proves it.
 
 \begin{proposition}[The in-sample Sharpe ratio is biased upwards]\label{prop7:bias}
-Under the assumptions of \cref{lem7:wishart}, the largest squared Sharpe ratio computed from the sample
+Under the assumptions of \cref{lem7:wishart}, the largest squared Sharpe ratio\ix{Squared Sharpe ratio} computed from the sample
 moments, $\hat\theta^2=\hat\mu^\top\hat\Sigma^{-1}\hat\mu$, has mean
 \begin{equation}\label{eq7:bias}
   \E\hat\theta^2=\frac{T-1}{T-N-2}\Bigl(\theta^2+\frac NT\Bigr).
@@ -359,7 +359,7 @@ above $\theta$.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch07/fig03_estimation}
-  \caption{Sharpe ratios of the sample tangency portfolio in \esM{} simulated samples of 60 and 240
+  \caption{\kind{simulation} Sharpe ratios of the sample tangency portfolio in \esM{} simulated samples of 60 and 240
   months drawn from normal returns with the full-sample moments of the ten industries. The in-sample
   ratio uses the estimated moments, the true ratio the moments that generated the data. The vertical
   line is the largest Sharpe ratio available, \esTheta.}
@@ -372,7 +372,7 @@ the inverse too large on average. \Cref{fig7:estimation} takes the full-sample m
 industries as the truth, with $\theta=\esTheta$ a year, and draws \esM{} normal samples of each
 length. With five years of data the root mean square of the in-sample Sharpe ratio,
 $\sqrt{\E\hat\theta^2}$ in annual units, is \esInSixty, against \esInTheorySixty{} from
-\cref{eq7:bias}, which gives $\E\hat\theta^2$ exactly; by Jensen's inequality the mean of $\hat\theta$
+\cref{eq7:bias}, which gives $\E\hat\theta^2$ exactly; by Jensen's inequality\ix{Jensen's inequality} the mean of $\hat\theta$
 itself is lower. The average true Sharpe ratio of the estimated portfolio
 is only \esOutSixty{}, and in \esNegSixty\% of samples it is negative. With ten years the numbers are
 \esInOneTwenty{} and \esOutOneTwenty, and with twenty years \esInTwoForty{} and \esOutTwoForty. Even
@@ -388,7 +388,7 @@ months, fifty years of data, the in-sample ratio is \cvInMax{} while the estimat
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.86\textwidth]{ch07/fig14_convergence}
-  \caption{Root mean square in-sample Sharpe ratio of the sample tangency portfolio, exact from
+  \caption{\kind{exact and simulation} Root mean square in-sample Sharpe ratio of the sample tangency portfolio, exact from
   \cref{eq7:bias} and simulated, and the average true Sharpe ratio of the estimated portfolio, against
   the length of the sample, \cvM{} normal samples at each length with the full-sample moments of the
   ten industries. The dashed line is the largest Sharpe ratio available, \esTheta.}
@@ -405,9 +405,9 @@ months, fifty years of data, the in-sample ratio is \cvInMax{} while the estimat
 If every investor uses the same means and covariances, cares only about the mean and variance of
 the portfolio, and can lend and borrow at $r_f$, then by
 \cref{prop7:tangency} every investor holds the same risky portfolio $w_T$ in some proportion. Adding
-up across investors, with markets clearing and the riskless asset in zero net supply, the market
-portfolio of risky assets must be $w_T$. This is the capital asset
-pricing model of \textcite{sharpe1964} and \textcite{lintner1965}. Its content is captured by an
+up across investors, with markets clearing and the riskless asset\ix{Riskless asset} in zero net supply, the market
+portfolio\ix{Market portfolio} of risky assets must be $w_T$. This is the capital asset
+pricing model\ix{Capital asset pricing model} of \textcite{sharpe1964} and \textcite{lintner1965}. Its content is captured by an
 identity that holds for any portfolio, whether or not anyone is in equilibrium.
 
 \begin{proposition}[Beta pricing and efficiency]\label{prop7:capm}
@@ -421,28 +421,28 @@ Sharpe ratio or the smallest.
 \end{proposition}
 
 \begin{proof}
-The vector of betas is $\beta=\Sigma w_p/\sigma_p^2$. If $w_p=c\Sigma^{-1}\mu_x$, then $\Sigma w_p=c\mu_x$
+The vector of betas\ix{Beta} is $\beta=\Sigma w_p/\sigma_p^2$. If $w_p=c\Sigma^{-1}\mu_x$, then $\Sigma w_p=c\mu_x$
 and $\sigma_p^2=w_p^\top\Sigma w_p=c\,\mu_{x,p}$, so $\beta=\mu_x/\mu_{x,p}$, which is \cref{eq7:capm}.
 Conversely, \cref{eq7:capm} says $\mu_x=\mu_{x,p}\Sigma w_p/\sigma_p^2$, so
 $w_p=(\sigma_p^2/\mu_{x,p})\Sigma^{-1}\mu_x$. The sign of the multiple decides whether $p$ maximises or
 minimises the Sharpe ratio, by \cref{prop7:tangency}.
 \end{proof}
 
-The line $\mu_{x,i}=\beta_i\mu_{x,M}$ in the plane of beta and mean is the security market line\index{security market line}. Read
-one way, \cref{prop7:capm} is a model of expected returns: assets are rewarded only for their
+The line $\mu_{x,i}=\beta_i\mu_{x,M}$ in the plane of beta and mean is the security market line\index{Security market line}. Read
+one way, \cref{prop7:capm} is a model of expected returns\ix{Expected return}: assets are rewarded only for their
 covariance with the market, and an asset with a beta of zero earns the riskless rate however volatile
 it is. Read the other way, it is a warning that \textcite{roll1977} made precise: testing the CAPM is
 the same as testing whether a market proxy is mean-variance efficient, and a rejection could mean the
 proxy is wrong. In the industry data the identity can be checked against the in-sample tangency
-portfolio, where it must hold, and it does to rounding error: the right panel of \cref{fig7:sml}
-puts all ten industries on the line, with tangency betas from \cpTanBetaMin{} to \cpTanBetaMax. Against
-the market factor it need not hold. \textcite{black1972} showed that without riskless borrowing the line still holds with
+portfolio, where it must hold, and it does to rounding error\ix{Rounding error}: the right panel of \cref{fig7:sml}
+puts all ten industries\ix{Industry} on the line, with tangency betas from \cpTanBetaMin{} to \cpTanBetaMax. Against
+the market factor\ix{Market factor} it need not hold. \textcite{black1972} showed that without riskless borrowing the line still holds with
 the mean of a zero-beta portfolio in place of $r_f$, so its intercept can be above the bill rate.
 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.76\textwidth]{ch07/fig04_sml}
-  \caption{Mean excess return of each industry against its beta on the market factor (left) and on
+  \caption{\kind{historical} Mean excess return of each industry against its beta on the market factor (left) and on
   the in-sample tangency portfolio (right), \fqFirst{} to \fqLast. On the left the dashed line is the
   security market line of the CAPM, through the origin with slope equal to the market premium, and the
   solid line is the least-squares fit, flatter and with a positive intercept. On the right the dashed
@@ -465,21 +465,21 @@ version of the model can accommodate. With ten points the evidence is thin, and
 \section{Factor models}
 \label{sec7:factors}
 
-A covariance matrix of $N$ assets has $N(N+1)/2$ free entries, 125,250 for five hundred stocks, and
-with fewer months than assets the sample matrix is singular. Factor models impose structure.
+A covariance matrix\ix{Covariance matrix} of $N$ assets has $N(N+1)/2$ free entries, 125,250 for five hundred stocks, and
+with fewer months than assets the sample matrix is singular. Factor models\ix{Factor model} impose structure.
 
 \begin{definition}[Linear factor model]\label{def7:factor}
-Excess returns follow a linear factor model with $K$ factors if
+Excess returns\ix{Excess return} follow a linear factor model with $K$ factors if
 \begin{equation}\label{eq7:factor}
   x_t=\alpha+Bf_t+\varepsilon_t ,
 \end{equation}
-where $f_t$ has mean $\bar f$ and covariance $\Omega$, $B$ is $N\times K$, the residuals $\varepsilon_t$
+where $f_t$ has mean $\bar f$ and covariance $\Omega$, $B$ is $N\times K$, the residuals\ix{Residual} $\varepsilon_t$
 have mean zero, are uncorrelated with $f_t$ and have a diagonal covariance matrix $D$. Then
 $\Sigma=B\Omega B^\top+D$.
 \end{definition}
 
 \begin{proposition}[Inverting a factor covariance]\label{prop7:woodbury}
-Under \cref{def7:factor}, with $\Omega$ nonsingular and every residual variance positive,
+Under \cref{def7:factor}, with $\Omega$ nonsingular and every residual variance\ix{Residual risk} positive,
 \begin{equation}\label{eq7:woodbury}
   \Sigma^{-1}=D^{-1}-D^{-1}B\bigl(\Omega^{-1}+B^\top D^{-1}B\bigr)^{-1}B^\top D^{-1},
 \end{equation}
@@ -495,10 +495,10 @@ $B^\top D^{-1}B\Omega+I=G\Omega$, the last term is $D^{-1}B\Omega B^\top$, which
 The count adds the loadings, the free entries of $\Omega$ and the diagonal of $D$.
 \end{proof}
 
-With five hundred stocks and six factors the count is 3,521 instead of 125,250. With ten industries a
-six-factor model has more parameters than the sample covariance, so its value here is as a
+With five hundred stocks and six factors the count is 3,521 instead of 125,250. With ten industries\ix{Industry} a
+six-factor model has more parameters than the sample covariance\ix{Sample covariance}, so its value here is as a
 description. Fitted with the factors of \textcite{fama2015} and the momentum factor of
-\textcite{carhart1997}, the model reproduces the industry correlations to within \fmCorrErr{}, and its
+\textcite{carhart1997}, the model reproduces the industry correlations\ix{Correlation} to within \fmCorrErr{}, and its
 minimum-variance portfolio has a predicted volatility of \fmGmvFactor\% against \fmGmvFactorTrue\%
 when evaluated with the sample covariance; the diagonal $D$ ignores the residual correlation between
 industries, so the model is too optimistic about how much can be hedged. \Cref{fig7:corrgap} shows
@@ -509,7 +509,7 @@ are removed.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.74\textwidth]{ch07/fig15_corrgap}
-  \caption{Sample correlation of the ten industries minus the correlation implied by the six-factor
+  \caption{\kind{historical} Sample correlation of the ten industries minus the correlation implied by the six-factor
   model $B\Omega B^\top+D$, \fqFirst{} to \fqLast. Each pair appears once; every cell carries its
   sign, with a third decimal where the gap rounds to zero at two.}
   \label{fig7:corrgap}
@@ -518,7 +518,7 @@ are removed.
 
 \paragraph{Arbitrage pricing.}
 A factor model is a statement about covariances. \textcite{ross1976} showed that it becomes a
-statement about means once arbitrage is ruled out. The exact version has a short proof.
+statement about means once arbitrage\ix{Arbitrage} is ruled out. The exact version has a short proof.
 
 \begin{proposition}[Exact arbitrage pricing]\label{prop7:apt}
 Suppose $x_t=\mu_x+B(f_t-\bar f)$ with no residual, and that every portfolio $w$ with $B^\top w=0$ has
@@ -545,20 +545,20 @@ manager earns beyond a portfolio of the factors with the same loadings.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch07/fig05_pca}
-  \caption{Principal components of the correlation matrix of the ten industries, \fqFirst{} to
+  \caption{\kind{historical} Principal components of the correlation matrix of the ten industries, \fqFirst{} to
   \fqLast. Left, the share of total variance explained by each component. Right, the loadings of the
   first two; the second is signed so that technology has a positive loading.}
   \label{fig7:pca}
 \end{figure}
 
 \paragraph{Factors from the data.}
-The factors need not be chosen in advance. The eigenvectors of the correlation matrix of the
+The factors need not be chosen in advance. The eigenvectors\ix{Eigenvalue} of the correlation matrix of the
 industries are weights on the standardised returns; the combinations they form are uncorrelated, and
 their eigenvalues are the variances they explain. Combinations of the raw returns with the same
 weights are not uncorrelated, and the weights need not add to one, so a component is not by itself a
 fully invested portfolio. \Cref{fig7:pca} shows that the first component explains \pcOne\% of the variance of the
 standardised returns and the first three \pcThree\%. The first has positive loadings on every industry
-and a correlation of \pcMktCorr{} with the market factor. The second, with \pcTwo\%, sets technology,
+and a correlation of \pcMktCorr{} with the market factor\ix{Market factor}. The second, with \pcTwo\%, sets technology,
 durable goods and retail against utilities and energy; its correlation with the value factor is
 \pcTwoHmlSigned, so it leans towards growth against value without being a value portfolio. Statistical factors explain the
 covariance well, but they come with no theory of their means, which is where the characteristic
@@ -570,21 +570,21 @@ factors of \textcite{fama1993} come in.
 \section{Estimating alpha and beta}
 \label{sec7:alpha}
 
-A manager's alpha and beta are estimated by the time-series regression
+A manager's alpha and beta\ix{Beta} are estimated by the time-series regression\ix{Linear regression}
 \begin{equation}\label{eq7:reg}
   x_{p,t}=\alpha+\beta^\top f_t+\varepsilon_t,\qquad t=1,\dots,T,
 \end{equation}
-of the fund's excess return on the excess returns of $K$ traded factors, the single market factor in
-the CAPM. When the traded factors price the assets, \cref{prop7:apt} gives $\alpha=0$;
-in general $\alpha$ is the mean return left after paying for the factor exposures at the factors' own
-mean returns, and reading it as skill assumes the factors are the right benchmark. Least squares gives the estimates, and its classical standard
-errors assume residuals that are uncorrelated over time with constant variance. Monthly fund returns
+of the fund's excess return\ix{Excess return} on the excess returns of $K$ traded factors, the single market factor in
+the CAPM\ix{Capital asset pricing model}. When the traded factors price the assets, \cref{prop7:apt} gives $\alpha=0$;
+in general $\alpha$ is the mean return\ix{Mean} left after paying for the factor exposures\ix{Factor loading} at the factors' own
+mean returns, and reading it as skill assumes the factors are the right benchmark. Least squares\ix{Least squares} gives the estimates, and its classical standard
+errors\ix{Standard error} assume residuals\ix{Residual} that are uncorrelated over time with constant variance\ix{Variance}. Monthly fund returns
 often fail both assumptions, and the errors of \textcite{newey1987}, used throughout this section with
-\alNW{} lags, allow for both. \Cref{tab7:alphas} reports the regressions for the ten industries.
+\alNW{} lags, allow for both. \Cref{tab7:alphas} reports the regressions for the ten industries\ix{Ten industries}\ix{Industry}.
 
 \begin{table}[t]
 \centering
-\caption{Alphas, in percent a year, of the ten industries, \fqFirst{} to \fqLast, against the market
+\caption{\kind{historical} Alphas, in percent a year, of the ten industries, \fqFirst{} to \fqLast, against the market
 factor alone (CAPM), with the beta and $R^2$, and against the market, size, value, profitability,
 investment and momentum factors (six factors), with the $R^2$. The t statistics use Newey-West\index{Newey-West} standard errors with \alNW{} lags.}
 \label{tab7:alphas}
@@ -603,17 +603,17 @@ investment and momentum factors (six factors), with the $R^2$. The t statistics 
 Against the market alone none of the ten alphas is significant at the 5\% level, and the market
 explains between \alRsqMinCapm{} and \alRsqMaxCapm{} of the variance. Adding five factors raises the
 explained variance to between \alRsqMinSix{} and \alRsqMaxSix, and yet \alNsigSixWord{} industries now
-have significant alphas, among them technology at \alHiTecA\% a year with a t statistic of
+have significant alphas, among them technology at \alHiTecA\% a year with a t statistic\ix{Test statistic} of
 \alHiTecT{} and the residual industry at \alOtherA\%. More factors explain more of the variance and
 can make the pricing errors worse: technology loads negatively on the value, profitability,
-investment and momentum factors, whose premia were all positive, so the six-factor model predicts a lower mean for it
+investment and momentum\ix{Momentum} factors, whose premia were all positive, so the six-factor model predicts a lower mean for it
 than the CAPM does. \Cref{sec7:attribution} breaks this down.
 
-The listing below runs the two regressions for health care with statsmodels and prints both kinds of
-t statistic. The Newey-West option needs \texttt{use\_correction=True} to apply the small-sample
+The listing below runs the two regressions for health care\ix{Health care} with statsmodels and prints both kinds of
+t statistic. The Newey-West\ix{Newey-West standard errors} option needs \texttt{use\_correction=True} to apply the small-sample
 factor $T/(T-k)$ used in \cref{tab7:alphas}; without it the t statistics come out slightly larger.
 Classical and Newey-West t statistics differ little for an industry portfolio, but for a fund
-with smoothed or option-like returns the gap can be large.
+with smoothed or option-like\ix{Option-like payoffs} returns the gap can be large.
 \Needspace*{18\baselineskip}
 \lstinputlisting[language=Python]{code/ch07/snippets/hac_alpha.py}
 
@@ -622,7 +622,7 @@ The standard error of the intercept has a simple form that explains why alphas a
 down.
 
 \begin{proposition}[Standard error of alpha]\label{prop7:alphase}
-In the regression $y_t=\alpha+\beta x_t+\varepsilon_t$ with residuals independent of $x$ and of each
+In the regression $y_t=\alpha+\beta x_t+\varepsilon_t$ with residuals independent\ix{Independence} of $x$ and of each
 other, with mean zero and variance $\sigma_\varepsilon^2$, the least-squares intercept has
 \begin{equation}\label{eq7:alphase}
   \Var(\hat\alpha\mid x)=\frac{\sigma_\varepsilon^2}{T}\Bigl(1+\frac{\bar x^2}{s_x^2}\Bigr),
@@ -637,11 +637,11 @@ $\Cov(\bar y,\hat\beta)=\sigma_\varepsilon^2\sum_t(x_t-\bar x)/(T^2s_x^2)=0$. He
 $\Var(\hat\alpha)=\sigma_\varepsilon^2/T+\bar x^2\sigma_\varepsilon^2/(Ts_x^2)$.
 \end{proof}
 
-The ratio $\bar x/s_x$ is the sample Sharpe ratio of the factor, which is small for monthly data, so
+The ratio $\bar x/s_x$ is the sample Sharpe ratio\ix{Sharpe ratio} of the factor, which is small for monthly data\ix{Monthly data}, so
 the standard error of alpha is essentially that of a mean of the residuals. For health care the
 residual volatility is \alHlthResid\% a year, the CAPM alpha \alHlthA\% and its classical standard
 error \alHlthSe\%, which \cref{eq7:alphase} reproduces exactly. The ratio of alpha to residual
-volatility is the information ratio, here \alHlthIR, and the ratio decides how long a track record must
+volatility is the information ratio\ix{Information ratio}, here \alHlthIR, and the ratio decides how long a track record must
 be.
 
 \begin{corollary}[Years needed to detect alpha]\label{cor7:detect}
@@ -665,7 +665,7 @@ statistic reaches two. They guarantee nothing: at that point a test at 5\% rejec
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.96\textwidth]{ch07/fig06_detect}
-  \caption{Left, the probability that the t statistic of alpha exceeds 1.96 in absolute value, against
+  \caption{\kind{exact and simulation} Left, the probability that the t statistic of alpha exceeds 1.96 in absolute value, against
   the length of the monthly record, for three annual information ratios, from \cref{cor7:detect}.
   Right, t statistics of \mgN{} simulated managers over \mgT{} months, \mgSkill{} of them with an
   information ratio of 0.5 and the rest with none; the dashed line is the 5\% critical value.}
@@ -691,7 +691,7 @@ and $\Cov(\varepsilon)=\Sigma_\varepsilon$. Then
 \begin{equation}\label{eq7:grsid}
   \alpha^\top\Sigma_\varepsilon^{-1}\alpha=\theta^2(f,x)-\theta^2(f),
 \end{equation}
-where $\theta^2(\cdot)$ is the largest squared Sharpe ratio of \cref{eq7:theta} for the assets listed.
+where $\theta^2(\cdot)$ is the largest squared Sharpe ratio\ix{Squared Sharpe ratio} of \cref{eq7:theta} for the assets listed.
 The same identity holds for the sample moments with divisor $T$.
 \end{proposition}
 
@@ -703,8 +703,8 @@ left is $\bar f^\top\Omega^{-1}\bar f+\alpha^\top\Sigma_\varepsilon^{-1}\alpha$.
 makes the residuals orthogonal to the factors and the same algebra applies.
 \end{proof}
 
-A joint test of alphas is a test of whether the assets improve the best Sharpe ratio available from
-the factors. For the CAPM, $J=\grsCapm$ with a p-value of \grsPCapm: the ten industries raise the
+A joint test\ix{Joint test} of alphas is a test of whether the assets improve the best Sharpe ratio available from
+the factors. For the CAPM, $J=\grsCapm$ with a p-value\ix{p value} of \grsPCapm: the ten industries raise the
 Sharpe ratio from \grsSRcapm{} for the market alone to \grsSRcapmAll{} in sample, and that gain is
 within what chance would give. For six factors, $J=\grsSix$ with a p-value of \grsPSix: the factors
 alone reach \grsSRfac, and adding the industries reaches \grsSRall. With five factors and no momentum
@@ -717,7 +717,7 @@ covariance with divisor $T$, and the $F$ distribution that follows \cref{eq7:grs
 \lstinputlisting[language=R]{code/ch07/snippets/grs.R}
 
 \paragraph{Betas move.}
-\Cref{fig7:rolling} estimates betas over rolling windows of \rbW{} months. The beta of technology ran
+\Cref{fig7:rolling} estimates betas over rolling windows\ix{Rolling window} of \rbW{} months. The beta of technology ran
 from \rbMinHiTec{} to \rbMaxHiTec, the peak in the window ending in \rbMaxWhenHiTec{} that contains the
 collapse of technology stocks after 2000. The beta of utilities fell to \rbMinUtils{} in the window
 ending in \rbMinWhenUtils, and that of energy reached \rbMaxEnrgy{} in the window ending in
@@ -729,7 +729,7 @@ weak guide to its beta in the next.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.72\textwidth]{ch07/fig07_rolling}
-  \caption{Market betas of three industries estimated over rolling windows of \rbW{} months, plotted at
+  \caption{\kind{historical} Market betas of three industries estimated over rolling windows of \rbW{} months, plotted at
   the end of each window, with bands of two classical standard errors.}
   \label{fig7:rolling}
 \end{figure}
@@ -738,7 +738,7 @@ weak guide to its beta in the next.
 \paragraph{Screening many managers.}
 An allocator who screens a database of managers by their t statistics faces the problem in reverse:
 with many managers and no skill, some will look skilled. The right panel of \cref{fig7:detect}
-simulates \mgN{} managers with ten years of monthly returns, betas between 0.6 and 1.4 and a tracking
+simulates \mgN{} managers with ten years of monthly returns\ix{Monthly returns}, betas between 0.6 and 1.4 and a tracking
 error of 8\% a year. One in ten has an annual information ratio of 0.5 and the rest have none. A
 two-sided test at 5\% flags \mgNaive{} managers, and \mgNaiveFalse{} of them have no skill; of the
 \mgNaivePos{} flagged with positive alphas, \mgNaivePosFalse{} are lucky. By \cref{cor7:detect} a
@@ -749,7 +749,7 @@ $q=10\%$ it flags none of the \mgN{} managers, because the skilled ones are not 
 lucky ones. With twenty-year records it flags \mgLongBh, of whom \mgLongBhFalse{} are false, while the
 naive test flags \mgLongNaive{} with \mgLongNaiveFalse{} false. Twice the share of p-values above one half
 estimates the share of managers without skill \parencite{storey2002}; with ten-year records it gives \mgPiZero, against
-a true value of 0.90. \textcite{barras2010} apply these ideas to mutual funds and
+a true value of 0.90. \textcite{barras2010} apply these ideas to mutual funds\ix{Mutual fund} and
 \textcite{harvey2016} to the hundreds of factors proposed in the literature, where the same
 arithmetic applies to researchers instead of managers.
 The listing applies the rule with R's \texttt{p.adjust} to the p-values of the simulated managers,
@@ -762,13 +762,13 @@ which the Python script writes out, and prints the counts above with Storey's es
 \section{Stale prices: beta hidden, alpha manufactured}
 \label{sec7:smoothing}
 
-Private equity, real estate, infrastructure and many credit and hedge funds report returns based on
-appraisals or on prices of assets that rarely trade. Chapter~1 showed that such returns are smoothed:
-the reported return mixes this period's true return with earlier ones. A regression of a smoothed
+Private equity, real estate, infrastructure and many credit and hedge funds\ix{Hedge fund} report returns based on
+appraisals\ix{Appraisal} or on prices of assets that rarely trade. Chapter~1 showed that such returns are smoothed\ix{Return smoothing}:
+the reported return\ix{Reported returns} mixes this period's true return with earlier ones. A regression\ix{Linear regression} of a smoothed
 series on the contemporaneous market return then measures the wrong thing.
 
 \begin{proposition}[Regressions on smoothed returns]\label{prop7:stale}
-Let the true excess return be $r_t=a+\beta m_t+e_t$, where the market excess returns $m_t$ are
+Let the true excess return\ix{Excess return} be $r_t=a+\beta m_t+e_t$, where the market excess returns\ix{Market excess return} $m_t$ are
 independent and identically distributed with mean $\bar m$ and variance $\sigma_m^2$, and $e_t$ is
 white noise independent of the market with variance $\sigma_e^2$. Let the reported return be
 $r^*_t=\sum_{k\ge0}\vartheta_kr_{t-k}$, with nonnegative weights $\vartheta_k$ that add to one. Then
@@ -784,7 +784,7 @@ $r^*_t=\sum_{k\ge0}\vartheta_kr_{t-k}$, with nonnegative weights $\vartheta_k$ t
 
 \begin{proof}
 (i) holds because the weights add to one. Since the market returns are independent,
-$\Cov(r^*_t,m_{t-j})=\vartheta_j\beta\sigma_m^2$, and the lagged market returns are uncorrelated with
+$\Cov(r^*_t,m_{t-j})=\vartheta_j\beta\sigma_m^2$, and the lagged\ix{Lag} market returns\ix{Lagged market returns} are uncorrelated with
 each other. The population regression on $m_t,\dots,m_{t-q}$ therefore has the separate slopes
 $\vartheta_j\beta$, which gives (ii) and (iii); the intercept in (ii) is the mean of $r^*_t$ less
 $\vartheta_0\beta\bar m$. For (iv), $r^*_t$ is a weighted sum of independent terms $\beta m_{t-k}+e_{t-k}$,
@@ -794,15 +794,15 @@ and $\sum_k\vartheta_k^2\le\bigl(\sum_k\vartheta_k\bigr)^2=1$.
 The common model of appraisal smoothing is $r^*_t=(1-\phi)r_t+\phi r^*_{t-1}$, for which
 $\vartheta_k=(1-\phi)\phi^k$, the slope on the current market is $(1-\phi)\beta$, the sum of $q+1$ slopes
 is $(1-\phi^{q+1})\beta$, and $\sum_k\vartheta_k^2=(1-\phi)/(1+\phi)$. The volatility falls by the
-square root of that factor while the mean is unchanged, so the Sharpe ratio rises by the factor
+square root of that factor while the mean is unchanged, so the Sharpe ratio\ix{Sharpe ratio} rises by the factor
 $\sqrt{(1+\phi)/(1-\phi)}$, which is $\sqrt3$ for $\phi=0.5$, and
-the missing beta times the market premium reappears as alpha. The regression on lagged market
+the missing beta\ix{Beta} times the market premium reappears as alpha. The regression on lagged market
 returns is the estimator of \textcite{dimson1979}, proposed for thinly traded shares, and
 \textcite{getmansky2004} give a model of the smoothing for hedge funds.
 
 To see the sizes, take the true returns to be the residual industry, whose excess returns have a beta
-of \smoBeta{}, a CAPM alpha of \smoAlpha\% a year, a volatility of \smoVol\% and a Sharpe ratio of
-\smoSR. The market's own first-order autocorrelation is \smoMktAcf, close enough to zero for
+of \smoBeta{}, a CAPM\ix{Capital asset pricing model} alpha of \smoAlpha\% a year, a volatility of \smoVol\% and a Sharpe ratio of
+\smoSR. The market's own first-order autocorrelation\ix{Autocorrelation}\ix{First-order autocorrelation} is \smoMktAcf, close enough to zero for
 \cref{prop7:stale} to apply. Smoothed with $\phi=0.5$, the series has a first-order autocorrelation of
 \smoAcfHalf, a beta of \smoBetaHalf, a volatility of \smoVolHalf\% and a Sharpe ratio of \smoSRHalf.
 For uncorrelated true returns the factor $\sqrt{(1-\phi)/(1+\phi)}$ would give a volatility of
@@ -815,13 +815,13 @@ drops to \smoBetaEight{} and the alpha rises to \smoAlphaEight\% with a t statis
 \smoQ{} lags gives betas of \smoDimsonHalf{} and \smoDimsonEight{} and alphas of
 \smoDimsonAlphaHalf\% and \smoDimsonAlphaEight\%, much closer to the truth of \smoBeta{} and \smoAlpha\%,
 though with $\phi=0.8$ twelve lags still leave \smoSpurEight{} points of spurious alpha. \Cref{fig7:smoothing} shows how
-many lags are needed: with $\phi=0.8$ six lags give a summed beta of only \smoDimsonSixEight, about four fifths of the true
+many lags are needed: with $\phi=0.8$ six lags give a summed beta\ix{Dimson beta} of only \smoDimsonSixEight, about four fifths of the true
 \smoBeta.
 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.84\textwidth]{ch07/fig08_smoothing}
-  \caption{Sum of the slopes of a regression of smoothed returns on the current and $q$ lagged market
+  \caption{\kind{historical} Sum of the slopes of a regression of smoothed returns on the current and $q$ lagged market
   returns, for the residual industry smoothed with two values of $\phi$, \fqFirst{} to \fqLast. Dashed
   lines are $(1-\phi^{q+1})\beta$ from \cref{prop7:stale}; the grey line is the beta of the unsmoothed
   returns.}
@@ -837,7 +837,7 @@ reported drawdown is \smoDdHalf\%, and with $\phi=0.8$ it is \smoDdEight\%, reac
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.86\textwidth]{ch07/fig16_appraisal}
-  \caption{Wealth from the excess returns of the residual industry, \smoDdFirst{} to \smoDdLast,
+  \caption{\kind{historical} Wealth from the excess returns of the residual industry, \smoDdFirst{} to \smoDdLast,
   true and smoothed with two values of $\phi$, with the largest peak-to-trough loss of each. The
   smoothing runs over the whole sample.}
   \label{fig7:appraisal}
@@ -852,19 +852,19 @@ reported drawdown is \smoDdHalf\%, and with $\phi=0.8$ it is \smoDdEight\%, reac
 \section{Option-like payoffs}
 \label{sec7:options}
 
-Many hedge fund strategies have payoffs that are not linear in the market. Merger arbitrage loses
+Many hedge fund\ix{Hedge fund} strategies have payoffs\ix{Payoff} that are not linear in the market. Merger arbitrage loses
 when deals break in a falling market, and a fund that sells index puts earns a steady premium and
-loses heavily in crashes; \textcite{agarwal2004} find such exposures across hedge fund styles. A
-linear regression assigns these funds a beta and an alpha, and the alpha can have either sign
+loses heavily in crashes; \textcite{agarwal2004} find such exposures\ix{Exposure} across hedge fund styles. A
+linear regression\ix{Linear regression} assigns these funds a beta and an alpha, and the alpha can have either sign
 depending on what the options were worth.
 
 Take a fund that at the start of each month sells one month puts on the market struck at \poMoney\%
-of its level, holds the strike in bills as collateral, and prices the puts with the Black-Scholes
-formula of Chapter~5 at the trailing twelve month realised volatility. The market path is the actual
+of its level, holds the strike\ix{Strike} in bills as collateral, and prices the puts with the Black-Scholes
+formula of Chapter~5 at the trailing twelve month realised volatility\ix{Volatility}\ix{Realised volatility}. The market path is the actual
 one from \poFirst{} to \fqLast; the first year of the data is used for the first volatility estimate.
 The pricing rule is hypothetical and is not a record of premiums that could have been traded: it
-ignores bid-ask spreads, margin and the gap between implied and realised volatility. Priced at realised volatility, the premium is \poZeroPrem\% a year, the
-mean excess return \poZeroMean\% and the CAPM alpha \poZeroA\% with a t statistic of \poZeroT. Priced at a
+ignores bid-ask spreads\ix{Bid-ask spread}, margin and the gap between implied and realised volatility. Priced at realised volatility, the premium is \poZeroPrem\% a year, the
+mean excess return\ix{Excess return} \poZeroMean\% and the CAPM\ix{Capital asset pricing model} alpha \poZeroA\% with a t statistic\ix{Test statistic} of \poZeroT. Priced at a
 volatility 20\% higher, an assumption made only to show the effect, the premium is \poTwentyPrem\%, the mean \poTwentyMean\% and the alpha \poTwentyA\% with a t
 statistic of \poTwentyT. In both cases the beta is \poTwentyB{} and the worst month is
 \poTwentyWorstWhen, with losses of \poZeroWorst\% and \poTwentyWorst\%. The fund's alpha is a statement about the price of
@@ -884,7 +884,7 @@ strike, \poMoney\% of the level, so the fit at zero lies above the cloud of flat
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.84\textwidth]{ch07/fig09_puts}
-  \caption{Monthly excess returns of a fund that sells one month puts struck at \poMoney\% of the
+  \caption{\kind{historical} Monthly excess returns of a fund that sells one month puts struck at \poMoney\% of the
   market, priced at 1.2 times trailing realised volatility, against the market excess return,
   \poFirst{} to \fqLast, with the CAPM line and the Henriksson-Merton fit.}
   \label{fig7:puts}
@@ -903,11 +903,11 @@ An option bought for $\pi_t$ with borrowed money pays $h_t-\pi_t$ in excess of t
 the replicating portfolio from the fund leaves $a+c\pi_t+\varepsilon_t$, whose mean is $a+c\,\E\pi_t$.
 \end{proof}
 
-This is the idea of \textcite{glosten1994}: measure performance against a benchmark that includes the
+This is the idea of \textcite{glosten1994}: measure performance against a benchmark\ix{Benchmark} that includes the
 options the fund could have traded. With the at-the-money put priced at the same volatility as the
 fund's own, the alpha of \cref{prop7:gj} is \poZeroAdj\% a year for the fund that sells at realised
 volatility and \poTwentyAdj\% for the one that sells at the markup. The CAPM alphas of \poZeroA\% and
-\poTwentyA\% were swings in the price of insurance. Against traded options both funds earn slightly less than
+\poTwentyA\% were swings in the price of insurance\ix{Insurance}. Against traded options both funds earn slightly less than
 they would by selling the at-the-money put of the benchmark, because a put struck at \poMoney\% is a
 different contract. Because the benchmark put is priced at the fund's own volatility, this alpha compares two strikes, not
 two prices of insurance, so the markup moves this alpha by only \poMarkupAdj{} points, against
@@ -921,13 +921,13 @@ with a t statistic of \poTwentyTmT.
 \section{Return attribution}
 \label{sec7:attribution}
 
-Attribution asks where a portfolio's return relative to its benchmark came from. A factor
+Attribution\ix{Performance attribution} asks where a portfolio's return relative to its benchmark\ix{Benchmark} came from. A factor
 attribution uses \cref{eq7:reg}: the mean excess return is $\hat\alpha+\sum_k\hat\beta_k\bar f_k$
 exactly, because least squares fits the means. For the technology industry over \fqFirst{} to \fqLast,
 the mean excess return of \faMean\% a year splits into \faMkt\% from the market, \faSmb\% from size,
 \faHml\% from value, \faRmw\% from profitability, \faCma\% from investment, \faMom\% from momentum and
 an alpha of \faAlpha\% (the components are rounded: the printed ones add to \faRoundedSum, and the four negative factor terms
-to \faFourRoundedNeg, against \faFourNegSigned{} unrounded). Against the CAPM's predicted mean of \faCapmPred\%, the smaller market loading takes off \faMktDrop{}
+to \faFourRoundedNeg, against \faFourNegSigned{} unrounded). Against the CAPM\ix{Capital asset pricing model}'s predicted mean of \faCapmPred\%, the smaller market loading takes off \faMktDrop{}
 points and the negative loadings on the last four factors \faFourNeg{} more, offset by \faSmb{} from
 size; that gap of \faGap{} points is what turns a CAPM alpha of \alHiTecCapm\% into a six-factor alpha
 of \faAlpha\% in \cref{tab7:alphas}. \Cref{fig7:waterfall} draws the same split.
@@ -935,14 +935,14 @@ of \faAlpha\% in \cref{tab7:alphas}. \Cref{fig7:waterfall} draws the same split.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.86\textwidth]{ch07/fig17_waterfall}
-  \caption{Mean excess return of technology, \fqFirst{} to \fqLast, split into the contributions
+  \caption{\kind{historical} Mean excess return of technology, \fqFirst{} to \fqLast, split into the contributions
   $\hat\beta_k\bar f_k$ of the six factors and the alpha, in percent a year. The bars are computed from
   unrounded estimates and add to the mean exactly. The dashed line is the mean predicted by the CAPM.}
   \label{fig7:waterfall}
 \end{figure}
 
 
-A holdings-based attribution splits the active return by segments, here industries. Let the
+A holdings-based attribution splits the active return\ix{Active return} by segments, here industries\ix{Industry}. Let the
 portfolio hold weight $w_i$ in segment $i$ and earn $R^p_i$ there, the benchmark hold $b_i$ and earn
 $R^b_i$, and $R_b=\sum_ib_iR^b_i$.
 
@@ -971,7 +971,7 @@ compounded returns, and
 \[
   k_t=\frac{\ln(1+R_t)-\ln(1+B_t)}{R_t-B_t},\qquad k=\frac{\ln(1+R)-\ln(1+B)}{R-B},
 \]
-with $k_t=1/(1+R_t)$ when $R_t=B_t$ and $k=1/(1+R)$ when $R=B$, all gross returns $1+R_t$, $1+B_t$
+with $k_t=1/(1+R_t)$ when $R_t=B_t$ and $k=1/(1+R)$ when $R=B$, all gross returns\ix{Gross return} $1+R_t$, $1+B_t$
 being positive. Then $\sum_t(k_t/k)(R_t-B_t)=R-B$, so the effects of
 \cref{eq7:brinson} scaled by $k_t/k$ add up over periods to the compounded active return.
 \end{proposition}
@@ -982,7 +982,7 @@ $\sum_tk_t(R_t-B_t)=\sum_t\ln(1+R_t)-\sum_t\ln(1+B_t)=\ln(1+R)-\ln(1+B)=k(R-B)$.
 
 \begin{table}[!tb]
 \centering
-\caption{Attribution of an illustrative industry portfolio against the cap-weighted ten industries,
+\caption{\kind{historical} Attribution of an illustrative industry portfolio against the cap-weighted ten industries,
 January to \atLast, in percentage points of cumulative return, linked over months by
 \cref{prop7:carino}. Weights are those of January, in percent. The benchmark weights drift from month
 to month, so industries held at their January weight still have allocation and interaction effects. Entries are
@@ -1001,9 +1001,9 @@ return of \atActive.}
 \end{table}
 
 These are the factors of \textcite{carino1999}. As an example, take the cap-weighted ten industries
-as the benchmark from January to \atLast, with the market values in the file for each month, and an
+as the benchmark from January to \atLast, with the market values\ix{Market capitalisation} in the file for each month, and an
 illustrative portfolio that starts from the benchmark weights of January, holds ten points less in
-technology and three or four points more in health care, energy and utilities, and is rebalanced to
+technology and three or four points more in health care, energy\ix{Energy} and utilities, and is rebalanced to
 those weights every month. Because the benchmark weights drift with prices, and in July change when the
 library reassigns firms to industries, while the portfolio's are reset, industries held at their January
 weight still show allocation and interaction effects, and large ones for industries such as
@@ -1025,20 +1025,20 @@ formulas for \cref{tab7:attrib}.
 \section{Black-Litterman: starting from the market}
 \label{sec7:bl}
 
-\Cref{sec7:estimation} showed that sample means make poor inputs. \textcite{black1992} start instead
-from the means that would make the market portfolio optimal. If an investor with risk aversion
-$\delta$ chooses $w=(\delta\Sigma)^{-1}\mu_x$, the excess means that make the market weights $w_m$
-optimal are the equilibrium returns
+\Cref{sec7:estimation} showed that sample means\ix{Sample mean} make poor inputs. \textcite{black1992} start instead
+from the means that would make the market portfolio\ix{Market portfolio} optimal. If an investor with risk aversion\ix{Risk aversion}
+$\delta$ chooses $w=(\delta\Sigma)^{-1}\mu_x$, the excess means that make the market weights\ix{Market weights} $w_m$
+optimal are the equilibrium returns\ix{Equilibrium returns}
 \begin{equation}\label{eq7:pi}
   \pi=\delta\Sigma w_m .
 \end{equation}
-Views are statements $P\mu_x=q+e$ about portfolios $P$ of the assets, with errors $e\sim\N(0,\Omega)$,
+Views are statements $P\mu_x=q+e$ about portfolios\ix{Portfolio} $P$ of the assets, with errors $e\sim\N(0,\Omega)$,
 and the prior is $\mu_x\sim\N(\pi,\tau\Sigma)$.
 
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch07/fig10_bl}
-  \caption{Weights of the ten industries at the end of \fqLast. Left, market weights and the
+  \caption{\kind{historical} Weights of the ten industries at the end of \fqLast. Left, market weights and the
   Black-Litterman weights with the two views of \cref{sec7:bl}; only the three industries named in
   the views move. Right, unconstrained mean-variance weights from the sample means of the last
   \blW{} months; note the different scale.}
@@ -1046,7 +1046,7 @@ and the prior is $\mu_x\sim\N(\pi,\tau\Sigma)$.
 \end{figure}
 
 \begin{proposition}[The Black-Litterman posterior]\label{prop7:bl}
-The posterior mean of $\mu_x$ given the views is
+The posterior mean\ix{Bayes' rule} of $\mu_x$ given the views is
 \begin{equation}\label{eq7:bl}
   \mu_{\mathrm{BL}}=\bigl[(\tau\Sigma)^{-1}+P^\top\Omega^{-1}P\bigr]^{-1}\bigl[(\tau\Sigma)^{-1}\pi+P^\top\Omega^{-1}q\bigr]
   =\pi+\tau\Sigma P^\top\bigl(P\tau\Sigma P^\top+\Omega\bigr)^{-1}(q-P\pi),
@@ -1071,19 +1071,19 @@ $(\delta\Sigma)^{-1}\tau\Sigma P^\top=(\tau/\delta)P^\top$.
 
 The second statement, due to \textcite{he2002}, is the reason the model behaves well: the investor
 departs from the market only along the portfolios that carry views, by amounts that grow with the
-surprise $q-P\pi$ and shrink with the uncertainty $\Omega$. Assets on which there is no view keep their
-market weights, whatever the estimated covariances. The weights are unconstrained mean-variance demands
-and need not add to one: a view on an absolute return changes the total risky exposure, and the
-balance is borrowed or lent at the riskless rate. The listing below computes \cref{eq7:bl} and
+surprise $q-P\pi$ and shrink with the uncertainty\ix{Uncertainty} $\Omega$. Assets on which there is no view keep their
+market weights, whatever the estimated covariances. The weights are unconstrained mean-variance\ix{Mean-variance optimisation} demands
+and need not add to one: a view on an absolute return changes the total risky exposure\ix{Exposure}, and the
+balance is borrowed or lent at the riskless rate\ix{Risk-free rate}. The listing below computes \cref{eq7:bl} and
 \cref{eq7:blw} for the two assets of \cref{ex7:eight}.
 \Needspace*{15\baselineskip}
 \lstinputlisting[language=Python]{code/ch07/snippets/black_litterman.py}
 
 For the ten industries at the end of \fqLast, take $\Sigma$ from the last \blW{} months, the market
 weights of the file, $\tau=\blTauFrac$, and $\delta=\blDelta$, the ratio of the long-run mean of the
-market excess return to its variance. The equilibrium returns run from \blPiMin\% a year for
+market excess return\ix{Market excess return} to its variance. The equilibrium returns run from \blPiMin\% a year for
 \blPiMinName{} to \blPiMax\% for \blPiMaxName, with \blPiHiTec\% for technology, whose weight is
-\blWmHiTec\%. Two views: health care will beat technology by 2\% a year, and energy will earn 5\% over
+\blWmHiTec\%. Two views: health care\ix{Health care} will beat technology by 2\% a year, and energy\ix{Energy} will earn 5\% over
 bills. With $\Omega$ equal to the diagonal of $P\tau\Sigma P^\top$, each view is held with the same
 confidence as the prior. The gap between health care and technology moves from \blViewOneBefore\% under
 the prior to \blViewOneAfter\% and energy from \blViewTwoBefore\% to \blViewTwoAfter\%. The weights move
@@ -1091,7 +1091,7 @@ by $\Lambda=(\blLamOne,\blLamTwo)$ along the two view portfolios: health care fr
 \blWblHlth\%, technology from \blWmHiTec\% to \blWblHiTec\%, energy from \blWmEnrgy\% to \blWblEnrgy\%,
 and every other industry stays at its market weight (\cref{fig7:bl}). The first view portfolio is long
 and short in equal amounts, while the second adds \blLamTwo{} of capital to energy, so the
-Black-Litterman weights add to \blBlSum{}: the excess over one is borrowed at the riskless rate, and the
+Black-Litterman\ix{Black-Litterman model} weights add to \blBlSum{}: the excess over one is borrowed at the riskless rate, and the
 weights are not rescaled to be fully invested. Mean-variance weights from the
 \blW-month sample means, with the same $\delta$ and $\Sigma$, have gross exposure of \blMvGross{} times
 capital and a short position of \blMvMax\% in \blMvMaxName.
@@ -1103,7 +1103,7 @@ capital and a short position of \blMvMax\% in \blMvMaxName.
 \section{Risk budgets and rebalancing}
 \label{sec7:risk}
 
-Institutional allocators often set targets for the share of risk each asset class contributes
+Institutional allocators often set targets for the share of risk each asset class\ix{Asset class} contributes
 instead of its share of capital. Portfolio volatility $\sigma_p(w)=\sqrt{w^\top\Sigma w}$ is
 homogeneous of degree one in $w$, so by Euler's theorem
 \begin{equation}\label{eq7:euler}
@@ -1129,8 +1129,8 @@ $w_i(\Sigma w)_i=c$ for all $i$, and then $y=w/\sqrt c$
 satisfies the first-order condition, so $y$ is the minimiser and $w$ is its normalisation.
 \end{proof}
 
-\Cref{fig7:risk} applies this to the market and the five long-short factor premia of the data
-library, treating each as an asset class with its own risk premium, as the alternative risk premia
+\Cref{fig7:risk} applies this to the market and the five long-short factor premia\ix{Factor premium} of the data
+library\ix{Data library}, treating each as an asset class with its own risk premium\ix{Risk premium}, as the alternative risk premia
 funds do. With equal notional weights the market supplies \rpEqMktShare\% of the risk with one sixth of the
 capital. The equal-contribution
 weights run from \rpErcMin\% in \rpErcMinName{} to \rpErcMax\% in \rpErcMaxName, with \rpErcMkt\% in the
@@ -1140,7 +1140,7 @@ year, so matching the market's volatility needs leverage of \rpLev{} times. Thes
 portfolios before trading costs, built by researchers who knew the history, and their published Sharpe
 ratios are likely to overstate what a fund could earn after costs, a point \textcite{harvey2016} make forcefully.
 \textcite{maillard2010} prove \cref{prop7:erc} and study how such portfolios compare with minimum
-variance and equal weights.
+variance and equal weights\ix{Equally weighted portfolio}.
 The Octave listing solves the first-order condition $y_i(\Sigma y)_i=1$ of the proof with
 \texttt{fsolve}, checks the answer to \cref{ex7:nine}, and reproduces these weights from the sample
 covariance of the six premia.
@@ -1150,7 +1150,7 @@ covariance of the six premia.
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.84\textwidth]{ch07/fig11_risk}
-  \caption{Shares of portfolio volatility, \cref{eq7:euler}, contributed by the market and the five
+  \caption{\kind{historical} Shares of portfolio volatility, \cref{eq7:euler}, contributed by the market and the five
   factor premia, \fqFirst{} to \fqLast, with equal weights and with equal risk contributions. Labels
   give the equal-contribution weights.}
   \label{fig7:risk}
@@ -1158,8 +1158,8 @@ covariance of the six premia.
 
 
 \paragraph{Rebalancing.}
-A portfolio rebalanced to fixed weights sells what has risen and buys what has fallen, and, to
-second order, its expected compound growth rate exceeds the weighted average of the expected growth
+A portfolio rebalanced\ix{Rebalancing} to fixed weights sells what has risen and buys what has fallen, and, to
+second order, its expected compound growth rate\ix{Compound growth rate}\ix{Growth rate} exceeds the weighted average of the expected growth
 rates of its assets.
 
 \begin{proposition}[Diversification return]\label{prop7:rebal}
@@ -1174,16 +1174,16 @@ and both brackets are nonnegative.
 
 \begin{proof}
 To second order $\E\ln(1+R)\approx\mu-\frac12(\sigma^2+\mu^2)$, and $\mu_p=\sum_iw_i\mu_i$. The second
-bracket is nonnegative by convexity of the square. For the first, correlations are at most one, so
+bracket is nonnegative by convexity\ix{Convexity} of the square. For the first, correlations are at most one, so
 $\sigma_p^2\le\bigl(\sum_iw_i\sigma_i\bigr)^2$, and $\bigl(\sum_iw_i\sigma_i\bigr)^2\le\sum_iw_i\sigma_i^2$
 by convexity again.
 \end{proof}
 
 For the ten industries rebalanced monthly to equal weights from \fqFirst, the growth rate of
-total returns is \rbGrowReb\% a year, against \rbGrowAvg\% for the average of the industries' own growth rates. The
+total returns\ix{Total return} is \rbGrowReb\% a year, against \rbGrowAvg\% for the average of the industries' own growth rates. The
 difference, \rbDivActual{} points before rounding, is matched by the first bracket of \cref{eq7:rebal}, \rbDivApprox;
 the second is negligible. A portfolio bought in equal weights and never rebalanced grew at
-\rbGrowHold\%, between the two, and ended with \rbHoldTop\% in \rbHoldTopName. The gain from rebalancing\index{rebalancing} is
+\rbGrowHold\%, between the two, and ended with \rbHoldTop\% in \rbHoldTopName. The gain from rebalancing\index{Rebalancing} is
 real but it is not free: it comes from the variance of the assets, and it can be offset by
 trends that a buy-and-hold portfolio rides. \textcite{booth1992} give the decomposition.
 
@@ -1192,26 +1192,26 @@ trends that a buy-and-hold portfolio rides. \textcite{booth1992} give the decomp
 \section{Case study: would estimating the frontier have beaten equal weights?}
 \label{sec7:case}
 
-The previous sections give reasons to doubt that an estimated frontier is worth much out of sample,
+\kind{historical} The previous sections give reasons to doubt that an estimated frontier\ix{Efficient frontier} is worth much out of sample,
 and one reason to hope: covariances are estimated far better than means. The case study puts this to a
 test in the spirit of \textcite{demiguel2009}. At the start of each month from \csStart{} to \csEnd,
-\csTT{} months in all, an investor uses only the previous \csW{} months of excess returns of the ten
-industries to form seven portfolios, holds them for the month and records the excess return. The
-rules are equal weights; market weights; the minimum-variance portfolio of \cref{prop7:frontier}
+\csTT{} months in all, an investor uses only the previous \csW{} months of excess returns\ix{Excess return} of the ten
+industries to form seven portfolios\ix{Portfolio}, holds them for the month and records the excess return. The
+rules are equal weights\ix{Equally weighted portfolio}; market weights\ix{Market weights}; the minimum-variance\ix{Minimum variance} portfolio of \cref{prop7:frontier}
 from the sample covariance; the same from a covariance shrunk towards a multiple of the identity by
-the rule of \textcite{ledoit2004}; the long-only minimum-variance portfolio; the direction of the
-sample tangency portfolio, scaled to the in-window volatility of equal weights with the rest in bills;
+the rule of \textcite{ledoit2004}; the long-only\ix{Long-only portfolio} minimum-variance portfolio; the direction of the
+sample tangency portfolio\ix{Tangency portfolio}, scaled to the in-window volatility of equal weights with the rest in bills;
 and the long-only tangency portfolio of \cref{prop7:longonly}. In \csFallback{} months every window
 mean was negative and the long-only tangency rule held the long-only minimum-variance portfolio
-instead. Sharpe ratios are compared with that of equal weights by the test of \textcite{jobson1981}
-with the correction of \textcite{memmel2003}, whose statistic is approximately standard normal when
-the two Sharpe ratios are equal. Turnover is the average monthly sum of absolute changes in weights
-after the drift of the previous month. The returns are before transaction costs and financing
-frictions, and the scaled tangency rule can need large long and short positions.
+instead. Sharpe ratios\ix{Sharpe ratio} are compared with that of equal weights by the test of \textcite{jobson1981}
+with the correction of \textcite{memmel2003}, whose statistic\ix{Test statistic} is approximately standard normal when
+the two Sharpe ratios are equal. Turnover\ix{Turnover} is the average monthly sum of absolute changes in weights
+after the drift of the previous month. The returns are before transaction costs\ix{Transaction costs} and financing
+frictions\ix{Frictions}, and the scaled tangency rule can need large long and short positions\ix{Short position}.
 
 \begin{table}[t]
 \centering
-\caption{Out-of-sample excess returns of seven rules for the ten industries, \csStart{} to \csEnd,
+\caption{\kind{historical} Out-of-sample excess returns of seven rules for the ten industries, \csStart{} to \csEnd,
 with weights estimated from the previous \csW{} months. Means, volatilities and alphas are in percent
 a year, Sharpe ratios annualised, $z$ is the Memmel statistic for the difference from the Sharpe ratio
 of equal weights, turnover is in percent a month, and $\alpha$ and $\beta$ are from a regression on the
@@ -1233,7 +1233,7 @@ slightly beat equal weights, at \csGmvSR, \csLwSR{} and \csLogmvSR, with the shr
 seven. None of
 these differences is significant: the $z$ statistics run from \csCapZ{} for market weights to
 \csLwZ{} for the shrunk rule. The $z$ statistics
-are approximate, since the Memmel test treats monthly returns as independent draws from a
+are approximate, since the Memmel test treats monthly returns\ix{Monthly returns} as independent draws from a
 normal distribution, while the weights of each rule carry over from month to month. The rules that use
 means did worse. The long-only tangency portfolio matched market weights at \csLotanSR, and the scaled
 sample tangency portfolio earned only \csTanSR, with a monthly turnover of \csTanTurn\% and a $z$
@@ -1243,7 +1243,7 @@ statistic of \csTanZ. Estimated means cost the investor most of the Sharpe ratio
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.94\textwidth]{ch07/fig12_case}
-  \caption{Top, cumulative log excess returns of five of the rules of \cref{tab7:oos}, \csStart{} to
+  \caption{\kind{historical} Top, cumulative log excess returns of five of the rules of \cref{tab7:oos}, \csStart{} to
   \csEnd. Bottom, the Sharpe ratio of four rules over trailing ten-year windows, minus the Sharpe ratio of
   equal weights over the same windows.}
   \label{fig7:case}
@@ -1260,7 +1260,7 @@ above that rate and at a much higher volatility. Leverage scales volatility with
 these portfolios' variance, \csGmvRes\%, \csLwRes\% and \csLogmvRes\% for the three rules, is residual
 risk that a low beta does not remove. With windows of 120 months the ranking is the same: equal weights \csTenEwSR, the shrunk
 minimum-variance portfolio \csTenLwSR{} with $z=\csTenLwZ$, the long-only tangency \csTenLotanSR, and the
-scaled tangency \csTenTanSR{} with $z=\csTenTanZ$. The median shrinkage intensity was \csShrinkMed, so
+scaled tangency \csTenTanSR{} with $z=\csTenTanZ$. The median shrinkage intensity\ix{Default intensity} was \csShrinkMed, so
 even a little shrinkage of the covariance is enough to stabilise the weights.
 
 The core of the experiment is short. The listing below runs the two minimum-variance rules with the
@@ -1274,26 +1274,26 @@ The answer to the question in the title is no. Over more than half a century, th
 estimated from five years of data did not beat equal weights by a margin the Sharpe ratio test can detect, and the
 version that trusted estimated means lost badly. For an allocator the implication is about where to
 spend effort. A covariance matrix, shrunk and used for minimum variance or for risk budgets, is a
-reasonable input. Expected returns should come from somewhere other than the recent past: from
-equilibrium, as in \cref{sec7:bl}, or from views whose uncertainty is stated.
+reasonable input. Expected returns\ix{Expected return} should come from somewhere other than the recent past: from
+equilibrium, as in \cref{sec7:bl}, or from views whose uncertainty\ix{Uncertainty} is stated.
 
 \FloatBarrier
 % =====================================================================================
 \section{Limits of the models}
 \label{sec7:limits}
 
-Mean-variance analysis ranks portfolios by two moments. Returns of alternative investments are often
-skewed and fat tailed, and an investor who cares about drawdowns or about the left tail will not be
+Mean-variance analysis ranks portfolios\ix{Portfolio} by two moments. Returns of alternative investments\ix{Alternative investments} are often
+skewed and fat tailed, and an investor who cares about drawdowns\ix{Drawdown} or about the left tail will not be
 indifferent between two portfolios with the same mean and variance; Chapter~8 treats measures of tail
-risk. The analysis is also for one period. A pension plan with liabilities cares about the surplus
-of assets over liabilities, and the frontier of surplus returns differs from the frontier of asset
-returns because the liability has its own duration, the subject of the immunisation in Chapter~6.
+risk\ix{Tail risk}. The analysis is also for one period. A pension plan with liabilities cares about the surplus
+of assets over liabilities, and the frontier\ix{Efficient frontier} of surplus returns differs from the frontier of asset
+returns because the liability has its own duration, the subject of the immunisation\ix{Immunisation} in Chapter~6.
 
-The data here are liquid portfolios of listed stocks with monthly returns. For private funds, the
+The data here are liquid portfolios of listed stocks with monthly returns\ix{Monthly returns}. For private funds, the
 returns are smoothed, the histories short and the samples selected, so every estimation problem of
 \cref{sec7:estimation,sec7:alpha} is worse and \cref{prop7:stale} has to be applied before anything
-else. The factor premia in \cref{sec7:risk} are paper portfolios before costs. The CAPM and the
-arbitrage pricing theory\index{arbitrage pricing theory} rest on assumptions, common beliefs, frictionless trading and no arbitrage,
+else. The factor premia\ix{Factor premium} in \cref{sec7:risk} are paper portfolios before costs. The CAPM and the
+arbitrage\ix{Arbitrage} pricing theory\index{Arbitrage pricing theory} rest on assumptions, common beliefs, frictionless trading and no arbitrage,
 that are idealisations. The value of the theory here is as a set of identities. \cref{prop7:capm} and
 \cref{prop7:grs} are algebra: they hold for any means and nonsingular covariance matrix that meet the
 conditions stated in them, population or sample, and say exactly what a test of beta pricing is

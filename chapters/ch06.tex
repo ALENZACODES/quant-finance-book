@@ -16,7 +16,7 @@ mortgage originated in any month from \csFirst{} through \csLast{} have been ref
 The rate half starts with a single bond. Duration and convexity say how its price responds to a
 change in yield, and the same algebra tells a lender how to fund a loan so that a parallel move in
 rates cannot hurt. Models of the short rate then combine today's curve with assumptions about how rates move to give a
-whole distribution of future curves, which is what a cap or a refinancing\index{refinancing} test needs; a swap, it turns out, needs only today's curve. The credit
+whole distribution of future curves, which is what a cap or a refinancing test needs; a swap, it turns out, needs only today's curve. The credit
 half starts with a firm whose debt is a short put on its assets, moves to a description of default
 as a sudden event with an intensity that can be read from credit default swaps, and ends with pools:
 how a common factor makes defaults arrive together, and how a structure cuts the pool's losses into
@@ -28,7 +28,7 @@ The numbers in the text are computed by nine scripts in \texttt{code/ch06/}
 (\texttt{bonds\_duration}, \texttt{short\_rates}, \texttt{swaps\_caps}, \texttt{merton\_model},
 \texttt{hazard\_cds}, \texttt{copula\_tranches}, \texttt{private\_credit}, \texttt{case\_refinance} and
 \texttt{exercises}); the tests in \texttt{code/ch06/test\_*.py} check them. An independent R script
-recomputes the duration tests, refits the curve, prices caplets, calibrates the Merton model\index{Merton model},
+recomputes the duration tests, refits the curve, prices caplets, calibrates the Merton model,
 bootstraps the hazard curve, evaluates the copula by its own quadrature, rescores the screener's
 example loans and rebuilds the case study from the data file. GNU Octave solves the CIR equations
 numerically and checks the caplet, the calibration and the large-pool losses. The screener's own
@@ -74,7 +74,7 @@ property's net operating income, not to be confused with $L$ above or the defaul
 \section{How far does a bond's price move when its yield moves?}
 \label{sec6:duration}
 
-A bond with coupon rate $c$, face value 100 and maturity $T$ years on a coupon date pays $50c$ at
+A bond with coupon\ix{Coupon} rate $c$, face value 100 and maturity $T$ years on a coupon date pays $50c$ at
 each half year $t_i=i/2$, $i=1,\dots,2T$, and 100 more at $T$. Write $\mathrm{CF}_i$ for the payment at
 $t_i$. At yield $y$, compounded twice a year, its price is
 \begin{equation}\label{eq6:price}
@@ -83,11 +83,11 @@ $t_i$. At yield $y$, compounded twice a year, its price is
 The price falls as the yield rises, and the question for anyone holding the bond is by how much.
 
 \begin{definition}\label{def6:duration}
-The \emph{modified duration}\index{modified duration} and \emph{convexity} of the bond at yield $y$ are
+The \emph{modified duration\ix{Duration}\ix{Duration!modified}}\index{Duration!modified} and \emph{convexity\ix{Convexity}} of the bond at yield $y$ are
 \[
   D=-\frac{p'(y)}{p(y)},\qquad C=\frac{p''(y)}{p(y)} .
 \]
-The \emph{Macaulay duration}\index{Macaulay duration} is $D_{\mathrm{mac}}=\sum_it_i\,\mathrm{CF}_i(1+y/2)^{-i}/p(y)$, the
+The \emph{Macaulay\ix{Duration!Macaulay} duration}\index{Macaulay duration} is $D_{\mathrm{mac}}=\sum_it_i\,\mathrm{CF}_i(1+y/2)^{-i}/p(y)$, the
 present-value weighted average time of the payments, and $D=D_{\mathrm{mac}}/(1+y/2)$.
 \end{definition}
 
@@ -104,7 +104,7 @@ known.
 For a bond with nonnegative payments, not all zero, and any $y>-2$:
 \begin{enumerate}[label=(\roman*)]
   \item $p'(y)<0<p''(y)$ and $p'''(y)<0$;
-  \item the error of \cref{eq6:taylor}, actual minus approximate relative price change, has the sign of
+  \item the error of \cref{eq6:taylor}, actual minus approximate relative price change\ix{Price change}, has the sign of
   $-\Delta y$: the approximation overstates the price after a rise in yield and understates it after a
   fall.
 \end{enumerate}
@@ -135,10 +135,10 @@ At $c=y$ the last two terms cancel, leaving $p'(y)=-100(1-v^{-2T})/y$, and $p(y)
 \end{proof}
 
 \begin{example}{A ten year Government of Canada bond}\label{ex6:tenyear}
-On \bdDate{} the ten year benchmark yield was \bdY\%. Treat it as the yield of a par bond with
+On \bdDate{} the ten year benchmark\ix{Benchmark} yield was \bdY\%. Treat it as the yield of a par bond\ix{Par bond} with
 semi-annual coupons, the same idealisation used for the curve in Chapter~4. Its modified duration
 is \bdD{} years (\cref{prop6:par} and the sum in \cref{def6:duration} both give \bdDpar), its Macaulay duration \bdMac{} years and its convexity \bdC. \Cref{tab6:approx}
-compares the exact price after a parallel move of one or two percentage points with the two
+compares the exact price after a parallel move of one or two percentage points\ix{Percentage point} with the two
 approximations. Duration alone misses by several tenths of a point of price for a one point move and
 by more than a point for two; with convexity the misses shrink to hundredths and about a tenth, with
 the signs that \cref{prop6:shape} predicts.
@@ -146,7 +146,7 @@ the signs that \cref{prop6:shape} predicts.
 
 \begin{table}[t]
 \centering
-\caption{Price per 100 face of the ten year par bond of \cref{ex6:tenyear} after a parallel move in
+\caption{\kind{exact} Price per 100 face of the ten year par bond of \cref{ex6:tenyear} after a parallel move in
 its yield from \bdY\%.}
 \label{tab6:approx}
 \begin{tabular}{lrrrr}
@@ -163,20 +163,20 @@ duration and convexity          & \bdQdDnTwo & \bdQdDn & \bdQdUp & \bdQdUpTwo\\
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig01_price_yield}
-  \caption{Price of the ten year par bond of \cref{ex6:tenyear} against its yield, with the tangent
+  \caption{\kind{exact} Price of the ten year par bond of \cref{ex6:tenyear} against its yield, with the tangent
   line of the duration approximation and the parabola of \cref{eq6:taylor}, both taken at \bdY\%.
   The parabola lies above the price curve to the right of the dot and below it to the left.}
   \label{fig6:priceyield}
 \end{figure}
 
 \paragraph{Is convexity worth the trouble for daily moves?}
-For daily changes of the size seen in Canadian benchmark yields, convexity adds little to the price
+For daily changes of the size seen in Canadian benchmark yields\ix{Benchmark bond}, convexity adds little to the price
 approximation. The file of benchmark yields
 used in Chapter~4 runs from \bdFirst{} to \bdDate. For each pair of consecutive observations, take a
 par bond at the first yield, reprice it exactly at the second, and compare with the two
 approximations. This tests the approximation along observed yield changes; it is a statement about
 the pricing function and makes no claim about what any bond earned. Over \bdNTen{} pairs for the ten
-year bond, the exact price changes have a root mean square of \bdRmsRetTen{} basis points of price. The
+year bond, the exact price changes have a root mean square\ix{Mean squared error} of \bdRmsRetTen{} basis points\ix{Basis point} of price. The
 duration-only error has a root mean square of \bdRmsDurTen{} and a maximum of \bdMaxDurTen{} basis points
 of price; the largest daily move in the ten year yield was \bdMaxDyTen{} basis points. Adding convexity brings the
 root mean square down to \bdRmsQdTen{} and the maximum to \bdMaxQdTen. For the five year bond the
@@ -188,7 +188,7 @@ $\tfrac12C\Delta y^2$, and what is left after convexity is the cubic term.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.94\textwidth]{ch06/fig02_daily_error}
-  \caption{Error of the two approximations in \cref{eq6:taylor} for one-day changes in the five and ten year
+  \caption{\kind{historical} Error of the two approximations in \cref{eq6:taylor} for one-day changes in the five and ten year
   benchmark yields, \bdFirst{} to \bdDate, in basis points of price. Each point reprices a par bond at
   the next day's yield. The error after convexity is drawn 100 times larger so that it shows.}
   \label{fig6:daily}
@@ -199,7 +199,7 @@ $\tfrac12C\Delta y^2$, and what is left after convexity is the cubic term.
 A lender who has promised a payment, or an insurer who owes one, wants assets whose value moves
 with the obligation. Suppose for this subsection that the curve is flat at a continuously compounded
 rate $z$ and moves only in parallel, to $z+\Delta z$. For cash flows $X_j\ge0$ at times $s_j$ the
-present value is $\sum_jX_je^{-zs_j}$ and the duration, the present-value weighted average time, is
+present value\ix{Present value} is $\sum_jX_je^{-zs_j}$ and the duration\ix{Duration}, the present-value weighted average time, is
 also minus the derivative of the log value in $z$. A portfolio's duration is therefore the
 value-weighted average of its parts' durations, because the derivative of a sum is the sum of the
 derivatives.
@@ -231,7 +231,7 @@ one flat rate and parallel moves there is a single risk factor; when the short a
 differently a duration-matched book can lose, and the theorem says nothing about that. The asset
 payments must be nonnegative, so a position funded partly with short bonds is not covered.
 \Cref{fig6:immunise} shows the two cases for 100 owed in seven years at $z=\imZ\%$. Zero-coupon
-bonds paying \imAone{} at two years and \imAtwo{} at fifteen years match both present value and
+bonds\ix{Zero-coupon bond} paying \imAone{} at two years and \imAtwo{} at fifteen years match both present value and
 duration, and the surplus stays positive: \imBarUp{} after a one point rise and \imBarDn{} after a one
 point fall. A single two year zero paying \imSingle{} matches only the present value; it gains
 \imShoUp{} if rates rise by one point and loses \imShoLoss{} if they fall. A two year asset and a seven year liability respond differently to a
@@ -243,7 +243,7 @@ in the case study.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig03_immunise}
-  \caption{Surplus of assets over a liability of 100 due in seven years after a parallel shift of a
+  \caption{\kind{exact} Surplus of assets over a liability of 100 due in seven years after a parallel shift of a
   flat continuously compounded curve at \imZ\%. The barbell of two and fifteen year zeros matches the
   liability's present value and duration, as in \cref{thm6:redington}; the single two year zero
   matches the present value only.}
@@ -255,18 +255,18 @@ in the case study.
 \label{sec6:short}
 
 A curve on one date prices any fixed set of cash flows by discounting. It cannot by itself price a payment whose amount depends on future rates, such as a cap or an option to
-prepay, nor say how likely a loan is to be refinanceable in five years. Pricing needs a model of how the
+prepay\ix{Prepayment}, nor say how likely a loan is to be refinanceable in five years. Pricing needs a model of how the
 curve moves under the pricing measure; the refinancing question needs one under the real-world measure,
 and the two need not agree, which is why the case study in \cref{sec6:case} uses the rates that actually
 occurred. The simplest models
-describe a single number, the instantaneous short rate $r_t$, under a risk-neutral measure $Q$ in
+describe a single number, the instantaneous short rate\ix{Short rate} $r_t$, under a risk-neutral measure\ix{Equivalent martingale measure} $Q$ in
 which the price at $t$ of a payment of 1 at $T$ is
 \begin{equation}\label{eq6:bond}
   P(t,T)=\E_Q\Bigl[e^{-\int_t^Tr_u\,du}\Bigm|\mathcal F_t\Bigr].
 \end{equation}
-The two models below were met in Chapters 3 and 4 as processes; here they produce bond prices.
+The two models below were met in Chapters 3 and 4 as processes; here they produce bond prices\ix{Bond price}.
 
-\begin{proposition}[Vasicek\index{Vasicek} bond prices]\label{prop6:vasicek}
+\begin{proposition}[Vasicek\index{Vasicek model} bond prices]\label{prop6:vasicek}
 Under $Q$ let $dr_t=\kappa(\bar r-r_t)\,dt+\sigma\,dW_t$ with $\kappa>0$ and $\sigma>0$
 \parencite{vasicek1977}. Then $P(t,T)=A(x)e^{-B(x)r_t}$ with $x=T-t$,
 \[
@@ -313,7 +313,7 @@ by It\^o's lemma the drift of $M$ is
 \[
   M_t\Bigl[\bigl(-(\ln A)'-\kappa\bar rB\bigr)+r_t\bigl(B'+\kappa B+\tfrac12\sigma^2B^2-1\bigr)\Bigr]=0 ,
 \]
-and $dM_t=-B(T-t)\,\sigma\sqrt{r_t}\,M_t\,dW_t$. So $M$ is a local martingale. Because $r_t\ge0$, $B\ge0$ and
+and $dM_t=-B(T-t)\,\sigma\sqrt{r_t}\,M_t\,dW_t$. So $M$ is a local martingale\ix{Martingale}\ix{Martingale!local}. Because $r_t\ge0$, $B\ge0$ and
 $A\le1$, it takes values in $[0,1]$, and a bounded local martingale is a martingale. Since
 $M_T=e^{-\int_0^Tr_u\,du}$, \cref{eq6:bond} gives $P(t,T)=e^{\int_0^tr_u\,du}\,\E_Q[M_T\mid\mathcal F_t]=f(t,r_t)$.
 \end{proof}
@@ -323,22 +323,22 @@ never reaches zero if $2\kappa\bar r\ge\sigma^2$ \parencite{feller1951,cox1985}.
 
 \subsection{Fitting the two models to the Canadian curve}
 
-On a given date the market quotes bills for three months, six months and a year and benchmark bonds
+On a given date the market quotes bills for three months, six months and a year and benchmark bonds\ix{Benchmark bond}
 for two to ten years, the eight yields of Chapter~4. Each model, with parameters
 $(r_0,\kappa,\bar r)$ and a fixed $\sigma$, gives a discount function and so a model quote for each
 instrument in its own convention: a simple yield $(1/P(0,t)-1)/t$ for a bill and a semi-annual par
 yield $2\bigl(1-P(0,T)\bigr)/\sum_{i=1}^{2T}P(0,t_i)$ for a bond. The fit minimises the sum of squared
-differences in basis points. The curve's shape constrains $\kappa$ and $\bar r$, although how sharply it separates them depends on
+differences in basis points\ix{Basis point}. The curve's shape constrains $\kappa$ and $\bar r$, although how sharply it separates them depends on
 the range of maturities and on the fitting criterion; it says little about $\sigma$, which enters only through a small convexity term, so $\sigma$ is set from history:
 the standard deviation of the monthly changes in the 90 day bill yield between the \srVolN{} month-ends
-in the file, times $\sqrt{12}$, which is \srSigV{} percentage points. For CIR the same size of move at the
+in the file, times $\sqrt{12}$, which is \srSigV{} percentage points\ix{Percentage point}. For CIR\ix{Cox-Ingersoll-Ross model} the same size of move at the
 average bill yield of \srMeanBill\% means $\sigma=\srSigC$. Using a real-world volatility under $Q$ is
-an assumption; by Girsanov's theorem a change of measure moves the drift and leaves the volatility
+an assumption; by Girsanov's theorem a change of measure\ix{Change of measure} moves the drift and leaves the volatility
 alone, so it is a natural one.
 
 \begin{table}[t]
 \centering
-\caption{The Vasicek and CIR models fitted to eight Government of Canada bill and bond yields, with
+\caption{\kind{historical} The Vasicek and CIR models fitted to eight Government of Canada bill and bond yields, with
 $\sigma$ fixed from history. Errors are model minus market, in basis points. The parameters are
 printed to five decimals, enough for the bond and swap values in the text to be reproduced from them.}
 \label{tab6:fits}
@@ -355,7 +355,7 @@ date & model & $r_0$ (\%) & $\kappa$ & $\bar r$ (\%) & rms error & largest error
 \end{table}
 
 \Cref{tab6:fits,fig6:fits} show fits on two dates, the last date in the file and a date in July 2023
-when the curve was inverted. On \srDateNow{} the fitted short rate is \srVasNowR\% and its long-run level \srVasNowRbar\%, and both models fit the
+when the curve was inverted. On \srDateNow{} the fitted short rate\ix{Short rate} is \srVasNowR\% and its long-run level \srVasNowRbar\%, and both models fit the
 eight quotes to \srVasNowRms{} basis points in root mean square. They
 agree with each other to within \srGapNow{} basis points at every quote, because with this little
 volatility the curve is almost entirely the deterministic pull of $r_0$ towards $\bar r$. The fitted
@@ -363,14 +363,14 @@ $\kappa$ of \srVasNowKap{} a year means a half-life of the pull, $\ln2/\kappa$, 
 fitted less well, with errors up to \srVasInvMax{} basis points. One factor and three parameters can
 make a curve that rises, falls or has one hump; they cannot follow every wiggle of a real curve, and
 models used for pricing add a time-dependent drift so that today's curve is matched exactly. The
-best known is the extended Vasicek model of \textcite{hullwhite1990}, in which $\bar r$ becomes a
-function of time chosen to reprice every zero-coupon bond on the day of the fit while bond prices keep
+best known is the extended Vasicek\ix{Vasicek model} model of \textcite{hullwhite1990}, in which $\bar r$ becomes a
+function of time chosen to reprice every zero-coupon bond on the day of the fit while bond prices\ix{Bond price} keep
 the form $A e^{-Br}$ \parencite{brigo2006}.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.94\textwidth]{ch06/fig04_curve_fits}
-  \caption{Government of Canada bill and benchmark yields (dots) and the model quotes of the fitted
+  \caption{\kind{historical} Government of Canada bill and benchmark yields (dots) and the model quotes of the fitted
   Vasicek and CIR models at the same maturities, on two dates. Bill quotes are simple yields and bond
   quotes semi-annual par yields, so each point compares like with like; the lines only join the points.}
   \label{fig6:fits}
@@ -384,21 +384,21 @@ choosing between the models by using the rates that actually occurred.
 As a check on \cref{prop6:cir}, a simulation draws \srMcPaths{} paths of the September 2026 CIR model
 from its exact noncentral chi-square transition and approximates $\int_0^{10}r_u\,du$ by the
 trapezoid rule. With monthly steps (stream 2) the ten year bond comes out at \srMcMonth{} with
-standard error \srMcMonthSE, \srMcMonthZabs{} standard errors \srMcMonthDir{} the formula's \srMcExact; with weekly
+standard error\ix{Standard error} \srMcMonthSE, \srMcMonthZabs{} standard errors \srMcMonthDir{} the formula's \srMcExact; with weekly
 steps (stream 3) it is \srMcWeek{} with standard error \srMcWeekSE, \srMcWeekZabs{} standard errors \srMcWeekDir. Neither
 run shows a bias from the trapezoid rule that these standard errors can detect.
 
 \subsection{Why a futures rate sits above the forward rate}
 
-Chapter~4 showed that a futures price is the risk-neutral expectation of the underlying when
-settlement is continuous, while a forward price is an expectation under a different measure, and it
+Chapter~4 showed that a futures\ix{Futures contract} price is the risk-neutral expectation of the underlying when
+settlement is continuous, while a forward price\ix{Forward price} is an expectation under a different measure, and it
 promised the size of the gap for contracts on rates. The cleanest case is the model of
 \textcite{ho1986}, $dr_t=\eta(t)\,dt+\sigma\,dW_t$ under $Q$, with $\eta$ a deterministic function
 chosen to fit today's curve.
 
 \begin{proposition}[Convexity adjustment]\label{prop6:holee}
 In the Ho-Lee\index{Ho-Lee} model, let $R(T_1,T_2)$ be the continuously compounded rate fixed at $T_1$ for the period
-to $T_2$ and $f(0;T_1,T_2)$ the forward rate for that period,
+to $T_2$ and $f(0;T_1,T_2)$ the forward rate\ix{Forward rate} for that period,
 \[
   R(T_1,T_2)=-\frac{\ln P(T_1,T_2)}{T_2-T_1},\qquad f(0;T_1,T_2)=\frac{\ln\bigl(P(0,T_1)/P(0,T_2)\bigr)}{T_2-T_1}.
 \]
@@ -422,19 +422,19 @@ because $T_2^3-T_1^3-(T_2-T_1)^3=3T_1T_2(T_2-T_1)$.
 
 If a futures contract settled continuously on a price that is linear in $R(T_1,T_2)$, its rate would be
 $\E_QR(T_1,T_2)$ by the futures and forward price proposition of Chapter~4, and the proposition would give the gap to the forward rate.
-Real contracts, such as the three month CORRA futures on the Montr\'eal Exchange, settle on a
+Real contracts, such as the three month CORRA\ix{CORRA} futures on the Montr\'eal Exchange, settle on a
 compounded simple rate and are marked daily, so the formula is a guide to size. It grows with the
 product of the two dates. With $\sigma=\srSigV$ points, a three month rate starting in one year
 carries an adjustment of \hlAdjOne{} basis points; starting in two, five and ten years it is
 \hlAdjTwo, \hlAdjFive{} and \hlAdjTen. Whether it matters depends on the horizon, the volatility and the precision needed: for near
-contracts it is negligible, and at long horizons it is material.
+contracts it is negligible, and at long horizons\ix{Horizon} it is material.
 
 
 % =====================================================================================
 \section{What do a swap and a cap cost on the fitted curve?}
 \label{sec6:swaps}
 
-An interest rate swap exchanges a fixed rate for a floating one on a notional amount that never
+An interest rate swap\ix{Swap rate} exchanges a fixed rate\ix{Fixed rate} for a floating one on a notional amount that never
 changes hands. Take payment dates $T_0<t_1<\dots<t_n=T_n$ with accrual fractions
 $\delta_i=t_i-t_{i-1}$ and $t_0=T_0$. At each $t_i$ the payer of the fixed rate $K$ pays $\delta_iK$
 per unit of notional and receives $\delta_iL(t_{i-1},t_i)$, where $L(t_{i-1},t_i)=\bigl(1/P(t_{i-1},t_i)-1\bigr)/\delta_i$ is the
@@ -442,10 +442,10 @@ simple rate for the period, fixed at its start. Write
 \[
   \mathcal A(T_0,T_n)=\sum_{i=1}^n\delta_iP(0,t_i)
 \]
-for the annuity of the schedule, the value of receiving $\delta_i$ at each date.
+for the annuity\ix{Annuity} of the schedule, the value of receiving $\delta_i$ at each date.
 
 \begin{proposition}[Swap rate]\label{prop6:swaprate}
-Suppose the floating rate is the simple rate implied by the same discount curve that values the
+Suppose the floating rate\ix{Floating rate} is the simple rate implied by the same discount curve\ix{Discount curve} that values the
 payments. Then the floating leg is worth $P(0,T_0)-P(0,T_n)$, the payer swap is worth
 $P(0,T_0)-P(0,T_n)-K\mathcal A(T_0,T_n)$, and the rate that makes it worth zero is
 \[
@@ -455,21 +455,21 @@ $P(0,T_0)-P(0,T_n)-K\mathcal A(T_0,T_n)$, and the rate that makes it worth zero 
 
 \begin{proof}
 The floating payment at $t_i$ is $1/P(t_{i-1},t_i)-1$. One unit of money held at $t_{i-1}$ buys
-$1/P(t_{i-1},t_i)$ zero-coupon bonds maturing at $t_i$, so the first term is worth 1 at $t_{i-1}$ and
+$1/P(t_{i-1},t_i)$ zero-coupon bonds\ix{Zero-coupon bond} maturing at $t_i$, so the first term is worth 1 at $t_{i-1}$ and
 $P(0,t_{i-1})$ today; the second is worth $P(0,t_i)$. The sum over $i$ telescopes to
 $P(0,T_0)-P(0,T_n)$. The fixed leg is $K\mathcal A$ by definition.
 \end{proof}
 
-The same telescoping works for a leg that compounds an overnight rate, such as CORRA, over each
+The same telescoping works for a leg that compounds an overnight rate\ix{Overnight rate}, such as CORRA\ix{CORRA}, over each
 period and pays at its end, provided payments are discounted at that overnight rate: rolling one unit
 overnight from $t_{i-1}$ to $t_i$ produces exactly one plus the compounded payment. With $T_0=0$ and
-semi-annual dates, $S_{\mathrm{sw}}$ is the par yield $2\bigl(1-P(0,T)\bigr)/\sum_iP(0,t_i)$ of
+semi-annual dates, $S_{\mathrm{sw}}$ is the par yield\ix{Par yield} $2\bigl(1-P(0,T)\bigr)/\sum_iP(0,t_i)$ of
 \cref{sec6:short}, so a swap rate on a single curve is a par yield under another name. Market swap rates differ from government par yields, because swaps have their own floating rate
-conventions and are discounted on a curve set by their collateral terms, while government bonds also
+conventions and are discounted on a curve set by their collateral terms, while government bonds\ix{Sovereign bond} also
 carry liquidity and other effects of the bond market; the numbers that follow use the fitted government curve as a stand-in.
 
 On the September 2026 Vasicek fit of \cref{tab6:fits} the five year swap rate is \swFive\% and the
-ten year rate \swTen\%. A swap that starts in five years and ends in ten has a forward rate of
+ten year rate \swTen\%. A swap that starts in five years and ends in ten has a forward rate\ix{Forward rate} of
 \swFiveFive\% and an annuity of \swAnnFiveFive{} per unit of notional, so each basis point between
 its fixed rate and the forward swap rate is worth \swAnnFiveFive{} basis points of notional today.
 The annuity also measures the swap's rate risk. The payer swap is worth $\mathcal A\,(S_{\mathrm{sw}}-K)$. Holding the
@@ -481,22 +481,22 @@ is worth zero.
 
 \subsection{Caplets as options on a zero-coupon bond}
 
-A caplet with strike $K$, fixing at $T$ and paying at $T+\delta$, pays
+A caplet\ix{Interest rate cap} with strike\ix{Strike} $K$, fixing at $T$ and paying at $T+\delta$, pays
 $\delta\bigl(L(T,T+\delta)-K\bigr)^+$ at $T+\delta$. A cap is a strip of caplets, and a borrower
 with a floating rate loan who buys one has capped the reference rate in each period the cap covers,
 though the loan's spread and any exposure the cap does not cover remain payable. The market quotes
-caplets by the formula of \textcite{black1976}, with $F$ the forward rate for the period,
-$\sigma_{\mathrm B}$ a volatility and $d_1=\bigl(\ln(F/K)+\tfrac12\sigma_{\mathrm B}^2T\bigr)/(\sigma_{\mathrm B}\sqrt T)$:
+caplets by the formula of \textcite{black1976}, with $F$ the forward rate\ix{Forward rate} for the period,
+$\sigma_{\mathrm B}$ a volatility\ix{Volatility} and $d_1=\bigl(\ln(F/K)+\tfrac12\sigma_{\mathrm B}^2T\bigr)/(\sigma_{\mathrm B}\sqrt T)$:
 \begin{equation}\label{eq6:black}
   \mathrm{Cpl}=\delta P(0,T+\delta)\bigl(F\Phi(d_1)-K\Phi(d_1-\sigma_{\mathrm B}\sqrt T)\bigr).
 \end{equation}
-The number $\sigma_{\mathrm B}$ that reproduces a price is its Black volatility. A model of the short rate gives the price directly, and for a Gaussian model in closed form.
+The number $\sigma_{\mathrm B}$ that reproduces a price is its Black volatility\ix{Black volatility}. A model of the short rate gives the price directly, and for a Gaussian model\ix{Gaussian model} in closed form.
 
 \begin{proposition}[Caplet as a bond put]\label{prop6:caplet}
 \begin{enumerate}[label=(\roman*)]
   \item In any arbitrage-free model, the caplet is worth $1+\delta K$ European puts, expiring at $T$
-  with strike $\bar P=1/(1+\delta K)$, on the zero-coupon bond maturing at $T'=T+\delta$.
-  \item In the Vasicek model of \cref{prop6:vasicek} with $\kappa>0$, such a put is worth
+  with strike $\bar P=1/(1+\delta K)$, on the zero-coupon bond\ix{Zero-coupon bond} maturing at $T'=T+\delta$.
+  \item In the Vasicek\ix{Vasicek model} model of \cref{prop6:vasicek} with $\kappa>0$, such a put is worth
   \[
     \mathrm{ZBP}=\bar P\,P(0,T)\Phi(-h_P+\sigma_P)-P(0,T')\Phi(-h_P),\qquad
     h_P=\frac1{\sigma_P}\ln\frac{P(0,T')}{\bar P\,P(0,T)}+\frac{\sigma_P}2,
@@ -516,7 +516,7 @@ deterministic function and leaves its volatility alone. Hence $r_T$ is Gaussian 
 same variance as under $Q$, $\sigma^2(1-e^{-2\kappa T})/(2\kappa)$, and
 $\ln P(T,T')=\ln A(T'-T)-B(T'-T)r_T$ is Gaussian with variance $\sigma_P^2$. A lognormal variable with
 mean $P(0,T')/P(0,T)$ and log variance $\sigma_P^2$ gives the put by the calculation behind Black's
-formula with a zero rate, which is the expression stated.
+formula\ix{Black's formula} with a zero rate, which is the expression stated.
 \end{proof}
 
 Part (ii) is the formula of \textcite{jamshidian1989}. For quarterly caplets struck at the forward on
@@ -526,7 +526,7 @@ notional, and their Black volatilities are \cpVolOne\%, \cpVolTwo\% and \cpVolFi
 falls with expiry because the Vasicek rate is mean reverting: its standard deviation at $T$,
 $\sigma\sqrt{(1-e^{-2\kappa T})/(2\kappa)}$, grows like $\sigma\sqrt T$ at first and then levels off
 at $\sigma/\sqrt{2\kappa}$, and \cref{eq6:black} divides the spread of the rate by $\sqrt T$. It also
-falls with strike. A Gaussian rate has the same spread in percentage points at every level, which in
+falls with strike. A Gaussian rate has the same spread in percentage points\ix{Percentage point} at every level, which in
 proportion to the strike is large for a low strike and small for a high one; for the three year
 caplet the Black volatility is \cpSkewLo\% at a 2\% strike and \cpSkewHi\% at 5\% (\cref{fig6:caplet}).
 Market caplet volatilities show a skew or smile in strike whose direction and size vary with market
@@ -536,13 +536,13 @@ terms of normal volatility, the spread of the rate in basis points.
 
 As a check on \cref{prop6:caplet}, a simulation draws \cpMcPaths{} values of $r_T$ and
 $\int_0^Tr_u\,du$ from their exact joint Gaussian law under $Q$ (stream 4), prices the two year
-caplet as the average of the discounted payoff, and gets \cpMc{} basis points with standard error
+caplet as the average of the discounted payoff\ix{Discounted payoff}, and gets \cpMc{} basis points with standard error
 \cpMcSE, which is \cpMcZabs{} standard errors \cpMcDir{} the formula's \cpMcExact.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig05_caplet_vols}
-  \caption{Black volatility of quarterly caplets priced in the September 2026 Vasicek fit, against
+  \caption{\kind{exact} Black volatility of quarterly caplets priced in the September 2026 Vasicek fit, against
   the strike, for expiries of one, three and five years. The thin vertical lines mark the forward rate
   for each expiry.}
   \label{fig6:caplet}
@@ -556,16 +556,16 @@ The model of \textcite{merton1974} treats a firm as a pool of assets worth $V_t$
 and by one zero-coupon debt issue with face value $K$ due at $T$. At $T$ the owners repay if
 $V_T\ge K$ and hand over the assets otherwise. Equity is worth $(V_T-K)^+$ at $T$ and debt
 $\min(V_T,K)=K-(K-V_T)^+$, so the lender holds a riskless bond and has written a put on the firm's
-assets. Write the \emph{quasi-leverage}\index{quasi-leverage} as $\ell=Ke^{-rT}/V_0$, the face of the debt discounted at the
+assets. Write the \emph{quasi-leverage}\index{Quasi-leverage} as $\ell=Ke^{-rT}/V_0$, the face of the debt discounted at the
 riskless rate as a fraction of the assets.
 
 \begin{proposition}[Merton spreads]\label{prop6:merton}
 Suppose that under $Q$ the assets follow $dV_t=rV_t\,dt+\sigma_VV_t\,dW_t$ with constants $r$ and
-$\sigma_V>0$, the firm pays nothing out before $T$, and default can happen only at $T$. Let
+$\sigma_V>0$, the firm pays nothing out before $T$, and default\ix{Default} can happen only at $T$. Let
 $v=\sigma_V\sqrt T$, $d_1=(-\ln\ell+\tfrac12v^2)/v$ and $d_2=d_1-v$. Then equity is worth
 $E_0=V_0\Phi(d_1)-Ke^{-rT}\Phi(d_2)$, the debt is worth
 $Ke^{-rT}\bigl(\Phi(d_2)+\Phi(-d_1)/\ell\bigr)$, the risk-neutral probability of default is
-$\Phi(-d_2)$, and the credit spread, the debt's continuously compounded yield less $r$, is
+$\Phi(-d_2)$, and the credit spread\ix{CDS spread}, the debt's continuously compounded yield less $r$, is
 \[
   s(T)=-\frac1T\ln\Bigl(\Phi(d_2)+\frac{\Phi(-d_1)}{\ell}\Bigr),
 \]
@@ -580,7 +580,7 @@ lognormal law of $V_T$. The yield is $-\ln(\text{debt}/K)/T$, so the spread is t
 \end{proof}
 
 \Cref{fig6:merton} draws $s(T)$ for four quasi-leverages with $\sigma_V=\mtSigV\%$, holding $\ell$
-fixed as the maturity changes. At $\ell=0.7$ the spread is \mtSSevenOne{} basis points at one year,
+fixed as the maturity\ix{Maturity} changes. At $\ell=0.7$ the spread is \mtSSevenOne{} basis points at one year,
 \mtSSevenFive{} at five and \mtSSevenTen{} at ten, with a peak of \mtPeakSeven{} near
 \mtPeakTSeven{} years. At $\ell=0.9$ the curve is humped much earlier: \mtSNineOne{} at one year, a
 peak of \mtPeakNine{} near \mtPeakTNine{} years, and \mtSNineTen{} at ten. Short maturities
@@ -605,7 +605,7 @@ and multiplying by $\sqrt T$ gives the limit. (iii) Now $d_1,d_2\to-\infty$, so 
 \cref{prop6:merton} tends to $1/\ell$ and $T\,s(T)\to\ln\ell$.
 \end{proof}
 
-A firm whose assets cover its discounted debt cannot default in a short time when the asset value
+A firm whose assets cover its discounted debt cannot default in a short time when the asset value\ix{Asset value}
 moves continuously, so its short spreads vanish, and part (i) says they vanish very fast. At
 $\ell=0.7$ the one month spread is \mtSSevenQ{} basis points. The limit arrives only once $v$ is small
 beside $\ln(1/\ell)$, which for $\ell=0.9$ means maturities well under a month: its one month spread
@@ -617,7 +617,7 @@ section does.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig06_merton_spreads}
-  \caption{Credit spreads of \cref{prop6:merton} against maturity for quasi-leverage
+  \caption{\kind{exact} Credit spreads of \cref{prop6:merton} against maturity for quasi-leverage
   $\ell=0.5$, $0.7$, $0.9$ and $1.1$, with $\sigma_V=\mtSigV\%$ and $\ell$ held fixed along each curve.}
   \label{fig6:merton}
 \end{figure}
@@ -627,7 +627,7 @@ section does.
 Neither $V_0$ nor $\sigma_V$ is observed. The equity's value and volatility are, at least for a
 listed firm, and the model ties them to the assets. Since $E_t=\mathcal C(t,V_t)$ for the call price $\mathcal C$,
 It\^o's lemma gives $dE_t=\dots\,dt+\partial_V\mathcal C\,\sigma_VV_t\,dW_t$, and $\partial_V\mathcal C=\Phi(d_1)$, so the
-instantaneous equity volatility $\sigma_E$ satisfies
+instantaneous equity volatility\ix{Equity volatility} $\sigma_E$ satisfies
 \begin{equation}\label{eq6:sige}
   \sigma_EE_0=\Phi(d_1)\,\sigma_VV_0 .
 \end{equation}
@@ -636,7 +636,7 @@ date of calibration. Together with $E_0=\mathcal C(0,V_0)$ it is two equations i
 
 Take a firm with equity worth 40, equity volatility 60\% and debt of face 80 due in five years, with
 $r=\mtR\%$. Solving the two equations gives $V_0=\mcV$ and $\sigma_V=\mcSigV\%$, so the quasi-leverage
-is \mcLev, the spread is \mcSpread{} basis points and the risk-neutral probability of default is
+is \mcLev, the spread is \mcSpread{} basis points and the risk-neutral probability\ix{Probability} of default\ix{Default probability} is
 \mcPdQ\%. The real-world probability needs the asset drift. With an expected asset return of
 $\mu=\mcMu\%$, $\ln V_T$ has mean $\ln V_0+(\mu-\tfrac12\sigma_V^2)T$ under $\mathbb P$, the distance to
 default $\bigl(\ln(V_0/K)+(\mu-\tfrac12\sigma_V^2)T\bigr)/(\sigma_V\sqrt T)$ is \mcDD{} standard
@@ -649,13 +649,13 @@ loss given default overstates the default rate that lenders actually experience.
 \section{How is a default intensity read from credit default swaps?}
 \label{sec6:hazard}
 
-The structural model explains default by the assets. The reduced-form approach of
+The structural model\ix{Merton model} explains default\ix{Default} by the assets. The reduced-form approach of
 \textcite{jarrow1995}, \textcite{lando1998} and \textcite{duffie1999} gives up on the explanation and
 describes the timing directly, which makes short spreads easy to match and fitting to market quotes
 routine.
 
 \begin{definition}\label{def6:hazard}
-A default time $\tau$ has \emph{hazard rate}\index{hazard rate} $\lambda(t)\ge0$ under $Q$ if its survival function is
+A default time $\tau$ has \emph{hazard rate\ix{Hazard rate}}\index{Hazard rate} $\lambda(t)\ge0$ under $Q$ if its survival function is
 \[
   S(t)=Q(\tau>t)=e^{-H(t)},\qquad H(t)=\int_0^t\lambda(u)\,du .
 \]
@@ -663,23 +663,23 @@ Then $Q(\tau\le t+h\mid\tau>t)=\lambda(t)h+o(h)$ at points where $\lambda$ is co
 the rate of default per unit of time for a name that has survived to $t$.
 \end{definition}
 
-A credit default swap\index{credit default swap} on a name with maturity $T$ has two legs. The protection buyer pays a spread
+A credit default swap\ix{Credit default swap}\ix{Swap rate}\index{Credit default swap} on a name with maturity\ix{Maturity} $T$ has two legs. The protection buyer pays a spread
 $s$ a year, quarterly, on the notional for as long as the name survives, plus the premium accrued
 since the last payment date if it defaults. The seller pays the loss $1-R$ per unit of notional at
-$\tau$ if $\tau\le T$, where $R$ is the recovery rate. If $\tau$ is independent of interest rates under
+$\tau$ if $\tau\le T$, where $R$ is the recovery rate\ix{Recovery rate}. If $\tau$ is independent of interest rates\ix{Interest rate} under
 $Q$, so that a payment at $u$ contingent on survival is worth $P(0,u)S(u)$, the two legs are worth
 $s\,\mathcal A_\tau(T)$ and $\mathrm{Prot}(T)$, where
 \begin{align*}
   \mathcal A_\tau(T)&=\sum_{i=1}^{4T}\tfrac14P(0,t_i)S(t_i)+\sum_{i=1}^{4T}\int_{t_{i-1}}^{t_i}(u-t_{i-1})P(0,u)\lambda(u)S(u)\,du,\\
   \mathrm{Prot}(T)&=(1-R)\int_0^TP(0,u)\lambda(u)S(u)\,du ,
 \end{align*}
-with $t_i=i/4$. The par spread is $\mathrm{Prot}(T)/\mathcal A_\tau(T)$. The code evaluates each integral
+with $t_i=i/4$. The par spread\ix{Par spread} is $\mathrm{Prot}(T)/\mathcal A_\tau(T)$. The code evaluates each integral
 by the midpoint rule with 24 steps a quarter.
 
 \begin{proposition}[Credit triangle]\label{prop6:triangle}
 If $\lambda$ is constant and the premium is paid continuously, so that the premium leg is
 $s\int_0^TP(0,u)S(u)\,du$, then the par spread is $s=\lambda(1-R)$ for every maturity $T$ and every
-discount curve.
+discount curve\ix{Discount curve}.
 \end{proposition}
 
 \begin{proof}
@@ -698,11 +698,11 @@ given $\lambda_1$, the $T_2$ quote involves only $\lambda_2$; and so on, so the 
 level at a time with a scalar root finder. \Cref{tab6:hazard} applies this to an upward sloping curve
 of quotes of \hzQOne, \hzQThree, \hzQFive, \hzQSeven{} and \hzQTen{} basis points at one, three, five,
 seven and ten years, with $R=\hzRec\%$, discounting on the September 2026 Vasicek curve. The fitted
-curve reprices all five quotes, which a test checks.
+curve\ix{Curve fitting} reprices all five quotes, which a test checks.
 
 \begin{table}[t]
 \centering
-\caption{Hazard rates bootstrapped from a CDS curve with recovery \hzRec\%. The last column is the
+\caption{\kind{exact} Hazard rates bootstrapped from a CDS curve with recovery \hzRec\%. The last column is the
 level of the hazard on the interval that ends at the maturity in the first column; the level for
 seven to ten years is used beyond ten.}
 \label{tab6:hazard}
@@ -730,7 +730,7 @@ probability is \hzSFive\%, so the risk-neutral probability of default within fiv
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig07_hazard}
-  \caption{The bootstrapped hazard rate of \cref{tab6:hazard} (steps), the triangle values
+  \caption{\kind{exact} The bootstrapped hazard rate of \cref{tab6:hazard} (steps), the triangle values
   $s_T/(1-R)$ at each quoted maturity (dots), and the survival probability $S(t)$ on the right axis
   (dashed).}
   \label{fig6:hazard}
@@ -760,10 +760,10 @@ rates fall would need a joint model.
 \subsection{How single-name contracts are quoted}
 \label{sec6:cdsquote}
 
-The par spread is the natural output of the model, but since 2009 North American single-name contracts
-have not traded at par. They carry a fixed running coupon of 100 basis points, usual for investment
+The par spread\ix{Par spread} is the natural output of the model, but since 2009 North American single-name contracts
+have not traded at par. They carry a fixed running coupon\ix{Coupon} of 100 basis points\ix{Basis point}, usual for investment
 grade names, or 500 for high yield, and the difference is settled by an upfront payment
-\parencite{markit2009}\index{credit default swap!upfront payment}. The buyer also pays a full coupon on each quarterly date,
+\parencite{markit2009}\index{Credit default swap!upfront payment}. The buyer also pays a full coupon on each quarterly date,
 and the seller rebates at the trade the premium accrued before it. With a coupon $C$ the upfront paid by
 the buyer per unit of notional is
 \[
@@ -771,34 +771,34 @@ the buyer per unit of notional is
 \]
 where $s$ is the par spread on the same hazard curve, so a name trading inside its coupon has a negative
 upfront and the buyer receives cash. Dealers quote a 100 basis point name by a conventional spread, and
-the upfront is computed from it with a standard model that assumes one flat hazard for all horizons and
+the upfront is computed from it with a standard model that assumes one flat hazard\ix{Flat hazard} for all horizons and
 standard recoveries; a 500 basis point name is usually quoted in points upfront.
 
 For the five year quote of \hzQFive{} basis points the flat hazard that reprices it is \cdFlatLam\%, the
-risky annuity is \cdAnnFlat{} years, and on a 100 basis point coupon the buyer receives \cdUpIg{} per
-100 of notional. Valued on the bootstrapped curve of \cref{tab6:hazard} instead, the annuity is
+risky annuity\ix{Annuity} is \cdAnnFlat{} years, and on a 100 basis point coupon the buyer receives \cdUpIg{} per
+100 of notional. Valued on the bootstrapped curve\ix{Bootstrapping a curve} of \cref{tab6:hazard} instead, the annuity is
 \cdAnnCurve{} and the buyer receives \cdUpIgCurve, a gap of \cdUpIgGapBp{} basis points of notional
 that comes from the flat hazard putting more of the default risk early. A high yield name quoted at
 \cdQHy{} basis points has a flat hazard of \cdLamHy\%, an annuity of \cdAnnHy{} and, on the 500 basis
 point coupon, an upfront of \cdUpHy{} points paid by the buyer; on a 100 basis point coupon it would
 need \cdUpHyOne. The code checks the identity above on both curves and that the upfront is zero
-when the quoted spread equals the coupon. Real conversions also fix the discount curve, the trade and
+when the quoted spread equals the coupon. Real conversions also fix the discount curve\ix{Discount curve}, the trade and
 settlement dates and the day count, which the sketch here leaves out.
 
 % =====================================================================================
 \section{Why do defaults in a pool arrive together?}
 \label{sec6:copula}
 
-A loan fund, a CLO or a bank's book holds many names. If their defaults were independent, the share
-that defaults in a large pool would be close to its expectation, so a big pool would carry little risk beyond its expected loss.
+A loan fund, a CLO\ix{Collateralised loan obligation} or a bank's book holds many names. If their defaults\ix{Default} were independent\ix{Independence}, the share
+that defaults in a large pool\ix{Large homogeneous pool} would be close to its expectation, so a big pool would carry little risk beyond its expected loss.
 Real pools carry more, because borrowers share an economy. The standard way to put that into numbers is a
-one-factor Gaussian model, the form of the Gaussian copula\index{Gaussian copula} of \textcite{li2000} that the market adopted.
+one-factor\ix{Common factor} Gaussian model\ix{Gaussian model}, the form of the Gaussian copula\ix{Copula}\index{Gaussian copula} of \textcite{li2000} that the market adopted.
 
 \begin{definition}\label{def6:copula}
 In a pool of $n$ names, name $i$ defaults by the horizon if
 $X_i=\sqrt\rho\,M+\sqrt{1-\rho}\,\varepsilon_i\le\Phi^{-1}(p)$, where $M,\varepsilon_1,\dots,\varepsilon_n$
 are independent standard normal variables and $0\le\rho<1$. Each name then defaults with
-probability $p$, and any two latent variables $X_i,X_j$ have correlation $\rho$. Each default loses a
+probability\ix{Probability} $p$, and any two latent variables $X_i,X_j$ have correlation $\rho$. Each default loses a
 fraction $1-R$ of an equal share of the pool, so the pool's loss is $L=(1-R)N/n$ with $N$ the number
 of defaults.
 \end{definition}
@@ -830,7 +830,7 @@ disastrous one both more likely.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig08_default_counts}
-  \caption{Probability of each number of defaults within five years among \cpN{} names with default
+  \caption{\kind{exact} Probability of each number of defaults within five years among \cpN{} names with default
   probability \hzPdFiveX\%, for factor correlations $\rho=0$, $0.1$, $0.3$ and $0.6$, by
   \cref{prop6:cond}. Counts above 40 are not drawn; at $\rho=0.6$ they carry \cpPAboveSix\% of the probability.}
   \label{fig6:counts}
@@ -840,7 +840,7 @@ As the pool grows the binomial noise averages away and only the factor is left. 
 \textcite{vasicek2002}.
 
 \begin{proposition}[Large pool]\label{prop6:lhp}
-Let $0<p<1$ and $0<\rho<1$. As $n\to\infty$ the default share $N/n$ converges almost surely to $p(M)$,
+Let $0<p<1$ and $0<\rho<1$. As $n\to\infty$ the default share $N/n$ converges\ix{Convergence} almost surely to $p(M)$,
 and for $0<x<1$
 \[
   Q\bigl(p(M)\le x\bigr)=\Phi\Bigl(\frac{\sqrt{1-\rho}\,\Phi^{-1}(x)-\Phi^{-1}(p)}{\sqrt\rho}\Bigr).
@@ -849,7 +849,7 @@ and for $0<x<1$
 
 \begin{proof}
 Given $M=m$ the default indicators are independent Bernoulli variables with mean $p(m)$, so by the
-strong law of large numbers $N/n\to p(m)$ with conditional probability one. Integrating the
+strong law of large numbers\ix{Law of large numbers} $N/n\to p(m)$ with conditional probability one. Integrating the
 conditional probability of convergence, which is 1 for every $m$, over the law of $M$ gives
 convergence with probability one. Since $p(m)$ is decreasing in $m$, $p(M)\le x$ exactly when
 $M\ge\bigl(\Phi^{-1}(p)-\sqrt{1-\rho}\,\Phi^{-1}(x)\bigr)/\sqrt\rho$, whose probability is the expression
@@ -858,7 +858,7 @@ stated.
 
 \subsection{Cutting the pool into tranches}
 
-A tranche\index{tranche} with attachment $a$ and detachment $d$, $0\le a<d\le1$, absorbs the part of the pool loss
+A tranche\ix{Tranche}\index{Tranche} with attachment $a$ and detachment $d$, $0\le a<d\le1$, absorbs the part of the pool loss
 between $a$ and $d$. Its loss as a fraction of its size is
 \[
   L_{[a,d]}=\frac{\min(L,d)-\min(L,a)}{d-a}=\frac{\min\bigl((L-a)^+,\,d-a\bigr)}{d-a}.
@@ -871,8 +871,8 @@ $d=1$ and takes the last.
   \item For any law of $L$ and any attachment points $0=a_1<d_1=a_2<\dots<d_m=1$,
   \[\textstyle\sum_j(d_j-a_j)\E L_{[a_j,d_j]}=\E L.\]
   \item Let $L$ and $L'$ take values in $[0,1]$ with $\E f(L')\ge\E f(L)$ for every convex $f$. Then
-  the equity tranche $[0,d]$ has an expected loss under $L'$ no larger than under $L$, and the senior
-  tranche $[a,1]$ has one no smaller.
+  the equity tranche $[0,d]$ has an expected loss\ix{Expected loss} under $L'$ no larger than under $L$, and the senior
+  tranche\ix{Senior debt} $[a,1]$ has one no smaller.
 \end{enumerate}
 \end{proposition}
 
@@ -886,7 +886,7 @@ means, by taking $f(x)=x$ and $f(x)=-x$. Part (i) says tranching only redistribu
 loss. Part (ii) says that anything spreading the pool loss out moves expected loss from the equity to
 the senior notes, and in every case computed here a higher $\rho$ acts that way. \Cref{tab6:tranches}
 gives the expected losses of six tranches at three correlations for the pool of \cpN{} names and in
-the large-pool limit, computed by quadrature over $M$; the thickness-weighted sum of each column is
+the large-pool limit, computed by quadrature\ix{Numerical integration} over $M$; the thickness-weighted sum of each column is
 \cpEL\%, as (i) requires, and a test checks it. As $\rho$ goes from 0.1 to 0.6 the equity loss falls
 from \trEqOne\% to \trEqSix\% and the 30 to 100\% tranche goes from \trSupOne\% to \trSupSix\%. The
 mezzanine tranches have payoffs that are neither convex nor concave, so (ii) says nothing about them:
@@ -897,7 +897,7 @@ most at low correlation, where the 100-name pool still has binomial noise: \trEq
 
 \begin{table}[t]
 \centering
-\caption{Five year expected loss of each tranche, as a percentage of the tranche, for \cpN{} names
+\caption{\kind{exact} Five year expected loss of each tranche, as a percentage of the tranche, for \cpN{} names
 with default probability \hzPdFiveX\%, $1-S(5)$ from \cref{tab6:hazard}, and recovery \hzRec\% (pool) and in the large-pool limit of
 \cref{prop6:lhp} (limit). An entry of 0.0000 is below 0.00005\%.}
 \label{tab6:tranches}
@@ -920,7 +920,7 @@ tranche (\%) & pool & limit & pool & limit & pool & limit\\
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig09_tranche_el}
-  \caption{Expected loss of the six tranches of \cref{tab6:tranches} for the \cpN-name pool against
+  \caption{\kind{exact} Expected loss of the six tranches of \cref{tab6:tranches} for the \cpN-name pool against
   the factor correlation, on a log scale. Values below 0.0001\% are off the scale.}
   \label{fig6:tranche}
 \end{figure}
@@ -936,7 +936,7 @@ The listing integrates over a fixed range without splitting it. For these six tr
 general method: for thinner or more senior tranches only the split is reliable.
 
 As a check on the 100-name column at $\rho=0.3$, a simulation draws \cpMcScen{} scenarios of $M$ and
-the $\varepsilon_i$ (stream 6). The equity tranche comes out at \cpMcEq\% with standard error
+the $\varepsilon_i$ (stream 6). The equity tranche comes out at \cpMcEq\% with standard error\ix{Standard error}
 \cpMcEqSE{} and the 15 to 30\% tranche at \cpMcSnB\% with standard error \cpMcSnBSE. The largest of
 the six gaps, \cpMcMaxZ{} standard errors, is in the \cpMcMaxName{} tranche, \cpMcMaxEst\% with standard
 error \cpMcMaxSE{} against \cpMcMaxTab\% in the table, and \cpMcSignNeg{} of the six are negative. The six
@@ -946,27 +946,27 @@ happens to be mild pulls all of them down together. A second run on stream 8 has
 
 \subsection{How a structure is built, and why its maturities must line up}\label{sec6:structures}
 
-A cash collateralised loan obligation buys a portfolio of loans, often a hundred or more, and pays for
+A cash collateralised loan obligation\ix{Collateralised loan obligation} buys a portfolio of loans\ix{Loan}, often a hundred or more, and pays for
 it by issuing notes in order of seniority with a thin layer of equity at the bottom. Interest from
-the loans pays the notes' coupons from the top down, and principal pays them down in the same order.
+the loans pays the notes' coupons\ix{Coupon} from the top down, and principal pays them down in the same order.
 Coverage tests protect the senior notes: if the par value of the loans falls too far relative to the
 notes at and above a given class, or if interest received falls too far below interest due, cash that
 would have gone to the junior notes is diverted to repay the senior ones. A synthetic structure
-holds no loans: it takes credit risk on a reference pool through credit default swaps, and its
-investors in effect sell protection on tranches of that pool, and for a homogeneous pool like the one
-above the one-factor model gives those tranches the expected losses of \cref{tab6:tranches}.
+holds no loans: it takes credit risk\ix{Credit risk} on a reference pool through credit default swaps, and its
+investors in effect sell protection on tranches\ix{Tranche} of that pool, and for a homogeneous pool like the one
+above the one-factor\ix{Common factor} model gives those tranches the expected losses of \cref{tab6:tranches}.
 
 The tranche losses above are losses by a five year horizon. A note is exposed until it is repaid, and
-when it is repaid depends on the timing of the collateral's cash. This is where maturity matching
+when it is repaid depends on the timing of the collateral's cash. This is where maturity\ix{Maturity} matching
 enters. If the notes have a legal final maturity before the collateral matures, the vehicle must sell
-or refinance loans to repay them, at whatever price the market offers on that date. A legal final maturity later than the collateral's reduces that risk, because scheduled principal from
-the loans can repay the notes as it arrives; defaults, extensions, the timing of prepayments,
-reinvestment limits and the waterfall can still leave a shortfall or force a sale. Cash flow
+or refinance\ix{Refinancing risk} loans to repay them, at whatever price the market offers on that date. A legal final maturity later than the collateral's reduces that risk, because scheduled principal from
+the loans can repay the notes as it arrives; defaults, extensions, the timing of prepayments\ix{Prepayment},
+reinvestment\ix{Reinvestment} limits and the waterfall can still leave a shortfall or force a sale. Cash flow
 structures therefore usually set the legal final maturity of the notes after the latest maturity
 the collateral is allowed to have, and limit what the manager may buy during the reinvestment period to loans maturing before that date.
 The rate side is matched separately: loans and notes in a typical loan obligation both pay floating
 coupons, so a move in the general level of rates changes both legs and the net duration of \cref{sec6:duration} is usually small, although fixed rate
-loans, rate floors and reset lags leave some exposure. What remains is the risk of wider credit spreads and the timing of the collateral's principal
+loans, rate floors and reset lags leave some exposure. What remains is the risk of wider credit spreads\ix{Credit spread} and the timing of the collateral's principal
 payments.
 
 The funding problems of asset-backed commercial paper conduits and structured investment vehicles in
@@ -976,13 +976,13 @@ into a falling market. Canada had its own version: in August 2007 the market for
 asset-backed commercial paper froze, and holders waited until the Montreal Accord restructuring
 turned the paper into notes maturing years later. Whether a borrower can refinance when its funding
 comes due is the same question, at the level of a single loan, that the case study in
-\cref{sec6:case} asks of commercial mortgages.
+\cref{sec6:case} asks of commercial mortgages\ix{Mortgage}\ix{Commercial mortgage}.
 
 % =====================================================================================
 \section{What does a private lender's screen measure?}
 \label{sec6:private}
 
-Private credit funds lend to mid-sized companies and against commercial property, and before any
+Private credit\ix{Private credit} funds lend to mid-sized companies and against commercial property, and before any
 model is run a deal is usually screened on a few ratios. This section takes the ratios used by the
 open-source private credit screener \texttt{private-credit-screener} \parencite{pcscreener}, a small browser tool that scores a loan
 on coverage, leverage and collateral and grades it, and asks what they measure. The code here is a
@@ -991,19 +991,19 @@ inputs to confirm that the two give the same scores and grades, and the same met
 rounding.
 
 \begin{definition}\label{def6:screen}
-A loan of amount $\mathcal L$ against a property of value $V$ with net operating income $\mathcal N$ a
+A loan of amount $\mathcal L$ against a property of value $V$ with net operating income\ix{Net operating income} $\mathcal N$ a
 year carries an annual rate $r_{\mathcal L}$, compounded monthly, and amortises over $n_{\mathrm{am}}$ years or pays
-interest only. Its annual debt service is $\mathcal L r_{\mathcal L}$ if interest only, and otherwise
+interest only\ix{Interest only}. Its annual debt service\ix{Debt service} is $\mathcal L r_{\mathcal L}$ if interest only, and otherwise
 $12\mathcal L r_{\mathrm m}/\bigl(1-(1+r_{\mathrm m})^{-12n_{\mathrm{am}}}\bigr)$ with $r_{\mathrm m}=r_{\mathcal L}/12$; dividing by $\mathcal L$ gives the
-\emph{loan constant}\index{loan constant} $k$. The screen computes
+\emph{loan constant\ix{Loan constant}}\index{Loan constant} $k$. The screen computes
 \[
   \mathrm{LTV}=\frac{\mathcal L}{V},\qquad \mathrm{DSCR}=\frac{\mathcal N}{k\mathcal L},\qquad
   \mathrm{DY}=\frac{\mathcal N}{\mathcal L},\qquad
   \text{exit LTV}=\frac{b}{\mathcal N(1+g)^T/(q_{\mathrm{in}}+\Delta q)},
 \]
-the loan to value\index{loan to value}, debt service coverage\index{debt service coverage}, debt yield and loan to value at maturity. Here $b$ is the
+the loan to value\ix{Loan to value}\index{Loan to value}, debt service coverage\index{Debt service coverage ratio}, debt yield\ix{Debt yield} and loan to value at maturity. Here $b$ is the
 balance due at the loan's term of $T$ years, $g$ is the annual growth of income, compounded annually,
-$q_{\mathrm{in}}$ is the going-in capitalisation rate entered for the property and $\Delta q$ the
+$q_{\mathrm{in}}$ is the going-in capitalisation rate\ix{Capitalisation rate} entered for the property and $\Delta q$ the
 assumed rise in that rate by the exit.
 \end{definition}
 
@@ -1019,7 +1019,7 @@ $(\mathcal L/V)(\mathcal N/\mathcal L)=\mathcal N/V$, and $\mathcal N/(k\mathcal
 \end{proof}
 
 Given the cap rate and the loan constant, the loan to value fixes the other two, so the first three ratios are not independent measures of credit quality: through the cap rate and the
-loan constant they reduce to how much was lent, how the market prices the income, and how expensive
+loan constant they reduce to how much was lent, how the market prices\ix{Market price} the income, and how expensive
 the debt is. The screen maps each ratio to a score between 0 and 1 along a straight line
 that is clipped at the ends: loan to value from 85\% down to 50\%, coverage from 1 up to 1.6, debt
 yield from 6\% up to 14\%, exit loan to value from 90\% down to 50\%, and a sponsor rating from 1 to
@@ -1037,7 +1037,7 @@ imply.
 
 \begin{table}[t]
 \centering
-\caption{The screener's metrics, score and grade for its three example loans. Ratios are in percent
+\caption{\kind{exact} The screener's metrics, score and grade for its three example loans. Ratios are in percent
 except the coverage; the cap rate is $\mathcal N/V$ and the constant is $k$.}
 \label{tab6:screen}
 \begin{tabular}{lrrrrrrrl}
@@ -1055,13 +1055,13 @@ Ottawa  & \pcOttLtv & \pcOttDscr & \pcOttDy & \pcOttCap & \pcOttConst & \pcOttEx
 
 A screen ranks loans, but it says nothing about how likely a loss is or how large it would be.
 For that one needs a law for the collateral. A lender holding the slice of a property's value from
-$b_{\mathrm{lo}}$ to $b_{\mathrm{hi}}$, such as a mezzanine lender behind a senior loan, recovers from a sale at
-$Y=(1-\theta)V_T$ after selling costs $\theta$, and the senior lender is the case $b_{\mathrm{lo}}=0$.
+$b_{\mathrm{lo}}$ to $b_{\mathrm{hi}}$, such as a mezzanine\ix{Subordination} lender behind a senior loan, recovers from a sale at
+$Y=(1-\theta)V_T$ after selling costs\ix{Selling costs} $\theta$, and the senior lender is the case $b_{\mathrm{lo}}=0$.
 
 \begin{proposition}[Slice expected loss]\label{prop6:slice}
 A claim with face $b_{\mathrm{hi}}-b_{\mathrm{lo}}$ that is paid from $Y$ after claims of $b_{\mathrm{lo}}$ loses
 $(b_{\mathrm{hi}}-Y)^+-(b_{\mathrm{lo}}-Y)^+$. If $Y$ is lognormal with mean $m$ and log standard deviation
-$v$, its expected loss is $\Pi(b_{\mathrm{hi}})-\Pi(b_{\mathrm{lo}})$, where $\Pi(0)=0$ and, for $K>0$,
+$v$, its expected loss\ix{Expected loss} is $\Pi(b_{\mathrm{hi}})-\Pi(b_{\mathrm{lo}})$, where $\Pi(0)=0$ and, for $K>0$,
 \[
   \Pi(K)=\E(K-Y)^+=K\Phi(-d_2)-m\Phi(-d_1),\qquad d_1=\frac{\ln(m/K)+\tfrac12v^2}{v},\quad d_2=d_1-v .
 \]
@@ -1074,10 +1074,10 @@ $b_{\mathrm{lo}}<Y<b_{\mathrm{hi}}$ and $Y\ge b_{\mathrm{hi}}$ shows. The expect
 of Chapter~5 with a zero rate and forward $m$.
 \end{proof}
 
-The slice uses the attachment and detachment logic of the tranches in \cref{sec6:copula}, and its loss
+The slice uses the attachment and detachment logic of the tranches\ix{Tranche} in \cref{sec6:copula}, and its loss
 is set by what the property fetches on sale in place of the share of a pool that is lost. Take a property worth 100 whose value at $T=\slT$ years has mean $100(1+\slG\%)^{\slT}$
 and log standard deviation $\sigma_V\sqrt T$, selling costs of \slCost\%, and loans at \slRate\% that
-amortise over \slAmort{} years. A senior loan at 60\% loan to value has a balance of \slBs{} at five
+amortise over \slAmort{} years. A senior loan at 60\% loan to value\ix{Loan to value} has a balance of \slBs{} at five
 years, and a loan to 75\% has \slBm, so the mezzanine slice runs from \slBs{} to \slBm. With
 $\sigma_V=10\%$ the five year expected losses are \slSenTen\% of face for the senior loan and
 \slMezTen\% for the mezzanine slice; with 15\% they are \slSenFifteen\% and \slMezFifteen\%; with
@@ -1091,7 +1091,7 @@ at which each claim stops.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{ch06/fig10_slice_el}
-  \caption{Five year expected loss by \cref{prop6:slice} for a property worth 100 whose expected value grows
+  \caption{\kind{exact} Five year expected loss by \cref{prop6:slice} for a property worth 100 whose expected value grows
   \slG\% a year, selling costs of \slCost\% and loans at \slRate\% amortising over \slAmort{}
   years, for three values of $\sigma_V$. Left: a senior loan from 0 up to the loan to value on the
   axis. Right: a slice 15 points thick ending at the loan to value on the axis.}
@@ -1099,30 +1099,389 @@ at which each claim stops.
 \end{figure}
 
 % =====================================================================================
+\section{How does a direct lender earn its spread, and what do its returns hide?}
+\label{sec6:direct}
+
+The loans of \cref{sec6:private} are secured on property. Most private credit\ix{Private credit} is lent to companies.
+\textcite{cai2024} describe it as debt that is not publicly traded, provided by non-bank entities such
+as private credit funds and business development companies to private businesses, usually middle-market
+firms with annual revenues between \$10 million and \$1 billion. A loan negotiated between one borrower
+and one lender, or a small group of lenders, is called direct lending\ix{Direct lending}. Such loans are usually senior
+secured\ix{Senior secured loan}, almost all pay a floating rate, and they are held to maturity or to a refinancing because there
+is no liquid secondary market. The International Monetary Fund put global private credit assets at about
+\$2.1 trillion in 2023, counting assets and capital committed but not yet invested, mostly in North
+America and Europe \parencite{imf2024gfsr}. This section takes the contract apart, prices its pieces,
+models its covenant, and then reads the accounts of listed lenders to see what the reported returns\ix{Reported returns} show
+and what they smooth away. Results are tagged \kind{exact} for a closed form, \kind{simulation} for a Monte
+Carlo\ix{Monte Carlo simulation} estimate and \kind{historical} for a computation on recorded data.
+
+\subsection{Who lends, and in what vehicle}
+
+A private credit\ix{Private credit} fund is a closed-end\ix{Drawdown fund} pooled vehicle that originates or invests in loans\ix{Loan} to private
+businesses and need not register as an investment company; like the funds of Chapter~2 it calls the
+capital its investors\ix{Investor} have committed as it lends \parencite{cai2024}. A business
+development company\ix{Business development company} (BDC) is a closed-end investment company created by the Small Business Investment
+Incentive Act of 1980 to channel capital to small and mid-sized private businesses \parencite{cai2024}.
+Some BDCs are listed and trade like shares\ix{Stock}; others are not listed and offer to buy back shares each
+quarter. A BDC must keep asset coverage\ix{Asset coverage ratio} of senior securities of at least 150\% once its shareholders or
+board have approved that level, against 200\% before, so it can borrow up to two dollars for every
+dollar of net assets \parencite{arcc2025}. Ares Capital reported asset coverage of
+\dlCoverArcc\% at the end of 2025, or debt of about \dlDeArcc{} times net assets, and lends to
+middle-market companies, which it defines as those with annual EBITDA between \$10 million and \$250
+million \parencite{arcc2025}.
+
+The Bank of Canada finds that private credit is a limited and stable source of funds for Canadian
+companies: loans from non-banks have stayed at about 15\% of the loans to Canadian businesses for a decade
+\parencite{boc2026private}. Canadian institutions are large lenders abroad, mostly in the United States. The
+Bank estimates the private lending of Canadian investors together with bank loans to private credit funds
+at about \$500 billion early in 2026. The three largest life insurers\ix{Insurance} held just over \$200 billion, about
+22\% of their invested assets, the large pension funds\ix{Pension plan} an estimated \$215 billion at the end of 2025, about
+9\%, investment funds \$54 billion, and the banks had lent at least \$40 billion to managers of private
+credit funds, about 1\% of their lending. Its Financial Stability Report notes that the sector is opaque,
+increasingly linked to banks, and untested in a downturn \parencite{bocfsr2026}.
+
+\subsection{The unitranche and its two lenders}
+
+A \emph{unitranche\ix{Unitranche}} loan combines senior and subordinated debt in one loan, generally with a first lien\ix{Senior secured loan}\ix{Lien},
+at a single blended rate \parencite{arcc2025}. The borrower sees one lender and one document. Behind it the
+lenders may agree among themselves, in an intercreditor agreement, that one of them is repaid first: the
+\emph{first out} piece is paid before the \emph{last out} piece, which earns more for standing behind it.
+The borrower's rate does not change; the split only reallocates the loss and the spread.
+
+\begin{proposition}[Splitting a unitranche]\label{prop6:unitranche}
+Let a unitranche of face $F$ be split into a first out piece of face $wF$ and a last out piece of face
+$(1-w)F$, paid from the recovery $Y$ at the horizon $T$. Then
+\begin{enumerate}[label=(\roman*)]
+  \item the expected losses\ix{Expected loss} add: $\mathrm{EL}_U=\mathrm{EL}_F+\mathrm{EL}_L$, with
+        $\mathrm{EL}_F=\Pi(wF)$, $\mathrm{EL}_L=\Pi(F)-\Pi(wF)$ and $\Pi$ the put of \cref{prop6:slice};
+  \item if the pieces pay spreads $s_F$ and $s_L$ on their faces, the borrower's spread $s_U$ is the
+        blend $s_U=w\,s_F+(1-w)\,s_L$, so $s_L=(s_U-w\,s_F)/(1-w)$;
+  \item with loss spreads $\ell_i=-\ln(1-\mathrm{EL}_i/\text{face}_i)/T$, which repay the expected loss of
+        each piece over $T$ years, the split that gives both pieces the same premium $\pi$ over their
+        loss spreads is $s_i=\pi+\ell_i$ with $\pi=s_U-w\,\ell_F-(1-w)\,\ell_L$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) is \cref{prop6:slice} with $b_{\mathrm{lo}}=0,b_{\mathrm{hi}}=wF$ and with $b_{\mathrm{lo}}=wF,b_{\mathrm{hi}}=F$,
+and the sum telescopes to $\Pi(F)$. (ii) The interest paid on the pieces, $s_FwF+s_L(1-w)F$, must equal
+the interest $s_UF$ paid by the borrower. (iii) Substituting $s_i=\pi+\ell_i$ into (ii) and solving for
+$\pi$.
+\end{proof}
+
+The blend in (ii) is exact in the spreads. The loss spreads are not linear in the expected losses, so
+the loss spread of the whole loan is not the blend of those of its pieces, and (iii) rather than the loss
+spread of the whole loan is what fixes the premium. Take an illustration. A company has an enterprise
+value\ix{Enterprise value} of \utV, lognormal at $T=\utT$ years with no expected growth\ix{Expected growth} and a log volatility of $\utSig\%$ a
+year, and a sale after default costs \utCost\% of it. It borrows a unitranche of \utFace{} split \utFo{}
+first out and \utLo{} last out, so $w=\utW\%$. \kind{exact} The five year expected losses are \utElU\% of
+face for the whole loan, \utElF\% for the first out piece and \utElL\% for the last out piece, and the loss
+spreads are \utLsU, \utLsF{} and \utLsL{} basis points\ix{Basis point}; the blend of the pieces' loss spreads is
+\utLsBlend{} basis points, more than the whole loan's. Set the borrower's spread to \utSu{} basis points, the median
+income yield less the bill rate of the listed BDCs\ix{Business development company} below in \dlLast. Then (iii) gives a premium of \utPi{} basis points to each
+lender, a first out spread of \utSf{} and a last out spread of \utSl. The first out lender gives up most
+of the spread for a loss that is a small fraction of the last out lender's. The enterprise value and its
+volatility are the inputs that matter, and in practice both are estimates.
+
+\subsection{Spreads, default and recovery}
+
+\Cref{sec6:hazard} gave the spread of a credit default\ix{Default} swap with a constant hazard rate\ix{Hazard rate} $\lambda$ and
+recovery\ix{Recovery rate} $R$ as about $\lambda(1-R)$. The same relation, read the other way, gives the default rate\ix{Default rate} a
+lender's loss spread can absorb: a loss spread of $s$ pays for an annual default rate of $s/(1-R)$.
+\textcite{cai2024} report, from KBRA DLD, recoveries after default of about \dlRecDirect\% for direct
+loans\ix{Loan} against \dlRecSynd\% for broadly syndicated loans\ix{Leveraged loan} and \dlRecHy\% for high-yield bonds, and they
+attribute the low recovery of direct loans to lending to sectors with few tangible assets, such as
+software and health care services. \kind{exact} At those recoveries 100 basis points of loss spread
+covers an annual default rate of \dlPdPerDirect\% on direct loans, \dlPdPerSynd\% on syndicated loans
+and \dlPdPerHy\% on high-yield bonds, and a default rate of 2\% a year costs \dlLossDirectTwo\% a year on
+direct loans against \dlLossSyndTwo\% on syndicated loans. The same paper reports a mean interest
+coverage, EBITDA over interest, of about \dlIcrPrivate{} for private credit borrowers against
+\dlIcrLev{} for leveraged loan borrowers. A direct lender\ix{Direct lending} is paid a higher spread for a borrower that is
+more levered, recovers less when it fails, and has no market price to say how it is doing.
+
+Part of a direct lender's return comes before the first coupon\ix{Coupon}. A loan is often funded below par, at
+an original issue discount\ix{Original issue discount}, or with an upfront fee, and \textcite{cai2024} note that private loans can
+carry high prepayment\ix{Prepayment} penalties. Both raise the yield, and by more when the loan is repaid early.
+
+\begin{proposition}[Yield to life]\label{prop6:oid}
+A loan bought at $1-u$ pays a coupon $c$ continuously and par at $T$. Its continuously compounded yield
+$y$ solves $1-u=c\,(1-e^{-yT})/y+e^{-yT}$, and
+\[
+  y=c+\frac{c}{1-e^{-cT}}\,u+O(u^2),\qquad \frac{c}{1-e^{-cT}}>\frac1T ,
+\]
+so the discount adds a little more than $u/T$ a year, and a shorter life raises the yield.
+\end{proposition}
+
+\begin{proof}
+The price is the integral of $ce^{-yt}$ over $[0,T]$ plus $e^{-yT}$. At $y=c$ it is exactly one, and
+its derivative in $y$ there is $-\int_0^Tt\,ce^{-ct}\,dt-Te^{-cT}=-(1-e^{-cT})/c$, which is
+smaller than $T$ in absolute value because $1-e^{-x}<x$ for $x>0$. Solving the first-order expansion
+for $y-c$ gives the result.
+\end{proof}
+
+\kind{exact} A loan paying \oiC\% bought at a discount of \oiU{} points yields \oiBpFive{} basis points more
+than its coupon if it lasts five years, against \oiApproxFive{} from $u/T$, and \oiBpThree{} more if it is
+repaid in three, against \oiApproxThree; the first-order term of the proposition gives \oiFirstFive{}
+and \oiFirstThree. A shorter life spreads the discount over fewer years.
+
+\subsection{Floating rates and interest coverage}
+
+A floating-rate\ix{Floating rate} loan moves the risk of the base rate from the lender to the borrower. If EBITDA\ix{EBITDA} is $X$
+and debt $D$ pays the base rate $r$ plus a spread $s$, interest coverage\ix{Interest coverage} is $X/\bigl(D(r+s)\bigr)$, and
+a rise in the base rate from $r_0$ to $r_1$ divides it by $(r_1+s)/(r_0+s)$ with EBITDA unchanged.
+\kind{historical} The one month US bill averaged \icBillLow\% in 2021 and reached \icBillHigh\% in
+\dlBillHighQ. With the spread of \utSu{} basis points used above, the cost of the same debt rose by
+\icCostRise\%. A borrower with the mean coverage of about \dlIcrPrivate{} reported by \textcite{cai2024}
+at the higher rates would, with the same EBITDA, have had coverage of about \icLow{} at the rates of
+2021. Coverage of one is the point at which EBITDA just pays interest, the trigger of the covenant-lite
+loan below. The lenders' income rose with the rate, as \cref{fig6:direct} shows; the borrowers' margin
+of safety fell by the same mechanism.
+
+\subsection{The covenant as a barrier}
+
+A maintenance covenant\ix{Covenant} is tested every quarter whether or not the borrower has missed a payment: debt
+over trailing EBITDA\ix{EBITDA} must stay below a level written into the loan. A breach lets the lender reprice,
+take more security or force a sale while the business still has value. A loan without such tests, a
+covenant-lite loan, leaves the lender waiting until the borrower cannot pay. Industry commentary cited by
+\textcite{cai2024} suggests that recent large private loans carry fewer maintenance covenants as direct
+lenders\ix{Direct lending} compete with banks.
+
+\begin{proposition}[Covenant breach]\label{prop6:covenant}
+Let EBITDA follow $X_t=X_0e^{\nu t+\sigma W_t}$ and let debt $D$ be fixed. A covenant $D/X_t\le c$, tested
+continuously, is breached by $T$ with probability
+\[
+  P\Bigl(\min_{t\le T}X_t\le b\Bigr)=\Phi\Bigl(\frac{a-\nu T}{\sigma\sqrt T}\Bigr)
+  +e^{2\nu a/\sigma^2}\,\Phi\Bigl(\frac{a+\nu T}{\sigma\sqrt T}\Bigr),\qquad b=\frac Dc,\quad a=\ln\frac b{X_0}<0 .
+\]
+If the business is sold at the first breach for a multiple $m$ of EBITDA, after costs $\theta$, the
+lender recovers $\min\bigl(1,(1-\theta)m/c\bigr)$ of its claim.
+\end{proposition}
+
+\begin{proof}
+The first part is the law of the minimum of a Brownian motion with drift, which follows from the
+reflection principle used in Chapter~9 for fund closures \parencite{shreve2004}. At the first breach
+$X=b=D/c$, so a sale raises $(1-\theta)mD/c$ against a claim of $D$.
+\end{proof}
+
+Take a borrower with debt of \cvLev{} times EBITDA, no expected growth\ix{Expected growth} and an EBITDA volatility of
+\cvSig\% a year. \kind{exact} A covenant at \cvCov{} times trips when EBITDA has fallen \cvDrop\%, with
+probability \cvPcov\% within \cvT{} years. A covenant-lite loan at a rate of \cvRate\% fails only when
+EBITDA no longer covers interest, a fall of \cvDropLite\%, with probability \cvPlite\%. Selling at \cvMult{}
+times EBITDA after costs of \cvCost\%, the lender recovers \cvRecCov\% at the covenant and \cvRecLite\%
+at the payment default. The covenant trips \cvTimes{} times as often, and at a level where a sale would
+still repay almost all of the loan, which is what gives the lender room to negotiate. \Cref{fig6:covenant} shows how the breach probability falls as the covenant
+is loosened. \kind{simulation} With quarterly tests in mind the formula can be checked by simulating
+monthly paths: 200{,}000 paths monitored monthly breach in \cvMcRaw\% of cases, fewer than the continuous
+\cvPcovOne\% because a path can dip below the level between tests, and with the barrier shifted by the
+correction of \textcite{broadie1997} the count is \cvMc\%, with a standard error of \cvMcSe{} points.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.96\textwidth]{ch06/fig14_covenant}
+  \caption{\kind{exact} Probability that a maintenance covenant on debt over EBITDA is breached within
+  \cvT{} years by \cref{prop6:covenant}, for a borrower with opening leverage of 5, no expected growth in
+  EBITDA and three volatilities. An illustration.}
+  \label{fig6:covenant}
+\end{figure}
+
+\subsection{What a listed lender charges}
+
+A BDC is managed by an adviser that is paid a base fee on assets and an incentive fee on income. Ares
+Capital pays a base fee of \dlBaseLo\% a year on total assets other than cash financed up to a debt to
+equity ratio of one, and \dlBaseHi\% on assets financed above it. Its income based fee is nothing while
+pre-fee net investment income is below a hurdle\ix{Hurdle rate} of \dlHurdleQ\% of net assets a quarter, all of the
+income between the hurdle and \dlCatchQ\%, the catch-up\ix{Catch-up}, and \dlIncRate\% of all of it above that; a
+further fee is charged on realised capital gains \parencite{arcc2025}. The catch-up ends where
+$\dlIncRate\%$ of the whole equals the excess over the hurdle, $1.75/(1-0.2)=2.1875$, as for the soft
+hurdle with full catch-up of Chapter~9.
+
+\begin{proposition}[A base fee charged on gross assets]\label{prop6:bdcfee}
+A fund with debt to equity $d$ and no cash, paying $f_1$ a year on assets financed up to $d=1$ and $f_2$
+above, pays base fees of $f_1(1+\min(d,1))+f_2(d-1)^+$ of net assets a year. If its assets yield $y$ and
+its debt costs $r_D$, its return on net assets before fees is $y(1+d)-r_Dd$.
+\end{proposition}
+
+\begin{proof}
+Each unit of net assets carries $1+d$ of assets, of which up to $1+\min(d,1)$ are charged $f_1$ and
+$(d-1)^+$ are charged $f_2$; the assets earn $y(1+d)$ and the debt costs $r_Dd$.
+\end{proof}
+
+\kind{exact} At Ares Capital's leverage\ix{Leverage} of \dlDeArcc{} the base fee is \dlBaseNaArcc\% of net assets a year,
+and at the legal limit of $d=\dlDeMax$ it would be \dlBaseNaMax\%. With its reported yield of
+\dlYieldArcc\% on debt investments at amortised cost at the end of 2025 \parencite{arcc2025} and, as an
+assumption, debt at \dlExRd\%, the return on net assets before fees is \dlExGross\%, the base fee takes
+\dlExBase\% and the income fee \dlExInc\%, leaving \dlExNet\% before other expenses and credit losses\ix{Loss rate}:
+fees take \dlExFeeShare\% of the return that leverage produces. The base fee on gross assets pays the
+adviser for leverage whether or not leverage pays the shareholders.
+
+Leverage also sets how much loss the asset coverage\ix{Asset coverage ratio} test can absorb.
+
+\begin{proposition}[Losses that break the coverage test]\label{prop6:coverage}
+A fund with debt to equity $d$ and no other liabilities has asset coverage $(1+d)/d$. It keeps coverage
+of at least $\kappa$ after losing a share $L$ of its assets if and only if $L\le1-\kappa d/(1+d)$, and the
+loss costs its shareholders $(1+d)L$ of net assets. If the loans\ix{Loan} default\ix{Default} as in the large pool\ix{Large homogeneous pool} of
+\cref{prop6:lhp}, with probability\ix{Probability} $p$, correlation $\rho$ and loss given default\ix{Loss given default} $\mathrm{LGD}$, the
+probability that defaults over the period break the test is
+\[
+  1-\Phi\Bigl(\frac{\sqrt{1-\rho}\,\Phi^{-1}(x^*)-\Phi^{-1}(p)}{\sqrt\rho}\Bigr),\qquad
+  x^*=\frac{1-\kappa d/(1+d)}{\mathrm{LGD}},
+\]
+when $0<x^*<1$.
+\end{proposition}
+
+\begin{proof}
+After the loss, assets are $(1+d)(1-L)$ against debt $d$, so coverage is at least $\kappa$ exactly when
+$L\le1-\kappa d/(1+d)$, and the loss of $(1+d)L$ falls on equity of one. The loss share is
+$\mathrm{LGD}$ times the default share, so the test breaks when the default share exceeds $x^*$, whose
+probability is one less \cref{prop6:lhp} at $x^*$.
+\end{proof}
+
+\kind{exact} At Ares Capital's leverage the test allows a loss of \acThrArcc\% of assets, at $d=1$ a loss of
+\acThrOne\%, and at $d=1.5$ only \acThrOneHalf\%. Take as an illustration a one year default
+probability of \acP\% and a correlation of \acRho, with the loss given default of direct loans from
+\textcite{cai2024}. Defaults alone then break the test within a year with probability \acBreachArcc\% at
+Ares Capital's leverage and \acBreachOneHalf\% at $d=1.5$. In the worst year in a thousand of this model
+\acQ\% of the loans default, the book loses \acQloss\% of its assets, and net assets fall by \acQeq\% at
+Ares Capital's leverage and by \acQeqTwo\% at the legal limit of two. Losses on marks, which come before
+defaults, would break the test sooner.
+
+\subsection{What the accounts of nineteen lenders show}
+
+Listed BDCs\ix{Business development company} file quarterly accounts with the Securities and Exchange Commission, tagged in XBRL, and the
+SEC publishes the tagged figures \parencite{secxbrl}. \texttt{scripts/pull\_bdc.py} reads them for
+\dlFirms{} listed BDCs, from Ares Capital to Gladstone Investment, and builds a table of their net
+assets, investments at fair value\ix{Fair value} and at amortised cost, investment income, fees, liabilities and the
+net increase in net assets resulting from operations, which is net investment income plus realised and
+unrealised gains. The tagging is broad from 2021, and for investment income from late 2022, so the
+results below run from \dlFirst{} to \dlLast{}. \Cref{tab6:bdc} lists the companies and
+\cref{fig6:direct} draws the averages. All are \kind{historical}.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{\kind{historical} Nineteen listed business development companies in \dlLast, from their XBRL
+  filings with the SEC: net assets, total liabilities over net assets, investments at fair value as a
+  percentage of amortised cost, the median share of total investment income paid in management and
+  incentive fees (a dash where the fees are not tagged), and the average annualised quarterly return on
+  net assets from \dlFirst. Ordered by net assets.}
+  \label{tab6:bdc}
+  \input{chapters/ch06-bdc-table.tex}
+\end{table}
+
+\emph{Floating rates\ix{Floating rate}.} The median\ix{Median} ratio of total investment income to average amortised cost rose from
+\dlYieldFirst\% in \dlYieldFirstQ{} to \dlYieldPeak\% in \dlYieldPeakQ{} and was \dlYieldLast\% in \dlLast,
+while the one month US bill averaged \dlBillFirst\%, then \dlBillPeak\% at its peak, then \dlBillLast\%. A
+regression of the median yield on the bill rate over the \dlYieldN{} quarters has a slope of \dlPass{},
+with a standard error of \dlPassSe{} and an $R^2$ of \dlPassRsq: a change in the base rate passes into
+the lenders' income about one for one, as floating-rate loans require. The median income yield less the
+bill rate was \dlSpreadLastBp{} basis points in \dlLast, which includes fees, discounts earned and
+dividends as well as the contractual spread.
+
+\emph{Leverage and fees.} In \dlLast{} the median ratio of total liabilities to net assets was
+\dlLevMed, and the highest \dlLevMax, within the limit of two. The management and incentive fees took a
+median \dlFeeShare\% of investment income, or \dlFeeNa\% of net assets a year. The companies differ more
+than the medians suggest: two carry their investments well above cost and three about ten points below
+it (\cref{tab6:bdc}).
+
+\emph{Marks.} Investments at fair value were \dlMarkFirst\% of their cost across the BDCs in \dlFirst{}
+and \dlMarkLast\% in \dlLast, the lowest of the period. A fall in the ratio is the lenders' own estimate
+of what their loans have lost, in default or in value, since they were made. Ares Capital reported loans
+on non-accrual\ix{Nonaccrual} status, those no longer paying, at \dlNonaccCost\% of its investments at amortised cost
+and \dlNonaccFv\% at fair value at the end of 2025 \parencite{arcc2025}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.96\textwidth]{ch06/fig13_direct_lending}
+  \caption{\kind{historical} Nineteen listed business development companies, from their quarterly filings
+  with the SEC. (a) The median ratio of total investment income to average investments at amortised
+  cost, annualised, and the US one month bill rate. (b) Investments at fair value less cost, summed across
+  the companies, as a share of cost, and the equally weighted average quarterly return on net assets,
+  the result of operations over the previous quarter's net assets.}
+  \label{fig6:direct}
+\end{figure}
+
+\subsection{Stale marks and de-smoothing}
+
+A loan with no market price is marked by its lender, usually each quarter, with a model and comparable
+deals. The IMF lists stale\ix{Stale pricing} and potentially subjective valuations\ix{Valuation} among the vulnerabilities of private
+credit, together with semi-liquid vehicles and layers of leverage, and warns that a severe downturn could bring a
+delayed realisation of losses followed by a spike in defaults and large valuation markdowns
+\parencite{imf2024gfsr}. Chapter~8 gave the tools.
+If reported returns\ix{Reported returns} follow $r^*_t=(1-\phi)r_t+\phi r^*_{t-1}$, the smoothing\ix{Return smoothing} proposition of Chapter~8 says the reported
+volatility\ix{Measured volatility} understates the true one by $\sqrt{(1-\phi)/(1+\phi)}$, the first autocorrelation\ix{Autocorrelation}\ix{First-order autocorrelation} of reported
+returns estimates $\phi$, and $r_t=(r^*_t-\phi r^*_{t-1})/(1-\phi)$ recovers the true return. And if marks
+lag the market, a regression on the market's return this quarter and last \parencite{dimson1979} gives a
+lagged beta\ix{Dimson beta}.
+
+\kind{historical} The average quarterly return on net assets of the BDCs\ix{Business development company} was \dlRoeMean\% a year with a
+volatility of only \dlRoeVol\%, and its worst quarter, \dlRoeMinQ, was \dlRoeMin\%. Its first
+autocorrelation over the \dlRoeN{} quarters is \dlRhoEw. Pooled within companies, over \dlRhoN{} pairs of
+quarters, the first autocorrelation is \dlRho{} with a standard error of \dlRhoSe, so the persistence is
+in the average more than in each lender, which is what marks that follow common market inputs with a
+delay would produce. On the US equity market,
+compounded to quarters from the French data, the average has a beta of \dlBetaZero{} on the current
+quarter and \dlBetaOne{} on the last, with a $t$ statistic\ix{Test statistic} of \dlBetaOneT{} on the lag over \dlDimN{}
+quarters: the lenders' marks follow the market with a delay.
+
+The sample is short and has no recession\ix{Recession} in it. The Form PF statistics of Chapter~9 give the credit
+hedge funds\ix{Hedge fund} of large advisers from 2013 \parencite{ofrhfm}. Their quarterly net return has a first
+autocorrelation of $\phi=\dlPfPhi$ over \dlPfN{} quarters; the same proposition then scales the reported
+volatility of \dlPfVol\% by \dlPfRatio, and de-smoothing\ix{Unsmoothing} the series gives a volatility of \dlPfVolDs\%.
+The worst quarter, \dlPfMinQ, was \dlPfMin\% as reported and \dlPfMinDs\% de-smoothed. The correction is
+modest for these funds. An autocorrelation measured in years without a recession may also understate the
+smoothing that a long downturn would reveal, since the proposition assumes a constant $\phi$.
+
+\subsection{Liquidity: the tender queue}
+
+A non-listed BDC offers liquidity\ix{Liquidity risk} by tender. Blackstone Private Credit Fund, for example, may buy back
+in each quarter up to \dlCap\% of its shares\ix{Stock} by net asset value\ix{Net asset value}\ix{Asset value}, at the quarter's net asset value per
+share, or \dlEarly\% of it for shares held less than a year, and when requests exceed the offer only part
+of each request is filled \parencite{bcred2025}. The fund offers investors\ix{Investor} at most \dlCap\% a quarter while
+it holds loans that, at Ares Capital for example, generally run three to ten years \parencite{arcc2025}.
+
+\begin{proposition}[The tender queue]\label{prop6:tender}
+A fund buys back a share $c$ of its net assets each quarter, pro rata among tenders that total $f>c$. An
+investor who tenders all its remaining holding every quarter still holds $(1-c/f)^n$ of it after $n$
+quarters, and needs $\ln 0.1/\ln(1-c/f)$ quarters to get nine tenths out.
+\end{proposition}
+
+\begin{proof}
+Each quarter a share $c/f$ of every tender is filled, so the remaining holding is multiplied by
+$1-c/f$.
+\end{proof}
+
+\kind{exact} If a tenth of the fund asks to leave each quarter, half of each request is filled and nine
+tenths of a holding take \dlQuartersTen{} quarters to leave. If a fifth asks, a quarter is filled, nine
+tenths take \dlQuartersTwenty{} quarters, and after a year \dlLeftFourTwenty\% of the holding is still in.
+The queue protects the remaining investors from forced sales\ix{Liquidation}, and it is also why the first investors to
+ask fare best.
+
+\FloatBarrier
+% =====================================================================================
 \section{Case study: could a five year commercial mortgage have been refinanced?}
 \label{sec6:case}
 
-A typical Canadian commercial mortgage has a five year term and a much longer amortisation, so most
-of the principal is still owed at maturity and has to be refinanced. Whether that is possible depends
+\kind{historical and simulation} A typical Canadian commercial mortgage\ix{Mortgage}\ix{Commercial mortgage} has a five year term and a much longer amortisation\ix{Amortisation}, so most
+of the principal is still owed at maturity\ix{Maturity} and has to be refinanced. Whether that is possible depends
 on the rate at maturity, the income the property earns by then, and the value a new lender will put
 on it. The study takes a stylised loan written at every month-end from \csFirst{} to \csLast, the
-\csN{} vintages whose maturity falls within the data, and asks whether a new lender would have lent
+\csN{} vintages\ix{Vintage year} whose maturity falls within the data, and asks whether a new lender would have lent
 enough to repay it.
 
 \paragraph{The loan}
-At origination the property is worth 100. Its cap rate depends on the rates of the day: it is
-\csCap\% when the five year Government of Canada yield is \csYRef\% and moves by $\beta=\csBeta$ points
+At origination the property is worth 100. Its cap rate\ix{Capitalisation rate} depends on the rates of the day: it is
+\csCap\% when the five year Government of Canada\ix{Government of Canada bond} yield is \csYRef\% and moves by $\beta=\csBeta$ points
 for each point of yield, $q_0=\csCap\%+\beta(y_0-\csYRef\%)$, so income is $\mathcal N_0=100\,q_0$.
 Over the vintages $q_0$ runs from \csCapZeroMin\% to \csCapZeroMax\%. The mortgage rate is $y_0$ plus
-\csSpread{} points, stated as a yearly rate compounded half-yearly, as Canadian mortgage rates are,
+\csSpread{} points, stated as a yearly rate compounded half-yearly\ix{Compounding!semi-annual}, as Canadian mortgage rates are,
 and paid monthly over a \csAmort{} year amortisation, so the monthly rate is $(1+j/2)^{1/6}-1$ for a
-quoted rate $j$. The lender applies two tests at origination and lends the smaller of \csLtv\% of value
-and the amount whose debt service coverage is \csDscrMin, $\mathcal N_0/(\csDscrMin\,k_0)$, with $k_0$
+quoted rate\ix{Quoted rate} $j$. The lender applies two tests at origination and lends the smaller of \csLtv\% of value
+and the amount whose debt service coverage\ix{Debt service coverage ratio} is \csDscrMin, $\mathcal N_0/(\csDscrMin\,k_0)$, with $k_0$
 the annual payment per unit of loan. Coverage sets the loan in \csDscrBindsZero{} of the \csN{}
-vintages, and loan to value at origination runs from \csLtvZeroMin\% to \csLtvZeroMax\%. Without the
+vintages, and loan to value\ix{Loan to value} at origination runs from \csLtvZeroMin\% to \csLtvZeroMax\%. Without the
 coverage test, a loan of \csLtv\% at a fixed \csCap\% cap rate would start below a coverage of
 \csDscrMin{} whenever the yield is above \csOldYCut\%, which is the case for \csOldBelow{} vintages; no
-lender would write those loans, and a refinancing test that the original loan could not pass says
+lender would write those loans\ix{Loan}, and a refinancing\ix{Refinancing risk} test that the original loan could not pass says
 little about refinancing risk.
 
 The loan amortises, so its balance at maturity is $b$. Over the term income grows by \csG\% a year,
@@ -1133,7 +1492,7 @@ two tests: it lends the smaller of \csLtv\% of $V_1$ and $\mathcal N_1/(\csDscrM
 new annual payment per unit of loan. The \emph{cover} $\gamma$ is that amount divided by $b$, and the
 loan refinances if $\gamma\ge1$. The data are the month-end five year yields from the file of
 Chapter~4, which runs to \csMatLast. Reading the quoted rates as compounded monthly instead would raise
-the effective rate by at most \csConvMax{} basis points and change the number of vintages that fail the
+the effective rate by at most \csConvMax{} basis points\ix{Basis point} and change the number of vintages that fail the
 test without shocks from \csFails{} to \csMonthlyFails.
 
 \paragraph{Without shocks}
@@ -1142,7 +1501,7 @@ On these assumptions \csFails{} of the \csN{} vintages have a cover below 1, all
 \csCoverMed, and the coverage test sets the new loan in \csDscrBindsOne{} vintages. When coverage
 sets both the original and the new loan, the cap rate drops out of the cover: the loan is proportional
 to $\mathcal N_0$, and so are $b$ and $\mathcal N_1$, so $\gamma$ depends only on the two loan constants
-and on income growth. A loan written when rates were low and refinanced when they had risen is then
+and on income growth\ix{Rent growth}. A loan written when rates were low and refinanced when they had risen is then
 the one at risk. The lowest cover, \csCoverMin, belongs to the vintage of \csCoverMinDate. The last
 vintage, \csLast, was written at a yield of \csLastYZero\% and a rate of \csRateZero\%, with a cap rate
 of \csLastCapZero\%, so coverage limited the loan to \csLastLoan{} with a coverage of \csLastDscrZero.
@@ -1155,7 +1514,7 @@ refinancing is the higher rate. \Cref{fig6:refi} shows the yield and the cover f
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.92\textwidth]{ch06/fig11_refinance}
-  \caption{Top: month-end five year Government of Canada yield, \csFirst{} to \csMatLast. Bottom: the
+  \caption{\kind{historical} Top: month-end five year Government of Canada yield, \csFirst{} to \csMatLast. Bottom: the
   cover $\gamma$ of each vintage by origination month (left axis, solid), with the line at 1, and the
   probability that the loan cannot refinance once income is uncertain (right axis, dashed).}
   \label{fig6:refi}
@@ -1169,7 +1528,7 @@ specific to one, both standard normal, so that $\E\zeta=1$.
 
 \begin{proposition}[Refinancing as a one-factor model]\label{prop6:refi}
 A loan of a vintage with cover $\gamma$ fails to refinance exactly when $\zeta<1/\gamma$, which has
-probability
+probability\ix{Probability}
 \[
   p=\Phi\Bigl(\frac{\ln(1/\gamma)+\tfrac12\sigma^2}{\sigma}\Bigr).
 \]
@@ -1199,7 +1558,7 @@ the cover is \csCoverBetaZero{} with a failure probability of \csPdBetaZero\%.
 A loan that cannot refinance is assumed to be sold, the lender receiving $\eta\zeta$ with
 $\eta=(1-\csCost\%)V_1$ against the balance $b$. The lender's loss is $(b-\eta\zeta)^+$; sale
 proceeds exceeding the debt do not produce a gain on the loan. With $u=\min(1/\gamma,\,b/\eta)$ and
-$z=(\ln u+\tfrac12\sigma^2)/\sigma$, the expected loss is
+$z=(\ln u+\tfrac12\sigma^2)/\sigma$, the expected loss\ix{Expected loss} is
 \[
   \E\bigl[(b-\eta\zeta)^+\mathbf 1\{\zeta<1/\gamma\}\bigr]=b\,\Phi(z)-\eta\,\Phi(z-\sigma),
 \]
@@ -1207,7 +1566,7 @@ because the loss is $b-\eta\zeta$ exactly when $\zeta<u$, $\mathbb P(\zeta<u)=\P
 For the last vintage this is \csEl{} basis points of the balance. The probability of failure is high
 and the loss given failure small, because the shortfall that stops a refinancing is a few points of
 value while a sale at a loan to value near \csLastLtvOne\% leaves a cushion. A simulation of
-\csMcScen{} scenarios for a pool of \csLoans{} such loans (stream 7) gives an average loss of
+\csMcScen{} scenarios\ix{Scenario analysis} for a pool of \csLoans{} such loans (stream 7) gives an average loss of
 \csMcEl{} basis points with standard error \csMcElSE, \csMcElZ{} standard errors from the formula.
 
 The pool's number of failures has mean \csMcMeanFail{} in the simulation, with standard error
@@ -1226,13 +1585,13 @@ given this loan at origination with a sponsor rating of \csSponsor{} and no cap 
 shift that actually happened it scores \csScoreReal, still a \csGradeReal. Even given that shift, the
 screen sees an exit loan to value of \csScreenExitLtv\%, far from the 90\% at which its exit score
 reaches zero. It has no input for the new lender's tests, a loan to value of at most \csLtv\% and a
-coverage of at least \csDscrMin, or for uncertainty in income, and it is those, applied at the rate at
+coverage of at least \csDscrMin, or for uncertainty\ix{Uncertainty} in income, and it is those, applied at the rate at
 maturity, that moved the failure probability.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.84\textwidth]{ch06/fig12_pool}
-  \caption{Number of loans out of \csLoans{} from the \csLast{} vintage that cannot refinance: the
+  \caption{\kind{exact and simulation} Number of loans out of \csLoans{} from the \csLast{} vintage that cannot refinance: the
   histogram of \csMcScen{} simulated scenarios and the distribution of \cref{prop6:cond} with
   $\rho=\csRho$, for every count from 0 to \csLoans.}
   \label{fig6:pool}
@@ -1246,24 +1605,24 @@ Every result in this chapter holds under hypotheses that real markets break, and
 in different places.
 
 The rate models are single-factor models fitted to one curve. In both models, every continuously compounded
-zero-coupon yield is an affine function of the short rate with a positive loading, so these yields move
+zero-coupon yield is an affine function of the short rate\ix{Short rate} with a positive loading, so these yields move
 in the same direction when the short rate changes; par yields also move in the same direction, although
 they are not generally affine functions of the short rate. The models therefore cannot describe a twist of the curve; with one random
 driver, level, slope and curvature cannot move independently, and the fitted Vasicek and CIR
-parameters change from one date to the next, as \cref{tab6:fits} showed. Swaps are discounted here on
+parameters change from one date to the next, as \cref{tab6:fits} showed. Swaps\ix{Swap rate} are discounted here on
 the government curve, while market swaps are discounted on the overnight curve and quoted at a spread
-to government bonds. Caplet prices from a Gaussian model have a fixed skew, and a market smile
+to government bonds\ix{Sovereign bond}. Caplet prices from a Gaussian model have a fixed skew, and a market smile
 generally needs more parameters.
 
-The Merton model has one debt maturity, continuous asset paths and no payouts, and its asset value
+The Merton model\ix{Merton model} has one debt maturity\ix{Maturity}, continuous asset paths and no payouts, and its asset value\ix{Asset value}
 is never observed. Firms have many debt issues, pay dividends and coupons, and can default before
 their debt matures. The first-passage models that followed allow for that, but with a fixed barrier below today's asset value and continuous paths they too give short-dated
 debt almost no spread; jumps and uncertain barriers are among the ways later models obtain one. The reduced-form model fixes the
-recovery rate and assumes that default is independent of interest rates, and a bootstrapped curve is
+recovery rate\ix{Recovery rate} and assumes that default is independent of interest rates\ix{Interest rate}, and a bootstrapped curve\ix{Bootstrapping a curve} is
 only as good as the quotes it is built from: a step function can fit any set of quotes that admits
 nonnegative hazards, which says nothing about whether the steps are where the risk is.
 
-The Gaussian copula has one correlation for every pair of names and thin joint tails. When tranche
+The Gaussian copula\ix{Copula} has one correlation\ix{Correlation} for every pair of names and thin joint tails. When tranche\ix{Tranche}
 prices are inverted for a correlation, each tranche gives a different number, which is the model
 telling its users that its shape is wrong. Dealers patched this by quoting a base correlation for each detachment point
 of the traded indices, pricing every tranche as the difference of two equity tranches, while rating and risk models for bespoke pools often kept a single
@@ -1271,7 +1630,7 @@ correlation; neither repair changed the thin tails that mattered in 2007 and 200
 simplify any real portfolio.
 
 The screener's weights and thresholds are choices, and the grade reflects those choices as much as
-the loan. In the case study the loan is stylised, the spread is the same in 2001 as in 2021, cap rates
+the loan. In the case study the loan is stylised, the spread is the same in 2001 as in 2021, cap rates\ix{Capitalisation rate}
 follow yields by a fixed rule, income grows at a fixed rate, nobody prepays, a lender who cannot
 refinance sells at once with a fixed cost, and losses are counted at maturity without discounting or
 lost interest. The shock to income is lognormal with one common factor. Each of these could be
@@ -1296,9 +1655,16 @@ into survival probabilities one interval at a time. A common factor makes defaul
 without changing their mean; tranching redistributes the pool's expected loss and moves it from
 equity to senior notes as losses spread out, and a structure whose notes outlast its collateral is much less exposed to forced sales, though not
 immune to them. A lender's screening ratios are tied together by two identities and do not, by themselves,
-identify the volatility of the collateral, which drives the expected loss of a slice. Over \csN{} vintages
-of a stylised Canadian commercial mortgage the refinancing test passes in every month without shocks,
-while with uncertain income the failure probability for the vintage of \csLast{} reaches \csPdMax\%.
+identify the volatility of the collateral, which drives the expected loss of a slice. A unitranche
+split into first out and last out pieces keeps the borrower's spread as the blend of the pieces'
+spreads, and with the recoveries reported for direct loans a basis point of spread covers less default
+than on syndicated loans. A maintenance covenant is a barrier on EBITDA that trips earlier and at a
+better recovery than a payment default. The accounts of \dlFirms{} listed lenders show income that moved
+with the base rate about one for one, fees of about a fifth of income, marks below cost in \dlLast{} and
+returns on net assets that follow the equity market with a lag. Over \csN{} vintages
+of a stylised Canadian commercial mortgage, sized at origination by both tests, \csFails{} vintages written
+between \csFailFirst{} and \csFailLast{} fail the refinancing test even without shocks, and with uncertain
+income the failure probability is largest, \csPdMax\%, for the vintage of \csPdMaxDate.
 
 % =====================================================================================
 \section{Exercises}
@@ -1328,14 +1694,29 @@ while with uncertain income the failure probability for the vintage of \csLast{}
   \item\label{ex6:nine} A loan of 1,000,000 at 4\%, compounded monthly, amortises over 25 years and is
   due in five. At maturity the rate is 6\%, the property earns 90,000 a year and a new lender requires a
   coverage of 1.25 on a 25 year amortisation. Find the balance due, the largest new loan and the cover.
+  \item\label{ex6:ten} A unitranche pays a spread of 600 basis points and is split 40\% first out and
+  60\% last out, with the first out lender paid 350 basis points. What does the last out lender earn?
+  With the recovery of direct loans used in \cref{sec6:direct}, what annual default rate would a loss
+  spread of 200 basis points cover?
+  \item\label{ex6:eleven} A borrower has debt of 4 times EBITDA and a maintenance covenant at 5.5
+  times. EBITDA has no drift and a volatility of 20\% a year. Use \cref{prop6:covenant} to find the
+  probability of a breach within three years.
+  \item\label{ex6:twelve} A fund buys back 5\% of its net assets each quarter, pro rata, and tenders
+  total 12.5\% every quarter. What share of each request is filled, and what share of a holding is still
+  in the fund after two years for an investor who tenders all of it every quarter?
+  \item\label{ex6:thirteen} A BDC has debt of 1.25 times net assets and no other liabilities. What share of its assets can
+  it lose before its asset coverage falls below 150\%, and what does a loss of 10\% of assets cost its
+  shareholders?
+  \item\label{ex6:fourteen} A borrower pays the base rate plus 6\% and has interest coverage of 3 when the base rate is
+  1\%. What is its coverage, with the same EBITDA, when the base rate is 5\%?
 \end{enumerate}
 
 \subsection*{Computing projects}
 \label{sec6:projects}
-These use the data and code in the repository. Each is solved by a function in
-\texttt{code/ch06/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
-checked with \texttt{python code/ch06/projects.py} from the root of the repository. The
-shipped series end in September 2026, and those that end earlier are noted.
+These use the data and code in the repository. Each is solved by a function in the file
+\texttt{code/ch06/projects.py}, which the tests in \texttt{test\_projects.py} run, so an answer
+can be checked by running that file from the root of the repository. The shipped series end in
+September 2026, and those that end earlier are noted.
 
 \begin{enumerate}[label=\textbf{P6.\arabic*}, leftmargin=*, ref=P6.\arabic*]
 \item Rerun the refinancing case study with \texttt{refi\_vintages} for loan-to-value limits of 60\%, 65\% and
@@ -1351,6 +1732,12 @@ this rising curve?
 month later, and compare the exact price change with the duration and the duration and convexity
 approximations from \texttt{mod\_duration} and \texttt{convexity}. Report the root mean square error of each
 in cents per 100 and the size and month of the largest miss of the duration approximation.
+\item For each business development company in \texttt{data/bdc\_quarterly.csv}, read with
+\texttt{load\_bdc} and \texttt{bdc\_panel} in \texttt{code/ch06/direct\_lending.py}, compute the first
+autocorrelation of its quarterly return on net assets, its volatility before and after de-smoothing as
+in Chapter~8, and the slope of its income yield on the one month bill rate. Which lenders look
+most smoothed, and does the pass-through of the base rate differ much between them? The filings end in
+June 2026.
 \end{enumerate}
 
 \subsection*{Answers}
@@ -1375,6 +1762,15 @@ in cents per 100 and the size and month of the largest miss of the duration appr
   $\xsEightDy\%/7\%$.
   \item The balance due is \xsNineB. The new loan constant is \xsNineK\%, so the largest new loan is
   $90{,}000/(1.25\times\xsNineK\%)=\xsNineMax$ and the cover is \xsNineCover.
+  \item By \cref{prop6:unitranche}(ii) the last out spread is $(600-0.4\times350)/0.6=\xdSl$ basis
+  points. A loss spread of 2\% covers a default rate of $2\%/(1-0.33)=\xdPd\%$ a year.
+  \item The barrier is $b=4/5.5$ of today's EBITDA. With no drift the probability is
+  \[2\Phi\bigl(\ln(4/5.5)/(0.2\sqrt3)\bigr)=2\Phi(\xdA)=\xdBreach\%.\]
+  \item $5/12.5=\xdFill\%$ of each request is filled, and after eight quarters $(1-0.4)^8=\xdLeft\%$ of
+  the holding is still in the fund.
+  \item By \cref{prop6:coverage} the fund can lose $1-1.5\times1.25/2.25=\xdThr\%$ of its assets, and a
+  loss of 10\% of assets costs $2.25\times10\%=\xdEq\%$ of net assets.
+  \item Coverage falls in proportion to $(1+6)/(5+6)$, from 3 to \xdIcr.
 \end{enumerate}
 
 % =====================================================================================
@@ -1391,7 +1787,16 @@ formula is from \textcite{jamshidian1989} and the caplet formula used for quotin
 \textcite{jarrow1995}, \textcite{lando1998} and \textcite{duffie1999}, and \textcite{okane2008}
 covers the conventions of credit default swaps and the pricing of tranches. The Gaussian copula for
 default times is from \textcite{li2000} and the large-pool limit from \textcite{vasicek2002}.
-\textcite{hull2022} covers market conventions for swaps, caps and credit derivatives.
+\textcite{hull2022} covers market conventions for swaps, caps and credit derivatives. The description of
+private credit and direct lending and the recoveries and interest coverage of direct loans are from
+\textcite{cai2024}, the size of the market and its vulnerabilities from \textcite{imf2024gfsr}, and the
+Canadian figures from \textcite{boc2026private} and \textcite{bocfsr2026}. The terms of a listed BDC are
+from the annual report of Ares Capital \parencite{arcc2025} and those of a non-listed one from the annual
+report of Blackstone Private Credit Fund \parencite{bcred2025}. The minimum of a Brownian motion with drift
+is in \textcite{shreve2004}, the continuity correction for discrete monitoring is from
+\textcite{broadie1997}, smoothing follows \textcite{geltner1993} as in Chapter~8, and the lagged beta is
+from \textcite{dimson1979}. The unitranche split, the covenant recovery, the fee on gross assets and the
+tender queue are short derivations given here.
 
 \paragraph{Software used}
 The scripts call NumPy \parencite{numpy} for arrays and random numbers, SciPy \parencite{scipy} for the normal
@@ -1418,7 +1823,15 @@ Chapter~4, which covers \bdFirst{} to \bdDate{} and was retrieved on 19 October 
 ended on 30 September 2026, so no October value enters any result, and the Bank's file has no value
 for 30 September, so the last observation is \bdDate. The
 study uses the last daily value of each month, so the last month-end is \csMatLast. The Bank can revise
-published values, and the numbers here use the saved file. The CDS quotes in \cref{sec6:hazard}, the
+published values, and the numbers here use the saved file. The accounts of the business development
+companies in \cref{sec6:direct} are from the XBRL company facts of the SEC \parencite{secxbrl}, read on
+22 October 2026 by \texttt{scripts/pull\_bdc.py} from the 10-Q and 10-K filings of \dlFirms{} companies
+for quarters to June 2026; information on the SEC's site is public and may be redistributed, so the
+table and the facts it is built from are shipped. The bill rate is the US one month series of the
+Chapter~5 file. The credit fund returns are the Form PF statistics of the Office of Financial Research
+used in Chapter~9 \parencite{ofrhfm}. The equity market return is from the French data library
+\parencite{frenchlib}, which is not redistributed. The unitranche, the covenant example and the tender examples are
+illustrations. The CDS quotes in \cref{sec6:hazard}, the
 firm in \cref{sec6:merton} and the loans in \cref{sec6:private} are illustrations and describe no real
 borrower.
 

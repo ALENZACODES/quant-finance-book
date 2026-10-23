@@ -45,8 +45,24 @@ def project_2():
                 sharpe_gross=L.sharpe(p.values), sharpe_net=L.sharpe(net))
 
 
+def project_3():
+    """The effective fee schedule of each strategy in the Form PF statistics: the fit of drag = a +
+    b max(gross, 0) strategy by strategy, with the annual management fee 4a, the incentive share b and
+    their robust standard errors, and the mean annual drag against a 2 and 20 schedule on the same gross
+    returns with no high-water mark."""
+    import hedge_data as H
+    d = H.load_ofr(); out = {}
+    for s in H.STRATS:
+        p = H.fee_panel(d, [s])
+        a, b, sa, sb, r2, n = H.fee_fit(p)
+        two20 = 0.5 + 0.2 * np.maximum(p.gross.values - 0.5, 0)
+        out[s] = dict(quarters=n, mgmt=4 * a, mgmt_se=4 * sa, inc=b, inc_se=sb, r2=r2,
+                      drag=4 * float(p.drag.mean()), drag_2_20=4 * float(two20.mean()))
+    return out
+
+
 def main():
-    for f in (project_1, project_2):
+    for f in (project_1, project_2, project_3):
         print(f.__name__, f())
 
 

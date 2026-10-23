@@ -2,7 +2,8 @@ import numpy as np
 
 def lasso(X, y, lam, sweeps=500):
     """Minimise (1/2n)|y - Xb|^2 + lam*|b|_1 by coordinate descent.
-    A fixed number of sweeps keeps the listing short; working code also stops when b stops changing."""
+    A fixed number of sweeps keeps the listing short; working code also stops
+    when b stops changing."""
     n, p = X.shape
     b, r = np.zeros(p), y.copy()            # r is the residual y - Xb
     c = (X ** 2).sum(axis=0) / n

@@ -100,6 +100,10 @@
   uniquelist=false,dashed=false,giveninits=true,doi=true,url=true,isbn=false]{biblatex}
 \RequirePackage{imakeidx}
 \makeindex[intoc,columns=2,title=Index]
+
+\newcommand{\ix}[1]{\index{#1}}  % index entries placed by scripts/add_index.py
+% the kind of a result in the applied chapters: exact (closed form), simulation, or historical
+\newcommand{\kind}[1]{\textsf{\small[#1]}}
 \RequirePackage[colorlinks=true,linkcolor=qbblue,citecolor=qbblue,urlcolor=qbred,
   pdfcreator={},pdfproducer={},pdfauthor={John Khan},pdftitle={},pdfsubject={},pdfkeywords={}]{hyperref}
 \setcounter{biburllcpenalty}{7000}
@@ -140,4 +144,5 @@
 
 % ---------------------------------------------------------------- review copy hook
 % \pid{ID} marks a scorable unit in the review build; main.tex defines it (empty in the reading copy).
+\setlength{\emergencystretch}{3em}
 \endinput

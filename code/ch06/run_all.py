@@ -2,7 +2,7 @@
 
 Usage:  python code/ch06/run_all.py
 Scripts: bonds_duration, short_rates, swaps_caps, merton_model, hazard_cds, copula_tranches,
-private_credit, case_refinance, exercises. Each draws from its own random stream
+private_credit, direct_lending, case_refinance, exercises. Each draws from its own random stream
 (numbers_ch06.rng_for), so a script run alone reproduces exactly the numbers it contributes here.
 Writes  figures/ch06/*.png, code/ch06/out/*.json, code/ch06/out/numbers.json, chapters/ch06-numbers.tex
 """
@@ -14,7 +14,7 @@ sys.path.insert(0, str(HERE))
 import numbers_ch06 as R  # noqa: E402
 
 SCRIPTS = ["bonds_duration", "short_rates", "swaps_caps", "merton_model", "hazard_cds", "copula_tranches",
-           "private_credit", "case_refinance", "exercises"]
+           "private_credit", "direct_lending", "case_refinance", "exercises"]
 
 
 def main():

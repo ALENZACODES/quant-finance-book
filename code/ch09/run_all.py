@@ -1,7 +1,7 @@
 """Regenerate every number and figure in Chapter 9 by running each of the chapter's scripts.
 
 Usage:  python code/ch09/run_all.py
-Scripts: trend, theory, carry, bias, survival, replicate, decompose, fees, fof, crypto, onchain,
+Scripts: trend, theory, carry, bias, survival, hedge_data, replicate, decompose, fees, fof, crypto, onchain,
 case_portfolio, exercises. Each draws from its own random stream
 (numbers_ch09.rng_for), so a script run alone reproduces exactly the numbers it contributes here.
 Writes  figures/ch09/*.png, code/ch09/out/*.json, code/ch09/out/numbers.json, chapters/ch09-numbers.tex
@@ -13,7 +13,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import numbers_ch09 as R  # noqa: E402
 
-SCRIPTS = ["trend", "theory", "carry", "bias", "survival", "replicate", "decompose", "fees", "fof",
+SCRIPTS = ["trend", "theory", "carry", "bias", "survival", "hedge_data", "replicate", "decompose", "fees", "fof",
            "crypto", "onchain", "case_portfolio", "exercises"]
 
 
