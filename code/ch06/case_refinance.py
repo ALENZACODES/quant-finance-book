@@ -1,5 +1,6 @@
 """Section 6.9, case study: can a five year commercial mortgage refinance at maturity? Every month-end
 vintage from January 2001 to September 2021, priced off the five year Government of Canada yield,
+each sized at origination by a loan to value and a coverage test and refinanced under the same tests,
 then a pool of loans with correlated income shocks for the last vintage.
 
 Run on its own:  python code/ch06/case_refinance.py   (writes code/ch06/out/case_refinance.json)
@@ -10,7 +11,7 @@ import numpy as np
 import pandas as pd
 from numbers_ch06 import N, RAW, put, pct, save, finish, rng_for, L, plt, BLUE, RED, GREY, SKY, ROSE, PALE, ROOT  # noqa: F401
 
-P = dict(ltv0=0.65, cap0=0.06, spread=2.25, amort=25, g=0.02, beta=0.5, dscr_min=1.25, ltv_max=0.65)
+P = dict(ltv_max=0.65, dscr_min=1.25, cap_ref=0.06, y_ref=4.0, beta=0.5, spread=2.25, amort=25, g=0.02)
 SIG_M, SIG_E, COST, LOANS = 0.10, 0.15, 0.10, 100
 SIG = math.sqrt(SIG_M ** 2 + SIG_E ** 2)
 
@@ -25,30 +26,46 @@ def main():
     rows = pd.DataFrame(L.refi_vintages(y.values, **P)); rows.index = y.index[:len(rows)]
     put("csN", len(rows), "{:.0f}"); N["csFirst"] = rows.index[0].strftime("%B %Y"); N["csLast"] = rows.index[-1].strftime("%B %Y")
     N["csMatLast"] = y.index[-1].strftime("%B %Y")
-    pct("csLtv", P["ltv0"], 0); pct("csCap", P["cap0"], 0); put("csSpread", P["spread"]); put("csAmort", P["amort"], "{:.0f}")
+    pct("csLtv", P["ltv_max"], 0); pct("csCap", P["cap_ref"], 0); put("csYRef", P["y_ref"], "{:.0f}")
+    put("csSpread", P["spread"]); put("csAmort", P["amort"], "{:.0f}")
     pct("csG", P["g"], 0); put("csBeta", P["beta"], "{:.1f}"); put("csDscrMin", P["dscr_min"])
-    put("csFails", int((rows.cover < 1).sum()), "{:.0f}")
+    # origination: both tests are applied, so no vintage starts below the coverage the refinancing needs
+    assert (rows.dscr0 >= P["dscr_min"] - 1e-12).all() and (rows.ltv0 <= P["ltv_max"] + 1e-12).all()
+    pct("csCapZeroMin", rows.cap0.min(), 2); pct("csCapZeroMax", rows.cap0.max(), 2)
+    pct("csLtvZeroMin", rows.ltv0.min(), 1); pct("csLtvZeroMax", rows.ltv0.max(), 1)
+    put("csDscrBindsZero", int(rows.dscr_binds0.sum()), "{:.0f}")
+    # the earlier design, 65% of value at a fixed 6% cap rate with no coverage test at origination
+    old = pd.DataFrame(L.refi_vintages(y.values, **P, size_at_origination=False, fixed_cap=True))
+    put("csOldBelow", int((old.dscr0 < P["dscr_min"]).sum()), "{:.0f}")
+    ycut = L.optimize.brentq(lambda v: 100 * P["cap_ref"] / (100 * P["ltv_max"] * L.mortgage_constant(v + P["spread"], P["amort"])) - P["dscr_min"], 0.0, 10.0)
+    put("csOldYCut", ycut)
+    fails = rows[rows.cover < 1]
+    put("csFails", len(fails), "{:.0f}")
+    if len(fails):
+        N["csFailFirst"] = fails.index[0].strftime("%B %Y"); N["csFailLast"] = fails.index[-1].strftime("%B %Y")
+        put("csFailYMax", fails.y0.max())
     put("csCoverMed", rows.cover.median(), "{:.3f}"); put("csCoverMin", rows.cover.min(), "{:.3f}")
     N["csCoverMinDate"] = rows.cover.idxmin().strftime("%B %Y")
-    put("csLtvBinds", int(rows.ltv_binds.sum()), "{:.0f}")
+    put("csLtvBinds", int(rows.ltv_binds.sum()), "{:.0f}"); put("csDscrBindsOne", int((~rows.ltv_binds).sum()), "{:.0f}")
     last = rows.iloc[-1]
     put("csLastYZero", last.y0); put("csLastYOne", last.y1); put("csLastB", last.B); put("csLastCover", last.cover, "{:.3f}")
     put("csLastDscrOne", last.dscr1); put("csLastLtvOne", 100 * last.ltv1, "{:.1f}"); put("csLastCapOne", 100 * last.cap1)
-    put("csLastDscrZero", last.dscr0)
+    put("csLastCapZero", 100 * last.cap0); put("csLastLoan", last.loan, "{:.1f}"); put("csLastDscrZero", last.dscr0)
+    put("csLastKZero", 100 * L.mortgage_constant(last.y0 + P["spread"], P["amort"])); put("csLastKOne", 100 * last.k1)
     pct("csSigM", SIG_M, 0); pct("csSigE", SIG_E, 0); pct("csSig", SIG, 1); put("csRho", SIG_M ** 2 / SIG ** 2, "{:.3f}")
     rows["pd"] = [L.refi_pd(c, SIG) for c in rows.cover]
     pct("csPdMed", rows.pd.median(), 1); pct("csPdLast", rows.pd.iloc[-1], 1); pct("csPdMax", rows.pd.max(), 1)
     N["csPdMaxDate"] = rows.pd.idxmax().strftime("%B %Y")
+    assert rows.pd.idxmax() == rows.cover.idxmin()
     pre = rows[rows.index < "2020-01-01"]; pct("csPdPreMed", pre.pd.median(), 1)
-    # the yield is a semi-annual bond yield used as a monthly compounded rate; size of that shortcut
-    yc = 1200 * ((1 + y.values / 200) ** (1 / 6) - 1)
-    put("csConvMax", 100 * np.max(y.values - yc), "{:.1f}")
-    rc = pd.DataFrame(L.refi_vintages(yc, **P))
-    put("csConvFails", int((rc.cover < 1).sum()), "{:.0f}")
-    pct("csConvPdMax", max(L.refi_pd(c, SIG) for c in rc.cover), 1)
+    # compounding: the same loans with the rate read as compounded monthly instead of semi-annually
+    rm = pd.DataFrame(L.refi_vintages(y.values, **P, comp="monthly"))
+    put("csMonthlyFails", int((rm.cover < 1).sum()), "{:.0f}")
+    put("csConvMax", 100 * max(r + P["spread"] - 1200 * L.monthly_rate(r + P["spread"]) for r in y.values), "{:.1f}")
     # sensitivity of the last vintage to the cap rate pass-through
     for b, nm in [(0.0, "Zero"), (1.0, "One")]:
-        q = dict(P, beta=b); r = L.refi_vintages(y.values, **q)[-1]
+        r = L.refi_vintages(y.values, **dict(P, beta=b))[-1]
+        assert r["dscr_binds0"] == (b > 0) and not r["ltv_binds"]   # the prose: which test binds
         put(f"csCoverBeta{nm}", r["cover"], "{:.3f}"); pct(f"csPdBeta{nm}", L.refi_pd(r["cover"], SIG), 1)
     # expected loss for the last vintage, closed form and by simulation of a pool
     a = (1 - COST) * last.V1
@@ -84,11 +101,12 @@ def main():
     put("csSenElOwn", 1e4 * sn.mean() / 0.99, "{:.2f}")
     put("csSenPHit", 100 * (sn > 0).mean(), "{:.1f}")
     # screener grade of the last vintage at origination, with no cap shift and with the realised one
-    deal = dict(loan=65.0, value=100.0, noi=6.0, rate=last.y0 + P["spread"], amort=25, termYrs=5, capRate=6,
+    deal = dict(loan=last.loan, value=100.0, noi=100 * last.cap0, rate=last.y0 + P["spread"], amort=25, termYrs=5,
+                capRate=100 * last.cap0,
                 exitCapShift=0.0, noiGrowth=2, fees=0, sponsorScore=3)
     put("csSponsor", deal["sponsorScore"], "{:.0f}")
     t0, g0, m0, _ = L.screener_score(deal)
-    t1, g1, m1, _ = L.screener_score(dict(deal, exitCapShift=100 * (last.cap1 - P["cap0"])))
+    t1, g1, m1, _ = L.screener_score(dict(deal, exitCapShift=100 * (last.cap1 - last.cap0)))
     put("csScreenExitLtv", m1["exitLtv"], "{:.1f}"); put("csScore", t0, "{:.0f}"); N["csGrade"] = g0; put("csScoreReal", t1, "{:.0f}"); N["csGradeReal"] = g1
     put("csRateZero", last.y0 + P["spread"])
     # figures

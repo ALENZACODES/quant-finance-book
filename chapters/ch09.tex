@@ -1,11 +1,11 @@
 % Chapter 9. All quoted numbers come from chapters/ch09-numbers.tex, written by code/ch09/run_all.py.
 \input{chapters/ch09-numbers}
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{8}
 \chapter{Hedge Funds, Managed Futures and Digital Assets}
 \label{ch:hedge}
 
-An investment committee that adds hedge funds, a trend following programme or a sleeve of bitcoin to
+An investment committee that adds hedge funds, a trend following\index{trend following} programme or a sleeve of bitcoin\index{bitcoin} to
 a portfolio of stocks and bonds is buying something it cannot fully see. The manager's positions
 change from month to month, the published track records come from databases that keep the winners
 and lose the losers, and the newest assets have a history that is short, violent and chosen after the
@@ -20,9 +20,9 @@ tested on public prices without relying on a manager's reported returns: first w
 built from public data. A section on carry and roll yield adds the part of a futures return that the
 programme leaves out. The middle of the chapter is about evidence. Fund databases overstate returns in
 ways that can be computed, a regression splits a return into parts in a way that depends on the
-factors chosen, and a regression clone of a fund shows how much of its return a few liquid positions
+factors chosen, and a regression clone\index{linear clone} of a fund shows how much of its return a few liquid positions
 could have delivered. Then come fees: hurdles, high-water marks and the option value of an incentive
-fee, and the second layer of a fund of funds, whose fees do not net across managers. The last part
+fee, and the second layer of a fund of funds\index{funds of funds}, whose fees do not net across managers. The last part
 turns to digital assets: the arithmetic of the protocol, volatility and correlation and how they have
 changed, the selection that went into studying the survivors, and the size of position at which
 bitcoin carries a given share of a portfolio's risk.
@@ -40,7 +40,7 @@ it, and \texttt{code/ch09/test\_assets.py} checks them. An independent R script 
 market series from the daily files, runs the trend programme and its fee with its own loops, fits the
 quarterly regression with \texttt{lm}, and recomputes the database formulas, the closure formulas
 by numerical integration, the carry splits from the raw rate files, the attribution regression, the
-fee formulas, Nakamoto's attacker table, the Fisher test, the fund of funds fees, the bitcoin statistics
+fee formulas, Nakamoto\index{Nakamoto}'s attacker table, the Fisher test, the fund of funds fees, the bitcoin statistics
 and the risk shares. GNU Octave recomputes the normal formulas, the hurdle and closure formulas by
 quadrature, the issuance sum, the risk share weight with \texttt{fzero} and the case study statistics
 from the saved programme returns.
@@ -95,7 +95,7 @@ world it loses money. \Cref{tab9:families} sorts the main families that way.
     Event driven & merger spreads, distressed debt & often like a short put on the deal or the market\\
     Relative value & convergence of close substitutes, carry & often like a short put on liquidity\\
     Global macro & views on rates, currencies and indices & varies with the manager\\
-    Managed futures & trends in futures prices & often convex in sustained moves, like a long straddle\\
+    Managed futures & trends in futures prices & often convex in sustained moves, like a long straddle\index{straddle}\\
     Multi-strategy & a mix of the above & a mix of the above\\
     \bottomrule
   \end{tabular}
@@ -125,7 +125,7 @@ from a database.
 \section{What a trend rule earns}
 \label{sec9:theory}
 
-A \emph{time series momentum} rule, in the form studied by \textcite{moskowitz2012}, holds each market
+A \emph{time series momentum}\index{time series momentum} rule, in the form studied by \textcite{moskowitz2012}, holds each market
 long when its own return over the past year was positive and short when it was negative. The sign of
 the position depends only on the market's own past, and the size is set so that each market carries a
 similar risk. Before building such a programme it helps to know what the rule can earn and from where.
@@ -198,7 +198,7 @@ $S_t^2=S_{t-1}^2+2S_{t-1}r_t+r_t^2$; summing from $t=1$ to $n$ and using $S_0=0$
 The expectation of the right side is $\tfrac12(n\sigma^2-n\sigma^2)=0$. A loss occurs when
 $S_n^2/(n\sigma^2)<\sum r_t^2/(n\sigma^2)$. The right side tends to one by the law of large numbers and
 $S_n/(\sigma\sqrt n)$ tends in law to a standard normal $Z$ by the central limit theorem, so the
-probability tends to $\Pr(Z^2<1)=2\Phi(1)-1$.
+probability tends to $\mathbb P(Z^2<1)=2\Phi(1)-1$.
 \end{proof}
 
 This identity appears as equation (7) of \textcite{dao2017}, who use it to read the profit of a trend
@@ -212,7 +212,7 @@ money in \stLossShare\% of the years, with a simulation standard error of \stLos
 returns with mean zero the exact share follows from \cref{eq9:straddle}: since
 $\sum r_t^2=S_n^2/n+\sum(r_t-\bar r)^2$, the rule loses exactly when $\lvert t\rvert<1$, where $t$ is
 the usual $t$ statistic of the mean of the $n$ returns, so the probability is
-$\Pr(\lvert t_{n-1}\rvert<1)$, \stLossFinite\% for $n=\stNday$, against the limit of
+$\mathbb P(\lvert t_{n-1}\rvert<1)$, \stLossFinite\% for $n=\stNday$, against the limit of
 \stLossTheory\%; the simulated share is a draw about \stLossZ{} standard errors low on this seed. Its profits have a skewness
 of \stSkew, against $2\sqrt2\approx2.8$ in the limit, where the profit is a multiple of $Z^2-1$. Panel (a) of \cref{fig9:straddle} shows the parabola.
 
@@ -479,7 +479,7 @@ rise in the high-water mark.
 \section{Carry and roll yield}
 \label{sec9:carry}
 
-A managed futures programme holds futures and forwards, and the return of a futures position is more
+A managed futures\index{managed futures} programme holds futures and forwards, and the return of a futures position is more
 than the change in the price of the underlying. The difference is the \emph{carry}: the return the
 position would earn if the spot price did not move, with the futures price converging to it. \textcite{koijen2018} define carry in this
 way for every asset class and show that it predicts returns in many of them. For commodities the same
@@ -592,7 +592,7 @@ sense in which it measures the change in the interpolated curve.
 Most of what is known about hedge fund returns comes from commercial databases to which funds report
 voluntarily. A fund starts reporting when it chooses, usually after a good start, and stops when it
 chooses, often after losses or before closing. Three biases follow. \emph{Survivorship bias} arises when
-the funds that stopped reporting are dropped from the sample. \emph{Backfill} or \emph{instant history bias}
+the funds that stopped reporting are dropped from the sample. \emph{Backfill} or \emph{instant history bias}\index{instant history bias}
 arises when a fund that joins the database brings its earlier, and selected, history with it.
 \emph{Selection bias} arises because the funds that report at all differ from those that do not.
 \textcite{brown1992} showed for mutual funds how survivorship alone creates apparent persistence
@@ -701,7 +701,7 @@ Funds also leave because they fail. A simple rule is that a fund closes the firs
 fraction $\ell$ of its starting value, which makes survival depend on the whole path of returns. In
 continuous time the survival probability and the survivors' mean have closed forms.
 
-\begin{proposition}[Closure at a loss limit]\label{prop9:closure}
+\begin{proposition}[Closure at a loss limit\index{loss limit}]\label{prop9:closure}
 Let the log value of a fund be $X_t=\mu t+sW_t$, with $W$ a standard Brownian motion, and let the fund
 close at the first time $X$ reaches $-b$, where $b=-\log(1-\ell)>0$. Write $m=\mu T$, $v=s\sqrt T$ and
 $k=e^{-2\mu b/s^2}$. The probability that the fund is still open at $T$ is
@@ -944,13 +944,16 @@ nonlinear losses of liquidity stress or of insurance claims, which is where the 
 A hedge fund charges a management fee, a fixed share of assets each year, and an incentive fee, a share
 $f$ of gains. The details of the incentive fee decide how much of a fund's return the investor keeps.
 \begin{itemize}
-  \item A \emph{high-water mark} is the highest value per unit on which a fee has been charged; the
-        incentive fee is charged only on value above it, so a fund that loses must recover the loss
-        before it is paid again.
+  \item A \emph{high-water mark}\index{high-water mark} is the highest value per unit after fees at any earlier
+        crystallisation date, or the starting value if that is higher, as in Chapter~2; the incentive fee
+        is charged only on value above it, so a fund that loses must recover the loss before it is paid
+        again.
   \item A \emph{hurdle} $h$ is a return the fund must earn before the incentive fee applies. Under a
         \emph{hard} hurdle the fee is charged only on the return above $h$. Under a \emph{soft} hurdle with
         full \emph{catch-up}, once the return exceeds $h$ the manager takes all of the excess until the
-        fee equals $f$ of the whole return, and $f$ of the return after that.
+        fee equals $f$ of the whole return, and $f$ of the return after that. Chapter~2 also uses a
+        soft hurdle with no catch-up range, which pays $f$ of the whole return as soon as it passes
+        $h$; the two agree for returns above $h/(1-f)$.
   \item \emph{Crystallisation} is the date at which an accrued incentive fee becomes payable, usually
         the end of each year.
 \end{itemize}
@@ -1140,9 +1143,9 @@ short history can say.
 A few facts about the protocol matter for an investor, and they can be stated without technical
 detail. Transactions are grouped into blocks, and each block contains a cryptographic hash of the one
 before, so the blocks form a chain in which changing an old transaction would change every later
-block. A new block is accepted only with a \emph{proof of work}: a number that makes the block's hash
+block. A new block is accepted only with a \emph{proof of work}\index{proof of work}: a number that makes the block's hash
 fall below a target, which can be found only by trial. Whoever finds it is paid in new coins, the
-\emph{block subsidy}, plus the fees of the transactions in the block. The protocol adjusts the target
+\emph{block subsidy}\index{block subsidy}, plus the fees of the transactions in the block. The protocol adjusts the target
 every 2016 blocks to keep the average time between blocks near ten minutes, and halves the subsidy
 every 210,000 blocks, about every \ocEpochYears{} years at that spacing. In the reference software,
 Bitcoin Core \parencite{bitcoincore}, the subsidy starts at 50 coins and is halved by a binary shift
@@ -1196,8 +1199,8 @@ Let $D_n$ be the deficit after $n$ blocks, a random walk that rises by one with 
 falls by one with probability $q$, from $D_0=z$. Then $(q/p)^{D_n}$ is a martingale, since
 $p(q/p)^{d+1}+q(q/p)^{d-1}=(q/p)^d(q+p)$. Stop it when $D$ first reaches $0$ or some $M>z$. The stopped
 martingale is bounded, so optional stopping gives
-$(q/p)^z=\Pr(\text{0 first})+(q/p)^M(1-\Pr(\text{0 first}))$, and
-$\Pr(\text{0 first})=\bigl((q/p)^z-(q/p)^M\bigr)/\bigl(1-(q/p)^M\bigr)$. Let $M\to\infty$; since $q/p<1$ the
+$(q/p)^z=\mathbb P(\text{0 first})+(q/p)^M(1-\mathbb P(\text{0 first}))$, and
+$\mathbb P(\text{0 first})=\bigl((q/p)^z-(q/p)^M\bigr)/\bigl(1-(q/p)^M\bigr)$. Let $M\to\infty$; since $q/p<1$ the
 limit is $(q/p)^z$.
 \end{proof}
 
@@ -1291,7 +1294,7 @@ to 2017.
 
 
 \paragraph{How much risk a small position carries}
-The \emph{risk contribution} of a holding is its weight times the covariance of its return with the
+The \emph{risk contribution}\index{risk contribution} of a holding is its weight times the covariance of its return with the
 portfolio's, and the risk contributions add up to the portfolio's variance (Chapter~7). For a sleeve of
 weight $w$ in a portfolio otherwise invested in $P$, the share of risk has a closed form.
 
@@ -1571,6 +1574,23 @@ which the market's structure changed, and the next decade's figures may differ.
   Nakamoto's figure, \exNNak, is larger.
 \end{enumerate}
 
+\subsection*{Computing projects}
+\label{sec9:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch09/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch09/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P9.\arabic*}, leftmargin=*, ref=P9.\arabic*]
+\item Run the time series momentum programme of \texttt{tsmom\_weights} and \texttt{tsmom\_returns} on the six
+shipped markets, for lookbacks of 3, 6, 12 and 24 months and costs of 0, 5 and 20 basis points per unit
+traded, from January 2003. Which lookback survives costs best, and why do short lookbacks lose most?
+\item Charge the twelve month programme a 2\% management fee and a 20\% incentive fee over a high-water mark
+with \texttt{fees\_hwm}, using the bill rate in \texttt{data/real\_assets\_monthly.csv}. What share of the
+gross excess return goes in fees, and what happens to the Sharpe ratio? Explain why the share is so high
+when the gross Sharpe ratio is low.
+\end{enumerate}
+
 \subsection*{Answers}
 \begin{enumerate}[label=\textbf{9.\arabic*}, leftmargin=*]
   \item The cumulative moves before each period are 0, 2, 1, 4 and 2\%, so the profits are $0$, $-2$, $3$,
@@ -1657,7 +1677,7 @@ list, with links, is in \texttt{CREDITS.md}.
 \paragraph{Data}
 US equity excess returns and the bill rate are from the data library of \textcite{frenchlib}, in the
 release built from the CRSP database of August 2026 and retrieved on 19 October 2026; these files are
-not redistributed, and \texttt{scripts/build\_french.py --download} rebuilds them. The US 10 year
+not redistributed, and \texttt{scripts/build\_french.py -{}-download} rebuilds them. The US 10 year
 yield, the WTI price and the exchange rates are FRED series \parencite{fredch9}, and the Canadian yields
 are from the Bank of Canada \parencite{bocvalet}; \texttt{scripts/pull\_fred.py} downloads the FRED
 series and cuts them at 30 September 2026. The bitcoin and ether prices are Coinbase series published on
@@ -1673,5 +1693,4 @@ the daily market return of the French library. The funds of
 \cref{sec9:biases,sec9:replication,sec9:fees,sec9:fof}, the oil curve and the exercise inputs are
 illustrations.
 
-\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
-\end{refsection}
+\end{chapterrefs}

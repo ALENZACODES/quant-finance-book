@@ -1,6 +1,6 @@
 % Chapter 5. All quoted numbers come from chapters/ch05-numbers.tex, written by code/ch05/run_all.py.
 \input{chapters/ch05-numbers}
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{4}
 \chapter{Black-Scholes: Derivation, Greeks and Numerical Checks}
 \label{ch:bs}
@@ -10,7 +10,7 @@ the equity option buried in a convertible bond, a volatility fund sells index va
 carried interest behaves like a call on the fund, and a real estate developer holds an option to wait
 before building. These claims are priced, hedged and argued about in one language, the language of the
 model that \textcite{black1973} and \textcite{merton1973} wrote down. Even people who think the model
-is wrong quote prices in its units, as implied volatilities, and measure their risks with its Greeks.
+is wrong quote prices in its units, as implied volatilities, and measure their risks with its Greeks\index{Greeks}.
 
 The chapter follows one question from start to finish: what should a dealer charge for a call, and
 what happens to the dealer who charges it? Two derivations give the price, one by building a hedge and
@@ -35,7 +35,7 @@ Time to expiry is written $\tau=T-t$.
 Every simulation draws from NumPy's default generator seeded with the base seed \texttt{505}
 and a stream number fixed in each script, so any script run alone gives the numbers printed here; the short listing in \cref{sec5:mc} uses seed \snipSeed{} so that it stands on its
 own. Monte Carlo standard errors are computed from the quantity that is actually averaged: the
-pair average for antithetic draws, and the payoff less the fitted multiple of the control for
+pair average for antithetic\index{antithetic} draws, and the payoff less the fitted multiple of the control for
 control variates.
 
 Each symbol keeps one meaning. $\Delta$ on its own is the delta and $\Delta_t$, with a time subscript,
@@ -43,8 +43,7 @@ the number of shares a strategy holds; $\Delta x$, $\Delta\tau$ and $\Delta t$, 
 subscript, are steps in log price, in time to expiry and in calendar time. $\theta$ is the market price of
 risk, as in Chapter~3, and $\rho$ is the Greek rho; correlations are written $\varrho$. Total
 volatility $\sigma\sqrt\tau$ is $\nu$, and $v_t$ is the variance in the stochastic volatility
-model. Jump parameters carry a subscript $J$. The dividend or income yield is $q$, the usual letter
-in option pricing; Chapter~4 wrote $\delta$ for the same quantity. $\mathbb P$ is the real-world
+model. Jump parameters carry a subscript $J$. The dividend or income yield is $\delta$, as in Chapter~4. $\mathbb P$ is the real-world
 probability and $Q$ the risk-neutral one, so that $P$ is free for the put price.
 \end{keybox}
 
@@ -53,8 +52,8 @@ probability and $Q$ the risk-neutral one, so that $P$ is free for the put price.
 \label{sec5:model}
 
 \begin{definition}\label{def5:market}
-The \emph{Black-Scholes market} on $[0,T]$ has two assets. A bank account grows at a constant rate,
-$dB_t=rB_t\,dt$. A stock pays dividends continuously at a constant yield $q$ and its price follows
+The \emph{Black-Scholes market}\index{Black-Scholes market} on $[0,T]$ has two assets. A bank account grows at a constant rate,
+$dB_t=rB_t\,dt$. A stock pays dividends continuously at a constant yield $\delta$ and its price follows
 \begin{equation}\label{eq5:gbm}
   dS_t=\mu S_t\,dt+\sigma S_t\,dW_t,\qquad S_0>0,
 \end{equation}
@@ -65,14 +64,14 @@ trading costs, any real number of shares can be held, and borrowing and lending 
 
 As shown in Chapter~3, $S_t=S_0\exp\bigl((\mu-\tfrac12\sigma^2)t+\sigma W_t\bigr)$, so log returns over
 any interval are normal and independent of the past. The total expected return of the stock is
-$\mu+q$: $\mu$ from the price and $q$ from the dividends.
+$\mu+\delta$: $\mu$ from the price and $\delta$ from the dividends.
 
 \begin{definition}\label{def5:selffin}
 A \emph{trading strategy} is a predictable process $\Delta_t$, integrable against $S$, the number of shares held, together with an
 initial value $\Pi_0$. The strategy, with value $\Pi_t$, is \emph{self-financing} if whatever is not in shares sits in
 the bank account and no money is added or withdrawn:
 \begin{equation}\label{eq5:selffin}
-  d\Pi_t=\Delta_t\,dS_t+q\Delta_tS_t\,dt+r(\Pi_t-\Delta_tS_t)\,dt .
+  d\Pi_t=\Delta_t\,dS_t+\delta\Delta_tS_t\,dt+r(\Pi_t-\Delta_tS_t)\,dt .
 \end{equation}
 The strategy is \emph{admissible} if $\int_0^T\Delta_t^2S_t^2\,dt<\infty$ almost surely and $\Pi_t$ is
 bounded below. An \emph{arbitrage} is an admissible self-financing strategy with $\Pi_0\le0$,
@@ -97,7 +96,7 @@ Let $g$ be a payoff with $0\le g(s)\le c_0(1+s)$ for some constant $c_0$, and le
 differentiable once in $t$ and twice in $S$ on $[0,T)\times(0,\infty)$, continuous on
 $[0,T]\times(0,\infty)$, bounded below, with $V_S$ bounded and
 \begin{equation}\label{eq5:pde}
-  V_t+\tfrac12\sigma^2S^2V_{SS}+(r-q)SV_S-rV=0,\qquad V(T,S)=g(S).
+  V_t+\tfrac12\sigma^2S^2V_{SS}+(r-\delta)SV_S-rV=0,\qquad V(T,S)=g(S).
 \end{equation}
 Then the strategy $\Delta_t=V_S(t,S_t)$ with $\Pi_0=V(0,S_0)$ is self-financing and admissible and
 satisfies $\Pi_t=V(t,S_t)$ for all $t$, in particular $\Pi_T=g(S_T)$. If the claim paying $g(S_T)$
@@ -116,7 +115,7 @@ Subtracting this from \cref{eq5:selffin}, the $dS_t$ terms cancel because $\Delt
   d(\Pi_t-V)=\bigl(qS_tV_S+r\Pi_t-rS_tV_S-V_t-\tfrac12\sigma^2S_t^2V_{SS}\bigr)dt
   =r(\Pi_t-V)\,dt,
 \end{equation*}
-where the second step uses \cref{eq5:pde} in the form $V_t+\tfrac12\sigma^2S^2V_{SS}=rV-(r-q)SV_S$.
+where the second step uses \cref{eq5:pde} in the form $V_t+\tfrac12\sigma^2S^2V_{SS}=rV-(r-\delta)SV_S$.
 So $e_t=\Pi_t-V(t,S_t)$ solves $de_t=re_t\,dt$ on $[0,T)$ with $e_0=0$, which forces $e_t=0$, and
 continuity of $\Pi$ and $V$ carries this to $t=T$. Since $V_S$ is bounded and $S$ has continuous
 paths, $\int_0^T\Delta_t^2S_t^2\,dt<\infty$; since $V$ is bounded below, so is $\Pi_t=V(t,S_t)$, and
@@ -129,12 +128,12 @@ trade is an arbitrage.
 \end{proof}
 
 The hypotheses on $V$ have to be checked claim by claim. For a call or a put, $V$ is positive by
-\cref{thm5:bs} and $|V_S|\le e^{-q\tau}$ by \cref{prop5:greeks}, hence $|V_S|\le1$ when $q\ge0$; more generally, for any payoff $g\ge0$, the
+\cref{thm5:bs} and $|V_S|\le e^{-\delta\tau}$ by \cref{prop5:greeks}, hence $|V_S|\le1$ when $\delta\ge0$; more generally, for any payoff $g\ge0$, the
 Feynman-Kac step after \cref{thm5:rn} writes $V(t,S)=e^{-r\tau}\E_Q[g(S_T)\mid S_t=S]\ge0$, so
 nonnegativity supplies the lower bound, while the smoothness, growth and delta-bound hypotheses must
 still be checked separately. A European put is also bounded above, by $Ke^{-r\tau}$ and therefore by $K$ when $r\ge0$, so its
 price is pinned from both sides. A call is not bounded above, and the theorem gives only that its price cannot exceed
-$V(0,S_0)$. Equality for the call then follows from put-call parity, \cref{eq5:parity}, whose proof
+$V(0,S_0)$. Equality for the call then follows from put-call parity\index{put-call parity}, \cref{eq5:parity}, whose proof
 uses only static trades in the stock and the bank account: a call priced below the formula, combined
 with the put and the static position, would give a put priced below its formula.
 
@@ -154,11 +153,11 @@ satisfies the partial differential equation in \cref{eq5:pde} on $(0,T)\times(0,
 \begin{proof}
 By It\^o's lemma and \cref{eq5:gbm},
 $dV=\bigl(V_t+\mu SV_S+\tfrac12\sigma^2S^2V_{SS}\bigr)dt+\sigma SV_S\,dW_t$, while by
-\cref{eq5:selffin}, $d\Pi=\bigl((\mu+q)h S+r(V-hS)\bigr)dt+\sigma hS\,dW_t$. The two are the same It\^o
+\cref{eq5:selffin}, $d\Pi=\bigl((\mu+\delta)h S+r(V-hS)\bigr)dt+\sigma hS\,dW_t$. The two are the same It\^o
 process, and an It\^o process determines its $dt$ and $dW$ coefficients uniquely up to sets of measure
 zero (a continuous martingale of finite variation is constant). Matching the $dW$ terms gives
 $\sigma S_th=\sigma S_tV_S$, so $h=V_S$ because $\sigma S_t>0$. Matching the $dt$ terms then gives
-$V_t+\mu SV_S+\tfrac12\sigma^2S^2V_{SS}=(\mu+q)SV_S+rV-rSV_S$, in which $\mu SV_S$ cancels and what is
+$V_t+\mu SV_S+\tfrac12\sigma^2S^2V_{SS}=(\mu+\delta)SV_S+rV-rSV_S$, in which $\mu SV_S$ cancels and what is
 left is \cref{eq5:pde}. The identities hold at $(t,S_t)$ for almost every $t$ and almost every path;
 since $S_t$ has a positive density on $(0,\infty)$ for each $t>0$ and both sides are continuous, they
 hold everywhere.
@@ -174,11 +173,11 @@ dividends paid so far, is a martingale, a replicable claim is priced by a discou
 expectation.
 
 \begin{theorem}[Risk-neutral pricing]\label{thm5:rn}
-Let $\theta=(\mu+q-r)/\sigma$ and define $Q$ on $\mathcal F_T$ by $dQ/d\mathbb P=\exp(-\theta W_T-\tfrac12\theta^2T)$.
+Let $\theta=(\mu+\delta-r)/\sigma$ and define $Q$ on $\mathcal F_T$ by $dQ/d\mathbb P=\exp(-\theta W_T-\tfrac12\theta^2T)$.
 Then
 \begin{enumerate}[label=(\roman*)]
   \item $\widetilde W_t=W_t+\theta t$ is a $Q$-Brownian motion and
-  $dS_t=(r-q)S_t\,dt+\sigma S_t\,d\widetilde W_t$;
+  $dS_t=(r-\delta)S_t\,dt+\sigma S_t\,d\widetilde W_t$;
   \item the discounted value of any self-financing strategy satisfies
   \begin{equation*}
     d(e^{-rt}\Pi_t)=e^{-rt}\Delta_t\sigma S_t\,d\widetilde W_t ,
@@ -196,7 +195,7 @@ Then
 
 \begin{proof}
 (i) is Girsanov's theorem from Chapter~3 with this $\theta$, and substituting
-$dW_t=d\widetilde W_t-\theta\,dt$ in \cref{eq5:gbm} gives $\mu-\sigma\theta=r-q$ as the drift.
+$dW_t=d\widetilde W_t-\theta\,dt$ in \cref{eq5:gbm} gives $\mu-\sigma\theta=r-\delta$ as the drift.
 (ii) By the product rule and \cref{eq5:selffin},
 \begin{equation*}
   d(e^{-rt}\Pi_t)=e^{-rt}\bigl(d\Pi_t-r\Pi_t\,dt\bigr)=e^{-rt}\Delta_t\bigl(dS_t+qS_t\,dt-rS_t\,dt\bigr)
@@ -225,7 +224,7 @@ $g(s)\le c_0(1+s)$.} So the two derivations agree. The hedge shows why the price
 else; the expectation shows how to compute it, and it also works for path-dependent claims that have
 no equation in $(t,S)$ alone.
 
-Under $Q$ the drift $\mu$ is replaced by $r-q$, and $\theta$, the market price of risk, is folded
+Under $Q$ the drift $\mu$ is replaced by $r-\delta$, and $\theta$, the market price of risk, is folded
 into the probabilities. A stock that a forecaster expects to return 10\% a year has, under $Q$, an
 expected total return equal to that of the bank account, dividends included, which is why discounting
 at $r$ is correct. $Q$ is a device for pricing and says nothing about the stock's actual expected
@@ -236,7 +235,7 @@ return.
 \label{sec5:formula}
 
 \begin{lemma}\label{lem5:lognormal}
-If $U\sim\N(m,\eta^2)$ with $\eta>0$ and $\ell\in\mathbb R$, then $\Pr(U>\ell)=\Phi\bigl((m-\ell)/\eta\bigr)$ and
+If $U\sim\N(m,\eta^2)$ with $\eta>0$ and $\ell\in\mathbb R$, then $\mathbb P(U>\ell)=\Phi\bigl((m-\ell)/\eta\bigr)$ and
 \begin{equation}\label{eq5:partial}
   \E\bigl[e^U\mathbf 1\{U>\ell\}\bigr]=e^{m+\eta^2/2}\,\Phi\Bigl(\frac{m+\eta^2-\ell}{\eta}\Bigr).
 \end{equation}
@@ -256,9 +255,9 @@ In the market of \cref{def5:market} the prices at time $t$ of European calls and
 and expiry $T$ are $C(t,S_t)$ and $P(t,S_t)$, where, with $\tau=T-t$,
 \begin{equation}\label{eq5:bs}
 \begin{aligned}
-  C(t,S)&=Se^{-q\tau}\Phi(d_1)-Ke^{-r\tau}\Phi(d_2),\qquad
-  P(t,S)=Ke^{-r\tau}\Phi(-d_2)-Se^{-q\tau}\Phi(-d_1),\\
-  d_1&=\frac{\ln(S/K)+(r-q+\tfrac12\sigma^2)\tau}{\sigma\sqrt\tau},\qquad d_2=d_1-\sigma\sqrt\tau .
+  C(t,S)&=Se^{-\delta\tau}\Phi(d_1)-Ke^{-r\tau}\Phi(d_2),\qquad
+  P(t,S)=Ke^{-r\tau}\Phi(-d_2)-Se^{-\delta\tau}\Phi(-d_1),\\
+  d_1&=\frac{\ln(S/K)+(r-\delta+\tfrac12\sigma^2)\tau}{\sigma\sqrt\tau},\qquad d_2=d_1-\sigma\sqrt\tau .
 \end{aligned}
 \end{equation}
 Both functions solve \cref{eq5:pde} with their payoffs as terminal values.
@@ -266,9 +265,9 @@ Both functions solve \cref{eq5:pde} with their payoffs as terminal values.
 
 \begin{proof}
 By \cref{thm5:rn}(i), conditional on $S_t=S$, $U=\ln S_T\sim\N(m,\eta^2)$ under $Q$ with
-$m=\ln S+(r-q-\tfrac12\sigma^2)\tau$ and $\eta^2=\sigma^2\tau$. Then
+$m=\ln S+(r-\delta-\tfrac12\sigma^2)\tau$ and $\eta^2=\sigma^2\tau$. Then
 $C=e^{-r\tau}\bigl(\E_Q[e^U\mathbf 1\{U>\ln K\}]-KQ(U>\ln K)\bigr)$. With $\ell=\ln K$,
-$(m-\ell)/\eta=d_2$, $(m+\eta^2-\ell)/\eta=d_1$ and $e^{m+\eta^2/2}=Se^{(r-q)\tau}$, so \cref{lem5:lognormal}
+$(m-\ell)/\eta=d_2$, $(m+\eta^2-\ell)/\eta=d_1$ and $e^{m+\eta^2/2}=Se^{(r-\delta)\tau}$, so \cref{lem5:lognormal}
 gives the call formula. The put follows from put-call parity below, together with
 $\Phi(-x)=1-\Phi(x)$. That $C$ solves \cref{eq5:pde} is checked in \cref{prop5:gammatheta}, and the
 terminal condition holds because $d_1,d_2\to\pm\infty$ as $\tau\downarrow0$ according as $S>K$ or $S<K$;
@@ -281,27 +280,27 @@ Chapter~4 measured the early exercise premium, and the same chapter showed that 
 trees converge to these formulas; here they are reached directly.
 
 \begin{proposition}[Put-call parity and bounds]\label{prop5:parity}
-For European options on a stock with a known dividend yield $q$, in any market without arbitrage that
+For European options on a stock with a known dividend yield $\delta$, in any market without arbitrage that
 has the stock and a bank account at the rate $r$, and in which dividends can be reinvested in the stock,
 \begin{equation}\label{eq5:parity}
-  C-P=Se^{-q\tau}-Ke^{-r\tau}.
+  C-P=Se^{-\delta\tau}-Ke^{-r\tau}.
 \end{equation}
-In the Black-Scholes market, in addition, $(Se^{-q\tau}-Ke^{-r\tau})^+<C<Se^{-q\tau}$, the price increases
+In the Black-Scholes market, in addition, $(Se^{-\delta\tau}-Ke^{-r\tau})^+<C<Se^{-\delta\tau}$, the price increases
 strictly in $\sigma$, it tends to the lower bound as $\sigma\downarrow0$ and to the upper bound as
 $\sigma\to\infty$.
 \end{proposition}
 
 \begin{proof}
-A long call and a short put pay $(S_T-K)^+-(K-S_T)^+=S_T-K$ at $T$. So does holding $e^{-q\tau}$ shares,
+A long call and a short put pay $(S_T-K)^+-(K-S_T)^+=S_T-K$ at $T$. So does holding $e^{-\delta\tau}$ shares,
 with the dividends reinvested in shares, and borrowing $Ke^{-r\tau}$; the law of one price gives
 \cref{eq5:parity}. For the bounds, $C=e^{-r\tau}\E_Q[(S_T-K)^+]$ and Jensen's inequality give
-$C\ge e^{-r\tau}(\E_QS_T-K)^+=(Se^{-q\tau}-Ke^{-r\tau})^+$, strictly because $(x-K)^+$ is not linear on
-the support of $S_T$; and $(S_T-K)^+<S_T$ gives $C<e^{-r\tau}\E_QS_T=Se^{-q\tau}$. Strict monotonicity
+$C\ge e^{-r\tau}(\E_QS_T-K)^+=(Se^{-\delta\tau}-Ke^{-r\tau})^+$, strictly because $(x-K)^+$ is not linear on
+the support of $S_T$; and $(S_T-K)^+<S_T$ gives $C<e^{-r\tau}\E_QS_T=Se^{-\delta\tau}$. Strict monotonicity
 in $\sigma$ follows from $\partial C/\partial\sigma>0$ in \cref{prop5:greeks}. As $\sigma\downarrow0$,
-$d_1$ and $d_2$ tend to $\pm\infty$ with the sign of $\ln(S/K)+(r-q)\tau$, which gives the lower bound
+$d_1$ and $d_2$ tend to $\pm\infty$ with the sign of $\ln(S/K)+(r-\delta)\tau$, which gives the lower bound
 (if that quantity is zero, $d_1$ and $d_2$ tend to $0$ and
-$C\to\tfrac12(Se^{-q\tau}-Ke^{-r\tau})=0$, which is again the lower bound);
-as $\sigma\to\infty$, $d_1\to\infty$ and $d_2\to-\infty$, which gives $Se^{-q\tau}$.
+$C\to\tfrac12(Se^{-\delta\tau}-Ke^{-r\tau})=0$, which is again the lower bound);
+as $\sigma\to\infty$, $d_1\to\infty$ and $d_2\to-\infty$, which gives $Se^{-\delta\tau}$.
 \end{proof}
 
 Parity needs no model for how the stock moves, only the stock, the bank account and a known yield. In the base case
@@ -328,62 +327,62 @@ between the two normal densities in the formula is in hand.
 
 \begin{lemma}\label{lem5:phi}
 With $\varphi$ the standard normal density and $d_1,d_2$ as in \cref{eq5:bs},
-$Se^{-q\tau}\varphi(d_1)=Ke^{-r\tau}\varphi(d_2)$.
+$Se^{-\delta\tau}\varphi(d_1)=Ke^{-r\tau}\varphi(d_2)$.
 \end{lemma}
 
 \begin{proof}
 $\varphi(d_2)/\varphi(d_1)=\exp\bigl(\tfrac12(d_1^2-d_2^2)\bigr)=\exp\bigl(\tfrac12(d_1-d_2)(d_1+d_2)\bigr)$.
-Here $d_1-d_2=\sigma\sqrt\tau$ and $d_1+d_2=2\bigl(\ln(S/K)+(r-q)\tau\bigr)/(\sigma\sqrt\tau)$, so the
-ratio is $(S/K)e^{(r-q)\tau}$, which rearranges to the claim.
+Here $d_1-d_2=\sigma\sqrt\tau$ and $d_1+d_2=2\bigl(\ln(S/K)+(r-\delta)\tau\bigr)/(\sigma\sqrt\tau)$, so the
+ratio is $(S/K)e^{(r-\delta)\tau}$, which rearranges to the claim.
 \end{proof}
 
 \begin{proposition}[The Greeks]\label{prop5:greeks}
 For the call in \cref{eq5:bs}, writing $\Theta=\partial C/\partial t=-\partial C/\partial\tau$,
 \begin{align*}
-  \Delta&=\frac{\partial C}{\partial S}=e^{-q\tau}\Phi(d_1), &
-  \Gamma&=\frac{\partial^2C}{\partial S^2}=\frac{e^{-q\tau}\varphi(d_1)}{S\sigma\sqrt\tau}, &
-  \mathcal V&=\frac{\partial C}{\partial\sigma}=Se^{-q\tau}\varphi(d_1)\sqrt\tau,\\
+  \Delta&=\frac{\partial C}{\partial S}=e^{-\delta\tau}\Phi(d_1), &
+  \Gamma&=\frac{\partial^2C}{\partial S^2}=\frac{e^{-\delta\tau}\varphi(d_1)}{S\sigma\sqrt\tau}, &
+  \mathcal V&=\frac{\partial C}{\partial\sigma}=Se^{-\delta\tau}\varphi(d_1)\sqrt\tau,\\
   \rho&=\frac{\partial C}{\partial r}=K\tau e^{-r\tau}\Phi(d_2), &
-  \Theta&=-\frac{Se^{-q\tau}\varphi(d_1)\sigma}{2\sqrt\tau}+qSe^{-q\tau}\Phi(d_1)-rKe^{-r\tau}\Phi(d_2). \span\span
+  \Theta&=-\frac{Se^{-\delta\tau}\varphi(d_1)\sigma}{2\sqrt\tau}+qSe^{-\delta\tau}\Phi(d_1)-rKe^{-r\tau}\Phi(d_2). \span\span
 \end{align*}
-For the put, $\Delta_P=\Delta-e^{-q\tau}$, $\rho_P=\rho-K\tau e^{-r\tau}$,
-$\Theta_P=\Theta-qSe^{-q\tau}+rKe^{-r\tau}$, and $\Gamma$ and $\mathcal V$ are the same as for the call.
+For the put, $\Delta_P=\Delta-e^{-\delta\tau}$, $\rho_P=\rho-K\tau e^{-r\tau}$,
+$\Theta_P=\Theta-qSe^{-\delta\tau}+rKe^{-r\tau}$, and $\Gamma$ and $\mathcal V$ are the same as for the call.
 Finally, $\mathcal V=\sigma\tau S^2\Gamma$.
 \end{proposition}
 
 \begin{proof}
 Differentiate \cref{eq5:bs} by the chain rule. For any of the inputs $\alpha$,
 \begin{equation*}
-  \frac{\partial C}{\partial \alpha}=\frac{\partial(Se^{-q\tau})}{\partial \alpha}\Phi(d_1)-\frac{\partial(Ke^{-r\tau})}{\partial \alpha}\Phi(d_2)
-  +Se^{-q\tau}\varphi(d_1)\frac{\partial d_1}{\partial \alpha}-Ke^{-r\tau}\varphi(d_2)\frac{\partial d_2}{\partial \alpha},
+  \frac{\partial C}{\partial \alpha}=\frac{\partial(Se^{-\delta\tau})}{\partial \alpha}\Phi(d_1)-\frac{\partial(Ke^{-r\tau})}{\partial \alpha}\Phi(d_2)
+  +Se^{-\delta\tau}\varphi(d_1)\frac{\partial d_1}{\partial \alpha}-Ke^{-r\tau}\varphi(d_2)\frac{\partial d_2}{\partial \alpha},
 \end{equation*}
 and by \cref{lem5:phi} the last two terms combine to
 \begin{equation*}
-  Se^{-q\tau}\varphi(d_1)\,\frac{\partial(d_1-d_2)}{\partial \alpha}=Se^{-q\tau}\varphi(d_1)\,\frac{\partial(\sigma\sqrt\tau)}{\partial \alpha}.
+  Se^{-\delta\tau}\varphi(d_1)\,\frac{\partial(d_1-d_2)}{\partial \alpha}=Se^{-\delta\tau}\varphi(d_1)\,\frac{\partial(\sigma\sqrt\tau)}{\partial \alpha}.
 \end{equation*}
 For $\alpha=S$ and $\alpha=r$ this vanishes,
 which leaves $\Delta$ and $\rho$. For $\alpha=\sigma$ the first two terms vanish and the last is
-$Se^{-q\tau}\varphi(d_1)\sqrt\tau$. For $\alpha=\tau$ the first two terms are
-$-qSe^{-q\tau}\Phi(d_1)+rKe^{-r\tau}\Phi(d_2)$
-and the last is $Se^{-q\tau}\varphi(d_1)\sigma/(2\sqrt\tau)$; changing sign gives $\Theta$. Then
-$\Gamma=\partial\Delta/\partial S=e^{-q\tau}\varphi(d_1)\,\partial d_1/\partial S$ with
+$Se^{-\delta\tau}\varphi(d_1)\sqrt\tau$. For $\alpha=\tau$ the first two terms are
+$-qSe^{-\delta\tau}\Phi(d_1)+rKe^{-r\tau}\Phi(d_2)$
+and the last is $Se^{-\delta\tau}\varphi(d_1)\sigma/(2\sqrt\tau)$; changing sign gives $\Theta$. Then
+$\Gamma=\partial\Delta/\partial S=e^{-\delta\tau}\varphi(d_1)\,\partial d_1/\partial S$ with
 $\partial d_1/\partial S=1/(S\sigma\sqrt\tau)$. The put Greeks follow by differentiating
 \cref{eq5:parity}, whose right side does not depend on $\sigma$ and is linear in $S$. Finally
-$\sigma\tau S^2\Gamma=\sigma\tau S^2e^{-q\tau}\varphi(d_1)/(S\sigma\sqrt\tau)=\mathcal V$.
+$\sigma\tau S^2\Gamma=\sigma\tau S^2e^{-\delta\tau}\varphi(d_1)/(S\sigma\sqrt\tau)=\mathcal V$.
 \end{proof}
 
 \begin{proposition}[Gamma and theta]\label{prop5:gammatheta}
-The call and put prices satisfy $\Theta+\tfrac12\sigma^2S^2\Gamma+(r-q)S\Delta-rV=0$, which is
+The call and put prices satisfy $\Theta+\tfrac12\sigma^2S^2\Gamma+(r-\delta)S\Delta-rV=0$, which is
 \cref{eq5:pde}. Equivalently, for a long option that is delta hedged and financed at $r$, the time
 decay net of financing is fixed by the gamma: $\Theta-rV+rS\Delta-qS\Delta=-\tfrac12\sigma^2S^2\Gamma$.
 \end{proposition}
 
 \begin{proof}
-Substitute \cref{prop5:greeks}. The gamma term $\tfrac12\sigma^2S^2\Gamma=Se^{-q\tau}\varphi(d_1)\sigma/(2\sqrt\tau)$
-cancels the first term of $\Theta$. The $\Phi(d_1)$ terms, $qSe^{-q\tau}\Phi(d_1)$ from $\Theta$,
-$(r-q)Se^{-q\tau}\Phi(d_1)$ from $(r-q)S\Delta$ and $-rSe^{-q\tau}\Phi(d_1)$ from $-rV$, sum to zero. So do the
+Substitute \cref{prop5:greeks}. The gamma term $\tfrac12\sigma^2S^2\Gamma=Se^{-\delta\tau}\varphi(d_1)\sigma/(2\sqrt\tau)$
+cancels the first term of $\Theta$. The $\Phi(d_1)$ terms, $qSe^{-\delta\tau}\Phi(d_1)$ from $\Theta$,
+$(r-\delta)Se^{-\delta\tau}\Phi(d_1)$ from $(r-\delta)S\Delta$ and $-rSe^{-\delta\tau}\Phi(d_1)$ from $-rV$, sum to zero. So do the
 $\Phi(d_2)$ terms, $-rKe^{-r\tau}\Phi(d_2)$ from $\Theta$ and $+rKe^{-r\tau}\Phi(d_2)$ from $-rV$. For the put use parity, since
-$Se^{-q\tau}-Ke^{-r\tau}$ also solves the equation.
+$Se^{-\delta\tau}-Ke^{-r\tau}$ also solves the equation.
 \end{proof}
 
 The identity is deterministic: it holds at every point $(t,S)$. What it says about money is that over
@@ -398,14 +397,14 @@ point of volatility, and $\rho=\rhoC$. Theta is \thetaC{} a year, or \thetaCDay{
 put has $\Delta_P=\deltaP$, $\Theta_P=\thetaP$ and $\rho_P=\rhoP$. \Cref{prop5:gammatheta} splits the
 call's theta into $-\tfrac12\sigma^2S^2\Gamma=\thetaGammaPart$, the cost of holding convexity, and
 $rV-rS\Delta=\thetaCarryPart$, the interest on the hedge. The second order cross sensitivities are
-vanna, $\partial^2C/\partial S\partial\sigma=-e^{-q\tau}\varphi(d_1)d_2/\sigma=\vannaB$, and volga,
+vanna, $\partial^2C/\partial S\partial\sigma=-e^{-\delta\tau}\varphi(d_1)d_2/\sigma=\vannaB$, and volga,
 $\partial^2C/\partial\sigma^2=\mathcal Vd_1d_2/\sigma=\volgaB$. Each Greek agrees with a central
 difference of the price to within the difference's own error, and the tests check this at 200 random
 points for calls and puts.
 
 \begin{proposition}[Where gamma peaks]\label{prop5:gammapeak}
 For fixed $\tau$, $\Gamma$ as a function of $S$ has a unique maximum at
-$S^*=K\exp\bigl(-(r-q+\tfrac32\sigma^2)\tau\bigr)$.
+$S^*=K\exp\bigl(-(r-\delta+\tfrac32\sigma^2)\tau\bigr)$.
 \end{proposition}
 
 \begin{proof}
@@ -416,7 +415,7 @@ so
 \end{equation*}
 This is positive when
 $d_1<-\sigma\sqrt\tau$ and negative when $d_1>-\sigma\sqrt\tau$, so the unique maximum is where
-$d_1=-\sigma\sqrt\tau$, that is $\ln(S/K)=-(r-q+\tfrac32\sigma^2)\tau$.
+$d_1=-\sigma\sqrt\tau$, that is $\ln(S/K)=-(r-\delta+\tfrac32\sigma^2)\tau$.
 \end{proof}
 
 For the one year option gamma peaks at $S^*=\gammaPeakS$, below the strike. As expiry approaches $S^*$
@@ -445,21 +444,21 @@ last few days.
 \section{Indices, futures and the Canadian dollar}
 \label{sec5:div}
 
-Everything so far allowed a continuous dividend yield $q$. Under further assumptions, stated with
+Everything so far allowed a continuous dividend yield $\delta$. Under further assumptions, stated with
 each case, the same formula prices options on an index, on a futures contract and on a currency. A
 stock that pays a few fixed cash dividends needs separate treatment.
 
 \begin{proposition}[Forward form]\label{prop5:yield}
-Let $F=Se^{(r-q)\tau}$ be the forward price for delivery at $T$. Then \cref{eq5:bs} can be written
+Let $F=Se^{(r-\delta)\tau}$ be the forward price for delivery at $T$. Then \cref{eq5:bs} can be written
 \begin{equation}\label{eq5:fwdform}
   C=e^{-r\tau}\bigl(F\Phi(d_1)-K\Phi(d_2)\bigr),\quad P=e^{-r\tau}\bigl(K\Phi(-d_2)-F\Phi(-d_1)\bigr),\quad
   d_{1,2}=\frac{\ln(F/K)\pm\tfrac12\sigma^2\tau}{\sigma\sqrt\tau}.
 \end{equation}
-The price depends on $S$, $r$ and $q$ only through $F$ and the discount factor $e^{-r\tau}$.
+The price depends on $S$, $r$ and $\delta$ only through $F$ and the discount factor $e^{-r\tau}$.
 \end{proposition}
 
 \begin{proof}
-$Se^{-q\tau}=e^{-r\tau}F$ and $\ln(S/K)+(r-q)\tau=\ln(F/K)$; substitute into \cref{eq5:bs}.
+$Se^{-\delta\tau}=e^{-r\tau}F$ and $\ln(S/K)+(r-\delta)\tau=\ln(F/K)$; substitute into \cref{eq5:bs}.
 \end{proof}
 
 An index with a 3\% yield and the base inputs has forward \divYieldFwd, call \divYieldCall, put
@@ -471,25 +470,25 @@ holder of the call does not receive the dividends.
   \item Suppose the futures price is a geometric Brownian motion, $dF_t=\mu_FF_t\,dt+\sigma F_t\,dW_t$,
   the contract is marked to market continuously, variation margin can be borrowed or lent without
   limit at the constant rate $r$, and there are no margin costs. Then an option on it that is settled
-  at $T$ satisfies \cref{eq5:pde} with $q=r$, and its price is \cref{eq5:fwdform} with $F$ the current
+  at $T$ satisfies \cref{eq5:pde} with $\delta=r$, and its price is \cref{eq5:fwdform} with $F$ the current
   futures price \parencite{black1976}.
   \item If $S$ is the price in domestic currency of one unit of a foreign currency, $r_d$ is the
   domestic rate and $r_f$ the foreign rate, an option on the currency satisfies \cref{eq5:pde} with
-  $r=r_d$ and $q=r_f$ \parencite{garman1983}.
+  $r=r_d$ and $\delta=r_f$ \parencite{garman1983}.
 \end{enumerate}
 \end{proposition}
 
 \begin{proof}
 (i) A futures position costs nothing to open and its gains are paid into the account as they arise,
 so a strategy holding $\Delta_t$ contracts and keeping its value $\Pi_t$ in the bank has
-$d\Pi_t=\Delta_t\,dF_t+r\Pi_t\,dt$. This is \cref{eq5:selffin} with $S$ replaced by $F$ and $q=r$, since
+$d\Pi_t=\Delta_t\,dF_t+r\Pi_t\,dt$. This is \cref{eq5:selffin} with $S$ replaced by $F$ and $\delta=r$, since
 then $qS\Delta+r(\Pi-\Delta S)=r\Pi$. The proof of \cref{thm5:pde} goes through unchanged, and so does
-\cref{thm5:bs}; with $q=r$, the forward of $F$ is $F$ itself. Unlike a stock, a futures contract has
+\cref{thm5:bs}; with $\delta=r$, the forward of $F$ is $F$ itself. Unlike a stock, a futures contract has
 zero value when opened and pays settlement gains; the equivalence is between the two pricing
 equations under the funding assumptions stated, and daily rather than continuous settlement adds a
 small error that the proof ignores. (ii) A unit of foreign currency held in a
 foreign bank account earns $r_f$, paid in units of the currency, exactly as a share earns a dividend
-yield. So holding $\Delta$ units gives \cref{eq5:selffin} with $q=r_f$ and $r=r_d$.
+yield. So holding $\Delta$ units gives \cref{eq5:selffin} with $\delta=r_f$ and $r=r_d$.
 \end{proof}
 
 A call on a futures contract at 70, struck at 72, with six months to run, $r=4\%$ and $\sigma=35\%$, is
@@ -503,7 +502,7 @@ where they earn $r_f$.
 
 \paragraph{Cash dividends}
 A stock that pays a fixed amount $D_i$ at times $t_i$ drops by about $D_i$ on each ex date, and no
-choice of constant $q$ reproduces that. Two simple treatments are common. The \emph{escrowed} model
+choice of constant $\delta$ reproduces that. Two simple treatments are common. The \emph{escrowed} model
 assumes that $S_t-\sum_{t_i>t}D_ie^{-r(t_i-t)}$, the price less the present value of the dividends still
 to come, follows a geometric Brownian motion, so the call is \cref{eq5:bs} with $S$ replaced by
 $S-\mathrm{PV}(D)$. The \emph{spot drop} model lets $S$ itself follow \cref{eq5:gbm} with volatility
@@ -547,7 +546,7 @@ available.
 
 \begin{proposition}\label{prop5:mc}
 Let $Y_1,\dots,Y_n$ be independent copies of the discounted payoff $Y=e^{-rT}(S_T-K)^+$, with
-$S_T=S_0\exp\bigl((r-q-\tfrac12\sigma^2)T+\sigma\sqrt TZ\bigr)$ and $Z\sim\N(0,1)$. The mean $\bar Y_n$ is
+$S_T=S_0\exp\bigl((r-\delta-\tfrac12\sigma^2)T+\sigma\sqrt TZ\bigr)$ and $Z\sim\N(0,1)$. The mean $\bar Y_n$ is
 unbiased for $C$, converges to $C$ almost surely, and
 $\sqrt n(\bar Y_n-C)/\widehat{\mathrm{sd}}_n\to\N(0,1)$ in distribution, where $\widehat{\mathrm{sd}}_n$
 is the sample standard deviation of the $Y_i$.
@@ -611,7 +610,7 @@ estimators give
 \begin{center}
 \begin{tabular}{lcccc}
   \toprule
-  & plain & antithetic & control variate & both\\
+  & plain & antithetic & control variate\index{control variate} & both\\
   \midrule
   estimate & \mcEstPlain & \mcEstAnti & \mcEstCV & \mcEstBoth\\
   standard error & \mcSEPlain & \mcSEAnti & \mcSECV & \mcSEBoth\\
@@ -665,10 +664,10 @@ The first is the \emph{pathwise} estimator, the second the \emph{likelihood rati
 \begin{proof}
 For the pathwise form, $S_T$ is proportional to $S_0$, so $\partial S_T/\partial S_0=S_T/S_0$, and
 $s\mapsto(s-K)^+$ is Lipschitz with derivative $\mathbf 1\{s>K\}$ except at $s=K$, which has
-probability zero. The difference quotients $\bigl((S_T(S_0+\delta S)-K)^+-(S_T(S_0)-K)^+\bigr)/\delta S$ are bounded
+probability zero. The difference quotients $\bigl((S_T(S_0+\epsilon)-K)^+-(S_T(S_0)-K)^+\bigr)/\epsilon$ are bounded
 by $S_T/S_0$, which is integrable, so dominated convergence lets the derivative pass inside the
 expectation. For the likelihood ratio form, write the price as $\int e^{-rT}(s-K)^+p(s;S_0)\,ds$, where
-$p$ is the lognormal density of $S_T$. With $z(s)=\bigl(\ln(s/S_0)-(r-q-\tfrac12\sigma^2)T\bigr)/(\sigma\sqrt T)$,
+$p$ is the lognormal density of $S_T$. With $z(s)=\bigl(\ln(s/S_0)-(r-\delta-\tfrac12\sigma^2)T\bigr)/(\sigma\sqrt T)$,
 $\partial p/\partial S_0=p(s;S_0)\,z(s)/(S_0\sigma\sqrt T)$. To differentiate under the integral it is
 enough that this derivative, times $(s-K)^+$, is bounded by an integrable function of $s$ uniformly
 for $S_0$ in a compact interval $[S_0',S_0'']\subset(0,\infty)$. On that interval
@@ -692,9 +691,9 @@ the true delta is positive, because all of the sensitivity sits at the jump.
 
 The third way to get a price is to solve \cref{eq5:pde} on a grid. In log price $x=\ln S$ and time to
 expiry $\tau$, the equation is $V_\tau=aV_{xx}+bV_x-rV$ with constant coefficients $a=\tfrac12\sigma^2$
-and $b=r-q-\tfrac12\sigma^2$. The scripts use a uniform grid of $M$ intervals centred on $\ln S_0$ and
+and $b=r-\delta-\tfrac12\sigma^2$. The scripts use a uniform grid of $M$ intervals centred on $\ln S_0$ and
 reaching six standard deviations, $6\sigma\sqrt T$, on each side, with the values $0$ and
-$Se^{-q\tau}-Ke^{-r\tau}$ for a call imposed at the two ends. Write $V^k_j$ for the value at
+$Se^{-\delta\tau}-Ke^{-r\tau}$ for a call imposed at the two ends. Write $V^k_j$ for the value at
 $x_j=x_0+j\,\Delta x$ and $\tau_k=k\,\Delta\tau$, and $L_h$ for the central difference operator
 \begin{equation*}
   (L_hV)_j=a\frac{V_{j+1}-2V_j+V_{j-1}}{\Delta x^2}+b\frac{V_{j+1}-V_{j-1}}{2\Delta x}-rV_j .
@@ -703,7 +702,7 @@ For a weight $w\in[0,1]$ the \emph{weighted scheme} is
 \begin{equation}\label{eq5:theta}
   \frac{V^{k+1}-V^k}{\Delta\tau}=w\,L_hV^{k+1}+(1-w)L_hV^k,
 \end{equation}
-which is \emph{explicit} for $w=0$, \emph{implicit} for $w=1$ and \emph{Crank-Nicolson} for
+which is \emph{explicit} for $w=0$, \emph{implicit} for $w=1$ and \emph{Crank-Nicolson}\index{Crank-Nicolson} for
 $w=\tfrac12$ \parencite{crank1947}. Many texts call it the $\theta$-scheme; here $\theta$ already names the market price of risk.
 For $w>0$ each step solves a tridiagonal system, which costs a number of operations proportional to
 $M$.
@@ -853,13 +852,13 @@ be inferred from option prices; dividend forecasts and funding rates may need es
 therefore quote options by the volatility that reproduces their price.
 
 \begin{definition}\label{def5:iv}
-The \emph{implied volatility} of a European option with market price $C^{\mathrm{mkt}}$ is the $\sigma>0$ at which the
+The \emph{implied volatility}\index{implied volatility} of a European option with market price $C^{\mathrm{mkt}}$ is the $\sigma>0$ at which the
 Black-Scholes price equals $C^{\mathrm{mkt}}$.
 \end{definition}
 
 \begin{proposition}\label{prop5:ivexist}
 A call price $C^{\mathrm{mkt}}$ has an implied volatility if and only if
-$(Se^{-q\tau}-Ke^{-r\tau})^+<C^{\mathrm{mkt}}<Se^{-q\tau}$, and it is then unique. A put with the same strike and
+$(Se^{-\delta\tau}-Ke^{-r\tau})^+<C^{\mathrm{mkt}}<Se^{-\delta\tau}$, and it is then unique. A put with the same strike and
 expiry, priced consistently with \cref{eq5:parity}, has the same implied volatility.
 \end{proposition}
 
@@ -980,24 +979,24 @@ steeper at short maturities. Jump diffusion and stochastic volatility can both g
 skews, although neither reproduces every feature of an observed equity index surface.
 
 \begin{proposition}[Jump diffusion]\label{prop5:merton}
-Let the stock follow \cref{eq5:gbm} under $Q$ with drift $r-q-\lambda_Jk_J$, plus jumps at the times of an
+Let the stock follow \cref{eq5:gbm} under $Q$ with drift $r-\delta-\lambda_Jk_J$, plus jumps at the times of an
 independent Poisson process $N^J$ of rate $\lambda_J$ that multiply the price by $e^{J_i}$ with
-$J_i\sim\N(\mu_J,\delta_J^2)$ independent, and $k_J=e^{\mu_J+\delta_J^2/2}-1$. Then
+$J_i\sim\N(\mu_J,\sigma_J^2)$ independent, and $k_J=e^{\mu_J+\sigma_J^2/2}-1$. Then
 \begin{equation*}
 \begin{gathered}
   C=\sum_{i=0}^\infty e^{-\lambda_J'T}\frac{(\lambda_J'T)^i}{i!}\,C_{\mathrm{BS}}(\sigma_i,r_i),\\
-  \lambda_J'=\lambda_J(1+k_J),\qquad\sigma_i^2=\sigma^2+\frac{i\delta_J^2}T,\qquad r_i=r-\lambda_Jk_J+\frac{i\ln(1+k_J)}T,
+  \lambda_J'=\lambda_J(1+k_J),\qquad\sigma_i^2=\sigma^2+\frac{i\sigma_J^2}T,\qquad r_i=r-\lambda_Jk_J+\frac{i\ln(1+k_J)}T,
 \end{gathered}
 \end{equation*}
 where $C_{\mathrm{BS}}(\sigma_i,r_i)$ is \cref{eq5:bs} with those inputs \parencite{merton1976}.
 \end{proposition}
 
 \begin{proof}
-The drift correction makes $\E_QS_T=S_0e^{(r-q)T}$, since $\E e^{J_i}=1+k_J$ and the expected number of
+The drift correction makes $\E_QS_T=S_0e^{(r-\delta)T}$, since $\E e^{J_i}=1+k_J$ and the expected number of
 jumps is $\lambda_JT$. Condition on $N^J_T=i$. Then
-$\ln S_T\sim\N\bigl(\ln S_0+(r-q-\lambda_Jk_J-\tfrac12\sigma^2)T+i\mu_J,\ \sigma^2T+i\delta_J^2\bigr)$. A
+$\ln S_T\sim\N\bigl(\ln S_0+(r-\delta-\lambda_Jk_J-\tfrac12\sigma^2)T+i\mu_J,\ \sigma^2T+i\sigma_J^2\bigr)$. A
 lognormal with rate $r_i$ and volatility $\sigma_i$ has the same variance and the mean
-$\ln S_0+(r_i-q-\tfrac12\sigma_i^2)T$, which equals the one above because $\ln(1+k_J)=\mu_J+\tfrac12\delta_J^2$.
+$\ln S_0+(r_i-\delta-\tfrac12\sigma_i^2)T$, which equals the one above because $\ln(1+k_J)=\mu_J+\tfrac12\sigma_J^2$.
 So $e^{-rT}\E_Q[(S_T-K)^+\mid N^J_T=i]=e^{(r_i-r)T}C_{\mathrm{BS}}(\sigma_i,r_i)$. Multiplying by
 $Q(N^J_T=i)=e^{-\lambda_JT}(\lambda_JT)^i/i!$ and using $e^{(r_i-r)T}=e^{-\lambda_Jk_JT}(1+k_J)^i$ gives the
 weights shown.
@@ -1012,7 +1011,7 @@ the absence of arbitrage.
 
 The second extension makes the variance itself random. In the model of \textcite{heston1993},
 \begin{equation*}
-  dS_t=(r-q)S_t\,dt+\sqrt{v_t}\,S_t\,dW^1_t,\qquad dv_t=\kappa(\bar v-v_t)\,dt+\xi\sqrt{v_t}\,dW^2_t,\qquad
+  dS_t=(r-\delta)S_t\,dt+\sqrt{v_t}\,S_t\,dW^1_t,\qquad dv_t=\kappa(\bar v-v_t)\,dt+\xi\sqrt{v_t}\,dW^2_t,\qquad
   d\langle W^1,W^2\rangle_t=\varrho\,dt .
 \end{equation*}
 A negative $\varrho$ makes volatility rise when the price falls, which fattens the left tail. The
@@ -1021,7 +1020,7 @@ characteristic function of $\ln S_T$ is known in closed form, and we quote the s
 \begin{equation*}
   C=e^{-rT}\Bigl(F-\frac{\sqrt{FK}}\pi\int_0^\infty\operatorname{Re}\bigl[e^{\mathrm i\omega\ln(F/K)}\psi(\omega-\tfrac{\mathrm i}2)\bigr]\frac{d\omega}{\omega^2+\frac14}\Bigr),
 \end{equation*}
-where $F=S_0e^{(r-q)T}$, $T$ is the time to expiry in years, and
+where $F=S_0e^{(r-\delta)T}$, $T$ is the time to expiry in years, and
 $\psi(u)=\E_Q\bigl[e^{\mathrm iu\ln(S_T/F)}\bigr]$ is the characteristic function of $\ln(S_T/F)$ under $Q$,
 extended to $u=\omega-\tfrac{\mathrm i}2$, where it is finite because $\E_QS_T<\infty$. It is coded in the
 form of \textcite{albrecher2007} that avoids jumps in the complex logarithm, and the integral is
@@ -1034,13 +1033,13 @@ relative tolerance $10^{-12}$ and at most 1,000 subintervals). With a Gaussian $
 to detect.
 
 \Cref{fig5:smiles} shows the two smiles. The jump model uses $\sigma=15\%$, $\lambda_J=0.5$ jumps a year,
-$\mu_J=-10\%$ and $\delta_J=15\%$; the stochastic volatility model uses $v_0=\bar v=0.04$, $\kappa=2$,
+$\mu_J=-10\%$ and $\sigma_J=15\%$; the stochastic volatility model uses $v_0=\bar v=0.04$, $\kappa=2$,
 $\xi=0.5$ and $\varrho=-0.7$. Measured by the volatility at $\ln(K/F)=-0.1$ less that at $+0.1$, the jump
 model's skew is \skewMerShort, \skewMerMid{} and \skewMerLong{} points at expiries of 0.1, 0.5 and 2
 years, and the stochastic volatility model's is \skewHesShort, \skewHesMid{} and \skewHesLong. Jumps give a
 steep short dated skew that flattens fast, because over a long horizon many small jumps look like a
 diffusion; the jump model's at-the-money volatility rises from \atmMerShort\% to \atmMerLong\% toward
-the volatility of the log return including jumps, $\sqrt{\sigma^2+\lambda_J(\mu_J^2+\delta_J^2)}=\merTotalVol\%$. Stochastic volatility
+the volatility of the log return including jumps, $\sqrt{\sigma^2+\lambda_J(\mu_J^2+\sigma_J^2)}=\merTotalVol\%$. Stochastic volatility
 keeps its skew longer. Its at-the-money volatility, \atmHesShort\%, \atmHesMid\% and \atmHesLong\%, sits
 below the 20\% that $v_0=\bar v=0.04$ suggests, because at the money the price is concave in variance
 and averaging over random variance lowers it, an argument that is exact for $\varrho=0$
@@ -1051,7 +1050,7 @@ which runs from \hesSurfMin\% to \hesSurfMax\%.
   \centering
   \includegraphics[width=\textwidth]{ch05/fig09_smiles}
   \caption{Implied volatility against log moneyness at three expiries. (a) Merton jump diffusion.
-  (b) Heston stochastic volatility.}
+  (b) Heston\index{Heston} stochastic volatility.}
   \label{fig5:smiles}
 \end{figure}
 
@@ -1125,7 +1124,7 @@ section works out what a hedger earns when the volatility is wrong and when the 
 at discrete times.
 
 \begin{theorem}[Hedging at the wrong volatility]\label{thm5:pnl}
-Let the stock follow $dS_t=\mu_tS_t\,dt+\sigma_tS_t\,dW_t$, $S_0>0$, and pay the constant yield $q$,
+Let the stock follow $dS_t=\mu_tS_t\,dt+\sigma_tS_t\,dW_t$, $S_0>0$, and pay the constant yield $\delta$,
 where $\mu_t$ and $\sigma_t$ are progressively measurable, unknown to the hedger, and satisfy
 $\int_0^T(|\mu_t|+\sigma_t^2)\,dt<\infty$ almost surely, so that $S$ is a positive continuous It\^o
 process and It\^o's lemma applies to $V(t,S_t)$ on $[0,T)$. For a volatility $\sigma$ let $V(\cdot;\sigma)$ be the
@@ -1144,15 +1143,15 @@ Then the discounted profit at $T$, after the hedge is liquidated at $S_T$ and th
 
 \begin{proof}
 Let $\Pi$ be the value of the dealer's hedge portfolio, with $\Pi_0=V^p_0$, and write $V^h_t=V(t,S_t;\sigma_h)$.
-As in the proof of \cref{thm5:rn}(ii), $d(e^{-rt}\Pi_t)=e^{-rt}\Delta_t\bigl(dS_t+(q-r)S_t\,dt\bigr)$. By
+As in the proof of \cref{thm5:rn}(ii), $d(e^{-rt}\Pi_t)=e^{-rt}\Delta_t\bigl(dS_t+(\delta-r)S_t\,dt\bigr)$. By
 It\^o's lemma with the true volatility and the equation for $V^h$,
 \begin{equation*}
 \begin{aligned}
   d(e^{-rt}V^h_t)&=e^{-rt}\bigl(V_t-rV+\tfrac12\sigma_t^2S_t^2V_{SS}\bigr)dt+e^{-rt}V_S\,dS_t\\
-  &=e^{-rt}\bigl(\tfrac12(\sigma_t^2-\sigma_h^2)S_t^2\Gamma^h_t-(r-q)S_t\Delta_t\bigr)dt+e^{-rt}\Delta_t\,dS_t ,
+  &=e^{-rt}\bigl(\tfrac12(\sigma_t^2-\sigma_h^2)S_t^2\Gamma^h_t-(r-\delta)S_t\Delta_t\bigr)dt+e^{-rt}\Delta_t\,dS_t ,
 \end{aligned}
 \end{equation*}
-using $V_t-rV=-\tfrac12\sigma_h^2S^2V_{SS}-(r-q)SV_S$. Subtracting,
+using $V_t-rV=-\tfrac12\sigma_h^2S^2V_{SS}-(r-\delta)SV_S$. Subtracting,
 $d\bigl(e^{-rt}(\Pi_t-V^h_t)\bigr)=e^{-rt}\tfrac12\Gamma^h_tS_t^2(\sigma_h^2-\sigma_t^2)\,dt$. Integrate from
 $0$ to $t<T$ and let $t\to T$. The left side converges because $\Pi$ and $V^h$ are continuous up to
 $T$, with $V^h_T=g(S_T)$, and the right side converges by \cref{eq5:pnlint}. The profit is
@@ -1162,8 +1161,8 @@ bound on wealth is a separate question.
 \end{proof}
 
 Condition \cref{eq5:pnlint} is where the behaviour of the volatility enters. For a call or a put
-$\Gamma^h_tS_t^2=S_te^{-q\tau}\varphi(d_1)/(\sigma_h\sqrt\tau)\le\max(1,e^{-qT})\,S_t/(\sigma_h\sqrt{2\pi\tau})$,
-since $\tau\le T$ and $\varphi\le1/\sqrt{2\pi}$; the factor is one when $q\ge0$. Then
+$\Gamma^h_tS_t^2=S_te^{-\delta\tau}\varphi(d_1)/(\sigma_h\sqrt\tau)\le\max(1,e^{-qT})\,S_t/(\sigma_h\sqrt{2\pi\tau})$,
+since $\tau\le T$ and $\varphi\le1/\sqrt{2\pi}$; the factor is one when $\delta\ge0$. Then
 $\tau^{-1/2}$ is integrable on $[0,T]$, so, since each path of $S$ is continuous and hence bounded on
 $[0,T]$, the condition holds whenever $\sigma_t$ is bounded.
 
@@ -1261,16 +1260,16 @@ version of the expansion is given by \textcite{bertsimas2000}.
 
 \begin{lemma}\label{lem5:gammamoment}
 For a call or a put, if $\ln S_t\sim\N(m,\eta^2)$, then with $\varsigma^2=\tfrac12\sigma^2\tau$ and
-$\ell=\ln K-(r-q+\tfrac12\sigma^2)\tau$,
+$\ell=\ln K-(r-\delta+\tfrac12\sigma^2)\tau$,
 \begin{equation*}
-  \E\bigl[(\Gamma_tS_t^2)^2\bigr]=\frac{e^{-2q\tau}\varsigma}{\sqrt{2\pi}\,\sigma^2\tau}\,e^{2m+2\eta^2}\,
+  \E\bigl[(\Gamma_tS_t^2)^2\bigr]=\frac{e^{-2\delta\tau}\varsigma}{\sqrt{2\pi}\,\sigma^2\tau}\,e^{2m+2\eta^2}\,
   \frac{1}{\sqrt{\eta^2+\varsigma^2}}\,\varphi\Bigl(\frac{m+2\eta^2-\ell}{\sqrt{\eta^2+\varsigma^2}}\Bigr).
 \end{equation*}
 \end{lemma}
 
 \begin{proof}
-By \cref{prop5:greeks}, $\Gamma S^2=Se^{-q\tau}\varphi(d_1)/(\sigma\sqrt\tau)$ with $d_1=(\ln S-\ell)/(\sigma\sqrt\tau)$.
-So $(\Gamma S^2)^2=e^{-2q\tau}S^2e^{-d_1^2}/(2\pi\sigma^2\tau)$, and
+By \cref{prop5:greeks}, $\Gamma S^2=Se^{-\delta\tau}\varphi(d_1)/(\sigma\sqrt\tau)$ with $d_1=(\ln S-\ell)/(\sigma\sqrt\tau)$.
+So $(\Gamma S^2)^2=e^{-2\delta\tau}S^2e^{-d_1^2}/(2\pi\sigma^2\tau)$, and
 $e^{-d_1^2}=e^{-(\ln S-\ell)^2/(2\varsigma^2)}=\sqrt{2\pi}\,\varsigma\,n_{\varsigma^2}(\ln S-\ell)$, where
 $n_a(x)=\varphi(x/\sqrt a)/\sqrt a$ is the normal density with variance $a$ (used only in this proof).
 For a value $x$ of $\ln S_t$, $e^{2x}$ times the $\N(m,\eta^2)$ density equals $e^{2m+2\eta^2}$ times the
@@ -1458,7 +1457,7 @@ A delta hedge removes the stock's random term and leaves an equation without the
 same price is a discounted expectation under the measure in which the stock earns the riskless rate
 less its yield. Solving gives the formula, whose Greeks follow from one identity between the two
 normal densities, and whose theta and gamma are tied together by the equation itself. Futures,
-currencies and indices fit by choosing $q$; cash dividends need an approximation. Monte Carlo
+currencies and indices fit by choosing $\delta$; cash dividends need an approximation. Monte Carlo
 converges like $n^{-1/2}$, and antithetic and control variates cut its variance by a factor of
 \vrMCBoth{} here. Crank-Nicolson is unconditionally stable and second order in our measurements but needs a damped start for
 smooth Greeks, and the explicit scheme needs $\lambda\le\tfrac12$. Newton's method from the inflection
@@ -1493,6 +1492,24 @@ profits that track the summed gamma-theta terms.
   table in \cref{sec5:pnl}, \cref{eq5:hedgevar} gives a standard deviation of \xvNineSd. How many rebalances a year bring it down to 0.25?
   \item\label{ex5:ten} A dealer sells the base call at 25\% when the volatility turns out to be 20\%. What
   is the profit if the dealer hedges continuously at 20\%? What can be said if the hedge uses 25\%?
+\end{enumerate}
+
+\subsection*{Computing projects}
+\label{sec5:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch05/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch05/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P5.\arabic*}, leftmargin=*, ref=P5.\arabic*]
+\item Write a one month at the money USD/CAD call every 21 trading days from 2008, price it with \texttt{gk}
+at the realised volatility of the previous 21 days and the bill rates of the two countries, and hedge it
+daily with the Garman-Kohlhagen delta from \texttt{greeks}. Report the writer's hedged profit per 100 US
+dollars of notional, its mean, spread and best and worst months. What does the mean say about realised
+against trailing volatility, and why is the spread not zero although the hedge is rebalanced daily?
+\item Price out of the money options on a grid of strikes, maturities and volatilities with \texttt{bs},
+then recover the volatility with \texttt{iv\_newton} and \texttt{iv\_brent}. Report the largest error and
+the iterations of each, and explain why the script leaves out prices below $10^{-6}$.
 \end{enumerate}
 
 \subsection*{Answers}
@@ -1579,5 +1596,4 @@ The script \texttt{scripts/build\_usdcad.py} rebuilds \texttt{data/usdcad\_rates
 downloads in \texttt{data/raw/}, cut at the same date, and a test checks that the rebuilt file is identical. The Bank can
 revise published values, and the numbers here use the saved files.
 
-\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
-\end{refsection}
+\end{chapterrefs}

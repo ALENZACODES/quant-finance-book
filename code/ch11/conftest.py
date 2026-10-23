@@ -27,7 +27,7 @@ def pytest_collection_modifyitems(config, items):
     if not all(p.exists() for p in DATA):
         skip = pytest.mark.skip(reason="data missing: run python scripts/pull_ch11.py and python scripts/pull_ch10.py")
         for item in items:
-            if "code/ch11" in str(item.fspath):
+            if "code/ch11" in str(item.fspath) and item.fspath.basename != "test_projects.py":
                 item.add_marker(skip)
 
 

@@ -1,5 +1,5 @@
 """Section 11.5: discounts for control and marketability. The combined discount on a minority stake,
-the protective put of Chaffe and the lookback value of Longstaff, both against the length of a
+the protective put of Chaffe, the average-strike put of Finnerty and the lookback value of Longstaff, both against the length of a
 restriction, with a simulation of the lookback that draws each path's maximum exactly. Writes
 fig14_dlom.png.
 Also writes the stake values of the minority table and out/minority_inputs.csv for the Octave listing."""
@@ -38,6 +38,18 @@ def main():
     for sig, nm in [(0.30, "Thirty"), (0.60, "Sixty")]:
         pct(f"dmCh{nm}One", L.chaffe_dlom(1.0, sig, r=rf), 1); pct(f"dmCh{nm}Four", L.chaffe_dlom(4.0, sig, r=rf), 1)
         pct(f"dmLs{nm}One", L.longstaff_bound(1.0, sig), 1); pct(f"dmLs{nm}Four", L.longstaff_bound(4.0, sig), 1)
+    # Finnerty's average-strike put, against a simulation of the same payoff
+    fin = L.finnerty_dlom(T_CASE, SIG_CASE); pct("dmFin", fin, 1)
+    m, se = L.average_strike_mc(T_CASE, SIG_CASE, 200_000, 250, rng)
+    pct("dmFinMc", m, 1); put("dmFinMcSE", 100 * se, "{:.2f}")
+    for sig, nm in [(0.30, "Thirty"), (0.60, "Sixty")]:
+        pct(f"dmFin{nm}One", L.finnerty_dlom(1.0, sig), 1); pct(f"dmFin{nm}Four", L.finnerty_dlom(4.0, sig), 1)
+    m4, se4 = L.average_strike_mc(4.0, 0.60, 200_000, 250, rng)
+    pct("dmFinMcSixFour", m4, 1)
+    # the closed form is below the simulated value, by more at higher variance
+    assert fin < m and L.finnerty_dlom(4.0, 0.60) < m4 and m4 - L.finnerty_dlom(4.0, 0.60) > m - fin
+    assert fin < chaffe0 < ls
+    put("dmStakeFin", STAKE * eq * (1 - L.combined_discount(dloc, fin)), "{:.2f}")
     grid(dloc, STAKE * eq, rf)
     # the put can never exceed the share price, the lookback value has no ceiling
     Ts = np.linspace(0.05, 5, 100)

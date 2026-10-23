@@ -30,6 +30,14 @@ def carry_examples():
     quote = 104.80
     put("bandQuote", quote, "{:.2f}")
     put("bandProfit", quote - hi, "{:.4f}")          # cash and carry per unit at expiry
+    # lending fees for the short in reverse cash and carry: general collateral and a special
+    for f, nm in ((0.0017, "Gc"), (0.043, "Sp")):
+        lo_f, _ = L.forward_band(99.95, 100.05, 0.038, 0.044, 1.0, fee=f)
+        put(f"bandLo{nm}", lo_f, "{:.4f}")
+        put(f"bandFee{nm}", 100 * f, "{:.2f}" if f < 0.01 else "{:.1f}")
+        RAW[f"bandLoRaw{nm}"] = lo_f
+    assert RAW["bandLoRawSp"] < RAW["bandLoRawGc"] < lo
+    put("bandWidthSp", hi - RAW["bandLoRawSp"], "{:.2f}"); put("bandWidth", hi - lo, "{:.2f}")
     Ts = np.linspace(0, 2, 201)
     band = np.array([L.forward_band(99.95, 100.05, 0.038, 0.044, T) for T in Ts])
     fig, ax = plt.subplots(figsize=(5.6, 2.9))

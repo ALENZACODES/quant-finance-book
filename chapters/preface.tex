@@ -1,0 +1,81 @@
+% Preface: audience, prerequisites, chapter dependencies, course paths and the code repository.
+\paragraph{Who the book is for}
+The book is written for two groups of readers. The first is students in Master's programmes in
+quantitative finance, financial engineering and investment management who want to see the methods of
+their core courses applied to private equity, private credit, real estate, real assets, hedge funds and
+structured products. The second is professionals who already work with alternative investments, or are
+preparing for the professional examinations that cover them, and who want the mathematics and the code
+behind the measures they use every day: the IRR and the public market equivalent, the waterfall, the
+loan-to-value and coverage tests, unsmoothed returns, value at risk, and the Sharpe ratio of a short
+track record.
+
+\paragraph{What you need to know}
+The reader should be comfortable with calculus in several variables, with matrices, inverses and
+eigenvalues, and with probability and statistics at the level of a first graduate course: random
+variables and their moments, conditional expectation, the normal and lognormal laws, and least squares
+regression. No measure theory is assumed; Chapter~3 builds Brownian motion and the It\^o integral from
+random walks and states the facts from measure theory that it uses. The code is in Python with NumPy,
+SciPy and pandas, and a reader who can run a script and read a short function will be able to follow it.
+Nothing in the text depends on R or Octave, which are used only for the independent checks.
+
+\paragraph{How the chapters depend on each other}
+The table lists, for each chapter, the earlier chapters whose results it uses. A chapter that is not
+listed in a row can be skipped by a reader who wants only that row's chapter.
+
+\begin{center}\small
+\begin{tabular}{@{}rlp{0.42\textwidth}@{}}
+\toprule
+& Chapter & Builds on\\
+\midrule
+1 & Returns, rates and the shape of risk & none\\
+2 & Fund structures, fees and waterfalls & 1\\
+3 & Random walks and stochastic calculus & 1\\
+4 & Arbitrage, forwards, futures and trees & 1 and 3\\
+5 & Black-Scholes & 3 and 4\\
+6 & Interest rates, credit and structured products & 4 and 5, with 1 and 3\\
+7 & Portfolio theory and factor models & 1\\
+8 & Risk and performance measurement & 1 and 7\\
+9 & Hedge funds, managed futures and digital assets & 2, 7 and 8, with 5 for the fee as an option\\
+10 & Real assets and commercial real estate & 1, 4 and 6\\
+11 & Private equity and business valuation & 1 and 2\\
+12 & Machine learning in finance & 7 and 8, with 5 for the hedging section\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Ways through the book}
+A course on derivatives and fixed income for alternative assets can take Chapters 1, 3, 4, 5 and 6. A
+course on alternative investments can take Chapters 1, 2, 7, 8, 9, 10 and 11, using the statements of
+Chapters 4 and 5 where Chapters 9 and 10 call on them. A course on quantitative methods for investment
+management can take Chapters 1, 7, 8 and 12. A practitioner who works on private markets may prefer to
+start with Chapters 1, 2 and 11 and continue with 10, 8 and 9. Each chapter ends with drills that can be
+done by hand, followed by computing projects that use the repository's data and scripts. Worked answers
+to the drills follow the exercises, and each project is solved by a function in
+\texttt{code/chNN/projects.py} that the tests run, so a reader can check an answer by running the script.
+
+\paragraph{The code repository}
+Every number in the text is computed by a script and every figure is drawn by one, so a reader can
+change an assumption and see what moves. The repository has one folder per chapter under
+\texttt{code/}, with its scripts, a library module, unit tests, and checks in R and GNU Octave that
+recompute the main results by other methods. To set it up, create a Python environment and install the
+pinned requirements:
+\begin{lstlisting}[language=bash]
+python -m venv .venv
+.venv/bin/pip install -r requirements.txt
+make code CH=06       # numbers, figures and cross-checks for Chapter 6
+.venv/bin/python -m pytest -q code/ch06
+make book             # the whole book from the committed numbers
+\end{lstlisting}
+Each script can also be run on its own from the repository root. Random numbers come from fixed seeds
+and named streams, so a rerun gives the printed figures exactly. The data snapshots in \texttt{data/}
+end in September 2026, and \texttt{data/SOURCES.md} gives the source of each file. A few data sets may
+not be redistributed; for those the repository ships a script in \texttt{scripts/} that downloads them
+from the original source, and the tests that need them are skipped until they have been fetched. The
+computing projects use only the files that ship with the code, read through
+\texttt{code/common/shipped.py}, so they run on a fresh copy without any download.
+
+\paragraph{Conventions}
+The notation that holds throughout the book, the compounding conventions of each chapter and the
+letters that change meaning between chapters are collected under Notation and conventions, just
+before Chapter~1.
+Results are numbered by chapter, proofs follow the statements, and every simulation names its seed.

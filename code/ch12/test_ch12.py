@@ -261,3 +261,51 @@ def test_round2_printed_values(RAW, NUM):
     assert NUM["ovEqSrSd"] == f"{sd:.4f}" and NUM["ovEqBench"] == f"{bench:.4f}"
     assert NUM["kfSelT"] == f"{RAW['kfSelT']:.0f}" and RAW["eqNfirst"] < RAW["eqNlast"]
     assert NUM["eqOlsGainDecade"] == "2010s" and NUM["nnDeltaMaxV"] == "0.50" and RAW["nnDeltaMaxSign"] == -1
+
+
+# ----------------------------------------------------------------------------- data snooping
+def test_bhy_matches_statsmodels():
+    from statsmodels.stats.multitest import multipletests
+    rng = np.random.default_rng(3)
+    for _ in range(50):
+        p = rng.random(40) ** 3
+        for a in (0.05, 0.1):
+            assert (L.bhy(p, a) == multipletests(p, a, "fdr_by")[0]).all()
+            assert (L.bh(p, a) == multipletests(p, a, "fdr_bh")[0]).all()
+            assert (L.holm(p, a) == multipletests(p, a, "holm")[0]).all()
+
+
+def test_stationary_bootstrap_blocks():
+    rng = np.random.default_rng(4)
+    idx = L.stationary_bootstrap(500, 400, 8, rng)
+    assert idx.min() >= 0 and idx.max() < 500
+    step = (np.diff(idx, axis=1) % 500)
+    # a block continues with probability 1 - 1/8; a fresh start lands on the next index with chance 1/500
+    cont = (step == 1).mean()
+    assert abs(cont - (7 / 8 + 1 / 8 / 500)) < 0.005
+    # every position is equally likely
+    counts = np.bincount(idx.ravel(), minlength=500) / idx.size
+    assert abs(counts.mean() - 1 / 500) < 1e-12 and counts.std() < 0.2 / 500
+
+
+def test_snooping_ordering_and_power():
+    rng = np.random.default_rng(5)
+    n, m = 300, 30
+    d = rng.standard_normal((n, m)) * 0.04 - 0.002
+    d[:, 0] += 0.012                                    # one rule with a real edge, t near 5
+    idx = L.stationary_bootstrap(n, 2000, 5, rng)
+    r = L.snooping_tests(d, idx)
+    assert r["p_spa_l"] <= r["p_spa_c"] <= r["p_spa_u"]
+    assert r["p_rc"] < 0.01 and r["p_spa_c"] < 0.01 and r["stepm"][0] and r["stepm"].sum() == 1
+    # with no edge the tests do not find one
+    d[:, 0] -= 0.012
+    q = L.snooping_tests(d, idx)
+    assert q["p_spa_l"] <= q["p_spa_c"] <= q["p_spa_u"] and q["p_rc"] > 0.05 and not q["stepm"].any()
+
+
+def test_snooping_numbers(RAW):
+    assert RAW["mtSpaPl"] <= RAW["mtSpaP"] <= RAW["mtSpaPu"]
+    assert RAW["mtStepM"] == 0 and RAW["mtRcP"] > 0.05
+    assert RAW["mtBhyFive"] <= RAW["mtBhFive"] and RAW["mtHolmFive"] <= RAW["mtNaiveFive"]
+    assert RAW["mtSimNaive"] > 50 and abs(RAW["mtSimRc"] / 100 - 0.05) < 4 * RAW["mtSimRcSe"]
+    close(RAW["mtCm"], sum(1 / i for i in range(1, int(RAW["mtRules"]) + 1)), 1e-12)

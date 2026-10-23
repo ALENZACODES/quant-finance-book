@@ -35,8 +35,8 @@ def main():
     put("zjHolm", int(L.holm(p, 0.05).sum()), "{:.0f}"); put("zjBonf", int((p <= 0.01).sum()), "{:.0f}")
     put("zjBh", int(L.bh(p, 0.05).sum()), "{:.0f}")
     # 12.11 probabilistic Sharpe ratio
-    se = L.sharpe_se(0.25, 120, -0.5, 4.0)
-    put("zkSe", se, "{:.4f}"); put("zkPsr", L.psr(0.25, 120, -0.5, 4.0), "{:.4f}"); put("zkZ", 0.25 / se, "{:.3f}")
+    se = L.sharpe_se(0.25, 120, -0.5, 1.0)
+    put("zkSe", se, "{:.4f}"); put("zkPsr", L.psr(0.25, 120, -0.5, 1.0), "{:.4f}"); put("zkZ", 0.25 / se, "{:.3f}")
     # 12.12 one-period minimum variance hedge
     put("zlH", 0.9 / 1.6, "{:.4f}"); pct("zlCut", 0.81 / (1.6 * 0.6), 1)
     return finish("exercises")

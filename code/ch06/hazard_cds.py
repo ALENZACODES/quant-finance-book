@@ -19,6 +19,30 @@ def curve():
     return lambda t: L.vas_P(r0, t, kap, rb, sig)
 
 
+def standard_coupons(P, knots, lams):
+    """Since 2009 North American single-name contracts trade with a fixed coupon of 100 or 500 basis
+    points and an upfront payment. A quoted (conventional) spread is turned into the upfront with a flat
+    hazard; the bootstrapped curve gives a slightly different upfront for the same contract."""
+    T = 5.0; q = QUOTES[2]
+    lc = L.flat_hazard(T, q, REC, P)
+    up_flat, ann_flat = L.cds_upfront(T, 0.01, [np.inf], [lc], REC, P)
+    up_curve, ann_curve = L.cds_upfront(T, 0.01, knots, lams, REC, P)
+    # identity: the upfront is (par spread - coupon) x risky annuity, on whichever curve is used
+    assert abs(up_flat - (q - 0.01) * ann_flat) < 1e-12 and abs(up_curve - (q - 0.01) * ann_curve) < 1e-12
+    pct("cdFlatLam", lc, 3); put("cdAnnFlat", ann_flat, "{:.3f}"); put("cdAnnCurve", ann_curve, "{:.3f}")
+    put("cdUpIg", -100 * up_flat, "{:.2f}"); put("cdUpIgCurve", -100 * up_curve, "{:.2f}")
+    put("cdUpIgGapBp", 1e4 * abs(up_flat - up_curve), "{:.1f}")
+    assert up_flat < 0 and up_curve < 0
+    # a high yield name quoted at 650 bp with the 500 bp coupon: the buyer pays
+    qh = 0.065; lh = L.flat_hazard(T, qh, REC, P)
+    up_h, ann_h = L.cds_upfront(T, 0.05, [np.inf], [lh], REC, P)
+    put("cdQHy", 1e4 * qh, "{:.0f}"); pct("cdLamHy", lh, 2); put("cdUpHy", 100 * up_h, "{:.2f}")
+    put("cdAnnHy", ann_h, "{:.3f}"); assert up_h > 0
+    # the same name on a 100 bp coupon would need a much larger upfront
+    up_h1, _ = L.cds_upfront(T, 0.01, [np.inf], [lh], REC, P); put("cdUpHyOne", 100 * up_h1, "{:.2f}")
+    RAW["cdUpZero"] = L.cds_upfront(T, q, [np.inf], [lc], REC, P)[0]
+
+
 def main():
     P = curve()
     knots, lams = L.bootstrap_hazard(MATS, QUOTES, REC, P)
@@ -41,6 +65,7 @@ def main():
     put("hzMcProt", 1e4 * pv.mean(), "{:.2f}"); put("hzMcProtSE", 1e4 * pv.std(ddof=1) / math.sqrt(n), "{:.2f}")
     put("hzProt", 1e4 * prot, "{:.2f}"); put("hzMcN", n, "{:,.0f}")
     put("hzMcProtZ", (pv.mean() - prot) / (pv.std(ddof=1) / math.sqrt(n)), "{:.1f}")
+    standard_coupons(P, knots, lams)
     fig, ax = plt.subplots(figsize=(5.8, 3.1))
     t = np.linspace(0, 10, 1001)
     h = np.array([lams[np.searchsorted(knots, x, side="left")] if x > 0 else lams[0] for x in t])

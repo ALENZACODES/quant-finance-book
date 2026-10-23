@@ -90,6 +90,40 @@ add("zjHolm", sum(p.adjust(p, "holm") <= 0.05), 0); add("zjBh", sum(p.adjust(p, 
 add("zjBonf", sum(p.adjust(p, "bonferroni") <= 0.05), 0)
 add("zlH", 0.9 / 1.6)
 
+# ---- data snooping: the 66 trend rules rebuilt from the shipped data, and the multiple-test counts
+me <- function(dates, x) { ok <- !is.na(x); m <- substr(dates[ok], 1, 7); v <- tapply(x[ok], m, function(z) z[length(z)]); v }
+fd <- read.csv("data/fred_markets_daily.csv"); gb <- read.csv("data/goc_bills_bonds.csv")
+ra <- read.csv("data/real_assets_monthly.csv")
+rf <- setNames(ra$tbill / 1200, substr(ra$date, 1, 7))
+pb <- function(y0, y1, m = 10) { n <- 2 * (m - 1 / 12); v <- (1 + y1 / 2)^(-n); y0 / y1 * (1 - v) + v - 1 + y0 / 12 }
+oil <- me(fd$date, fd$DCOILWTICO); eur <- me(fd$date, fd$DEXUSEU); jpy <- me(fd$date, fd$DEXJPUS)
+cad <- me(fd$date, fd$DEXCAUS); us <- me(fd$date, fd$DGS10) / 100
+gc <- me(gb$date, gb$BD.CDN.10YR.DQ.YLD) / 100; bc <- me(gb$date, gb$TB.CDN.90D.MID) / 100
+mon <- sort(Reduce(intersect, list(names(oil), names(us), names(gc), names(bc), names(eur), names(rf))))
+mon <- mon[mon <= "2026-09"]
+lag1 <- function(v) c(NA, v[-length(v)])
+X <- cbind(OIL = oil[mon] / lag1(oil[mon]) - 1 - lag1(rf[mon]),
+           UST = pb(lag1(us[mon]), us[mon]) - lag1(rf[mon]),
+           GOC = pb(lag1(gc[mon]), gc[mon]) - lag1(bc[mon]) / 12,
+           EUR = eur[mon] / lag1(eur[mon]) - 1, JPY = lag1(jpy[mon]) / jpy[mon] - 1, CAD = lag1(cad[mon]) / cad[mon] - 1)
+X <- X[complete.cases(X), ]
+rules <- NULL
+for (a in colnames(X)) {
+  lp <- cumsum(log1p(X[, a]))
+  for (Lk in 2:12) {
+    ma <- stats::filter(lp, rep(1 / Lk, Lk), sides = 1)
+    pos <- lag1(sign(lp - ma)); sw <- abs(c(NA, diff(pos)))
+    rules <- cbind(rules, pos * X[, a] - 0.001 * sw)
+  }
+}
+rules <- rules[complete.cases(rules), ]
+add("mtN", nrow(rules), 0); add("mtPos", sum(colMeans(rules) > 0), 0)
+add("mtBestMean", 100 * 12 * max(colMeans(rules)), 1e-9)
+sp <- read.csv("code/ch12/out/snoop_p.csv")
+add("mtBhyFive", sum(p.adjust(sp$p, "BY") <= 0.05), 0); add("mtBhyTen", sum(p.adjust(sp$p, "BY") <= 0.10), 0)
+add("mtBhFive", sum(p.adjust(sp$p, "BH") <= 0.05), 0); add("mtHolmTen", sum(p.adjust(sp$p, "holm") <= 0.10), 0)
+add("mtNaiveTen", sum(sp$p <= 0.10), 0)
+
 res <- data.frame(name = names(out), value = unlist(out), tol = unlist(tols))
 write.csv(res, "code/ch12/out/r_check.csv", row.names = FALSE, quote = FALSE)
 cat(nrow(res), "R checks written\n")

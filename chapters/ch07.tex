@@ -1,6 +1,6 @@
 % Chapter 7. All quoted numbers come from chapters/ch07-numbers.tex, written by code/ch07/run_all.py.
 \input{chapters/ch07-numbers}
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{6}
 \chapter{Portfolio Theory, Factor Models, Alpha and Beta}
 \label{ch:portfolio}
@@ -12,14 +12,14 @@ the plan could not get more cheaply by holding index funds, which is a statement
 beta. Both claims rest on the same algebra, and both are much harder to verify from data than the
 algebra suggests. This chapter builds the algebra, measures how far the data can be trusted, and
 ends with a test on more than half a century of returns: would an investor who estimated the
-mean-variance frontier from the previous five years have done better than one who simply held equal
+mean-variance frontier\index{mean-variance frontier} from the previous five years have done better than one who simply held equal
 weights?
 
 The first half is portfolio choice. Diversification by equal weights has a floor set by the average covariance. The
 frontier of portfolios with the least variance for a given mean has a closed form, and adding a
-riskless asset picks out one portfolio on it, the tangency portfolio, which every mean-variance
+riskless asset picks out one portfolio on it, the tangency portfolio\index{tangency portfolio}, which every mean-variance
 investor with the same means and covariances holds in some proportion when all can borrow and lend
-at the riskless rate. The CAPM is the statement that the market is that portfolio, and
+at the riskless rate. The CAPM\index{capital asset pricing model} is the statement that the market is that portfolio, and
 it turns out to be equivalent to a linear relation between expected returns and betas. Factor models
 generalise the relation and give a covariance matrix that can be estimated. The second half is
 measurement. Alpha is the intercept of a regression, and its standard error, the number of years it
@@ -27,7 +27,7 @@ takes to detect, the joint test across many assets and the problem of screening 
 once all follow from least squares. Returns of illiquid assets are smoothed, which hides beta and
 manufactures alpha, and option-like strategies produce alpha in a linear regression that is only a
 premium for selling insurance. Attribution splits a manager's active return into decisions, the
-Black-Litterman model blends equilibrium returns with views, and risk budgets allocate volatility
+Black-Litterman\index{Black-Litterman} model blends equilibrium returns with views, and risk budgets allocate volatility
 instead of capital.
 
 \begin{keybox}[How to read this chapter]
@@ -36,7 +36,7 @@ The numbers in the text are computed by ten scripts in \texttt{code/ch07/} (\tex
 \texttt{attribution}, \texttt{black\_litterman}, \texttt{allocation}, \texttt{case\_oos} and
 \texttt{exercises}); the tests in \texttt{code/ch07/test\_*.py} check them. An independent R script
 recomputes the frontier, searches for the long-only tangency portfolio on its own, reruns every
-regression with \texttt{lm}, the Newey-West errors and the joint test, applies the false discovery
+regression with \texttt{lm}, the Newey-West errors and the joint test, applies the false discovery\index{false discovery}
 rule with \texttt{p.adjust}, smooths and unsmooths the returns, reprices the put-writing fund, rebuilds
 the attribution, the Black-Litterman posterior and the risk budgets, and recomputes the case study.
 GNU Octave solves the long-only problems with its quadratic programming solver and the risk budget
@@ -55,7 +55,7 @@ annualised the same way.
 Random draws come from NumPy's default generator with base seed \texttt{707} and a stream number
 fixed in each script. The seed is an arbitrary label that makes the runs repeatable; it carries no
 date or other meaning. Simulated samples are drawn from normal distributions with the moments of the
-data, so they show what estimation error does when the model is exactly right.
+data, so they show what estimation error\index{estimation error} does when the model is exactly right.
 
 Notation. There are $N$ risky assets with return vector $R$, mean $\mu$ and covariance matrix
 $\Sigma$, which is always assumed positive definite. $x=R-r_f\mathbf 1$ is the vector of excess
@@ -428,7 +428,7 @@ $w_p=(\sigma_p^2/\mu_{x,p})\Sigma^{-1}\mu_x$. The sign of the multiple decides w
 minimises the Sharpe ratio, by \cref{prop7:tangency}.
 \end{proof}
 
-The line $\mu_{x,i}=\beta_i\mu_{x,M}$ in the plane of beta and mean is the security market line. Read
+The line $\mu_{x,i}=\beta_i\mu_{x,M}$ in the plane of beta and mean is the security market line\index{security market line}. Read
 one way, \cref{prop7:capm} is a model of expected returns: assets are rewarded only for their
 covariance with the market, and an asset with a beta of zero earns the riskless rate however volatile
 it is. Read the other way, it is a warning that \textcite{roll1977} made precise: testing the CAPM is
@@ -586,7 +586,7 @@ often fail both assumptions, and the errors of \textcite{newey1987}, used throug
 \centering
 \caption{Alphas, in percent a year, of the ten industries, \fqFirst{} to \fqLast, against the market
 factor alone (CAPM), with the beta and $R^2$, and against the market, size, value, profitability,
-investment and momentum factors (six factors), with the $R^2$. The t statistics use Newey-West standard errors with \alNW{} lags.}
+investment and momentum factors (six factors), with the $R^2$. The t statistics use Newey-West\index{Newey-West} standard errors with \alNW{} lags.}
 \label{tab7:alphas}
 \small
 \begin{tabular}{lrrrrrrr}
@@ -771,27 +771,27 @@ series on the contemporaneous market return then measures the wrong thing.
 Let the true excess return be $r_t=a+\beta m_t+e_t$, where the market excess returns $m_t$ are
 independent and identically distributed with mean $\bar m$ and variance $\sigma_m^2$, and $e_t$ is
 white noise independent of the market with variance $\sigma_e^2$. Let the reported return be
-$r^o_t=\sum_{k\ge0}\vartheta_kr_{t-k}$, with nonnegative weights $\vartheta_k$ that add to one. Then
+$r^*_t=\sum_{k\ge0}\vartheta_kr_{t-k}$, with nonnegative weights $\vartheta_k$ that add to one. Then
 \begin{enumerate}[label=(\roman*)]
-  \item $\E r^o_t=\E r_t$;
-  \item the population slope of $r^o_t$ on $m_t$ alone is $\vartheta_0\beta$, and its intercept is
+  \item $\E r^*_t=\E r_t$;
+  \item the population slope of $r^*_t$ on $m_t$ alone is $\vartheta_0\beta$, and its intercept is
   $a+(1-\vartheta_0)\beta\bar m$;
-  \item in the regression of $r^o_t$ on $m_t,m_{t-1},\dots,m_{t-q}$ the slopes add to
+  \item in the regression of $r^*_t$ on $m_t,m_{t-1},\dots,m_{t-q}$ the slopes add to
   $\beta\sum_{j=0}^q\vartheta_j$, which tends to $\beta$ as $q$ grows;
-  \item $\Var r^o_t=(\beta^2\sigma_m^2+\sigma_e^2)\sum_k\vartheta_k^2\le\Var r_t$.
+  \item $\Var r^*_t=(\beta^2\sigma_m^2+\sigma_e^2)\sum_k\vartheta_k^2\le\Var r_t$.
 \end{enumerate}
 \end{proposition}
 
 \begin{proof}
 (i) holds because the weights add to one. Since the market returns are independent,
-$\Cov(r^o_t,m_{t-j})=\vartheta_j\beta\sigma_m^2$, and the lagged market returns are uncorrelated with
+$\Cov(r^*_t,m_{t-j})=\vartheta_j\beta\sigma_m^2$, and the lagged market returns are uncorrelated with
 each other. The population regression on $m_t,\dots,m_{t-q}$ therefore has the separate slopes
-$\vartheta_j\beta$, which gives (ii) and (iii); the intercept in (ii) is the mean of $r^o_t$ less
-$\vartheta_0\beta\bar m$. For (iv), $r^o_t$ is a weighted sum of independent terms $\beta m_{t-k}+e_{t-k}$,
+$\vartheta_j\beta$, which gives (ii) and (iii); the intercept in (ii) is the mean of $r^*_t$ less
+$\vartheta_0\beta\bar m$. For (iv), $r^*_t$ is a weighted sum of independent terms $\beta m_{t-k}+e_{t-k}$,
 and $\sum_k\vartheta_k^2\le\bigl(\sum_k\vartheta_k\bigr)^2=1$.
 \end{proof}
 
-The common model of appraisal smoothing is $r^o_t=(1-\phi)r_t+\phi r^o_{t-1}$, for which
+The common model of appraisal smoothing is $r^*_t=(1-\phi)r_t+\phi r^*_{t-1}$, for which
 $\vartheta_k=(1-\phi)\phi^k$, the slope on the current market is $(1-\phi)\beta$, the sum of $q+1$ slopes
 is $(1-\phi^{q+1})\beta$, and $\sum_k\vartheta_k^2=(1-\phi)/(1+\phi)$. The volatility falls by the
 square root of that factor while the mean is unchanged, so the Sharpe ratio rises by the factor
@@ -1183,7 +1183,7 @@ For the ten industries rebalanced monthly to equal weights from \fqFirst, the gr
 total returns is \rbGrowReb\% a year, against \rbGrowAvg\% for the average of the industries' own growth rates. The
 difference, \rbDivActual{} points before rounding, is matched by the first bracket of \cref{eq7:rebal}, \rbDivApprox;
 the second is negligible. A portfolio bought in equal weights and never rebalanced grew at
-\rbGrowHold\%, between the two, and ended with \rbHoldTop\% in \rbHoldTopName. The gain from rebalancing is
+\rbGrowHold\%, between the two, and ended with \rbHoldTop\% in \rbHoldTopName. The gain from rebalancing\index{rebalancing} is
 real but it is not free: it comes from the variance of the assets, and it can be offset by
 trends that a buy-and-hold portfolio rides. \textcite{booth1992} give the decomposition.
 
@@ -1293,7 +1293,7 @@ The data here are liquid portfolios of listed stocks with monthly returns. For p
 returns are smoothed, the histories short and the samples selected, so every estimation problem of
 \cref{sec7:estimation,sec7:alpha} is worse and \cref{prop7:stale} has to be applied before anything
 else. The factor premia in \cref{sec7:risk} are paper portfolios before costs. The CAPM and the
-arbitrage pricing theory rest on assumptions, common beliefs, frictionless trading and no arbitrage,
+arbitrage pricing theory\index{arbitrage pricing theory} rest on assumptions, common beliefs, frictionless trading and no arbitrage,
 that are idealisations. The value of the theory here is as a set of identities. \cref{prop7:capm} and
 \cref{prop7:grs} are algebra: they hold for any means and nonsingular covariance matrix that meet the
 conditions stated in them, population or sample, and say exactly what a test of beta pricing is
@@ -1359,6 +1359,24 @@ estimated frontier beat equal weights by a margin a test can detect, and estimat
   mean and the weights after a view that the first asset will earn 3\% with $\Omega=\tau\sigma_1^2$.
   \item\label{ex7:nine} Two assets have volatilities of 20\% and 5\% and a correlation of 0.2. Show that
   the equal-risk-contribution weights do not depend on the correlation and find them.
+\end{enumerate}
+
+\subsection*{Computing projects}
+\label{sec7:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch07/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch07/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P7.\arabic*}, leftmargin=*, ref=P7.\arabic*]
+\item Estimate the tangency, minimum variance and equal risk contribution portfolios of the six markets
+returned by \texttt{market\_returns} in \texttt{code/common/shipped.py} on the months to December 2014, with the
+sample covariance and with \texttt{lw\_identity}, and hold them from 2015. Compare in-sample and out of
+sample Sharpe ratios. Which portfolio loses least, and how much does shrinkage help with only six assets?
+\item Draw 2,000 normal samples of the same length with the sample mean and covariance of the six markets,
+refit the tangency portfolio on each and record its squared Sharpe ratio. Compare the average with the
+true value and with \texttt{sharpe2\_bias}. How large is the bias relative to the true value, and how
+would it change with twelve markets?
 \end{enumerate}
 
 \subsection*{Answers}
@@ -1440,5 +1458,4 @@ to time, and the numbers here use the saved files. The put-writing fund of \cref
 managers of \cref{sec7:alpha} and the portfolio of \cref{tab7:attrib} are illustrations and describe no
 real fund.
 
-\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
-\end{refsection}
+\end{chapterrefs}

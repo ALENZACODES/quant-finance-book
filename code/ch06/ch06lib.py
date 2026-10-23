@@ -260,6 +260,19 @@ def cds_par(T, knots, lams, R, P, freq=4):
     return prot / ann
 
 
+def flat_hazard(T, s, R, P):
+    """The flat hazard rate at which a T year CDS has par spread s: the conversion of a quoted
+    (conventional) spread under the standard model, which assumes one hazard for every horizon."""
+    return optimize.brentq(lambda l: cds_par(T, [np.inf], [l], R, P) - s, 1e-8, 2.0, xtol=1e-15)
+
+
+def cds_upfront(T, coupon, knots, lams, R, P):
+    """Upfront payment by the protection buyer, per unit notional, for a contract with a fixed running
+    coupon: the protection leg less the coupon times the risky annuity. Negative means the buyer receives."""
+    ann, prot = cds_legs(T, knots, lams, R, P)
+    return prot - coupon * ann, ann
+
+
 def bootstrap_hazard(mats, spreads, R, P):
     knots = list(mats[:-1]) + [np.inf]; lams = []
     for j, (T, s) in enumerate(zip(mats, spreads)):
@@ -400,26 +413,55 @@ def slice_el(lo, hi, V0, g, sigma, T, cost):
     return P(hi) - P(lo)
 
 
-def refi_vintages(y, ltv0=0.65, cap0=0.06, spread=2.25, amort=25, g=0.02, beta=0.5, dscr_min=1.25,
-                  ltv_max=0.65, term_m=60):
+def monthly_rate(rate_pct, comp="semi"):
+    """Monthly rate for a nominal annual rate in percent: compounded semi-annually, not in advance, as
+    Canadian mortgage rates are stated (comp="semi"), or monthly (comp="monthly", as in the screener)."""
+    if comp == "monthly":
+        return rate_pct / 1200
+    return (1 + rate_pct / 200) ** (1 / 6) - 1
+
+
+def mortgage_constant(rate_pct, amort_yrs, comp="semi"):
+    """Annual debt service per unit of loan for level monthly payments over amort_yrs years."""
+    i = monthly_rate(rate_pct, comp); n = 12 * amort_yrs
+    return 12 * i / (1 - (1 + i) ** (-n))
+
+
+def mortgage_balance(loan, rate_pct, amort_yrs, months, comp="semi"):
+    """Balance after the given number of level monthly payments."""
+    i = monthly_rate(rate_pct, comp); p = loan * mortgage_constant(rate_pct, amort_yrs, comp) / 12
+    return loan * (1 + i) ** months - p * ((1 + i) ** months - 1) / i
+
+
+def refi_vintages(y, ltv_max=0.65, dscr_min=1.25, cap_ref=0.06, y_ref=4.0, beta=0.5, spread=2.25, amort=25,
+                  g=0.02, term_m=60, comp="semi", size_at_origination=True, fixed_cap=False):
     """Refinancing test for a loan originated at each month-end of the yield series y (percent).
-    Rates are the five year yield plus a spread, in percent, compounded monthly as in the screener.
-    Returns one row per vintage: origination and maturity yields, balloon, value and NOI at maturity,
-    the largest new loan the two tests allow divided by the balloon (the cover), and the binding test."""
+
+    The property is worth 100 at origination. Its cap rate is cap_ref when the five year yield is y_ref
+    and moves by beta per point of yield, q = cap_ref + beta (y - y_ref)/100, so income is 100 q0
+    (fixed_cap=True keeps q0 = cap_ref for every vintage). The rate is the yield plus spread, compounded
+    as comp says. At origination the loan is the smaller of ltv_max of value and the amount whose debt
+    service coverage is dscr_min (size_at_origination=False lends ltv_max of value whatever the coverage).
+    At maturity income has grown at g, the cap rate is q1 = q0 + beta (y1 - y0)/100, and a new lender
+    applies the same two tests at the yield then; the cover is the largest new loan over the balance."""
     rows = []
     vals = np.asarray(y, float)
     for i in range(len(vals) - term_m):
         y0, y1 = vals[i], vals[i + term_m]
         r0, r1 = y0 + spread, y1 + spread
-        loan, noi0 = 100 * ltv0, 100 * cap0
-        B = balloon(loan, r0, amort, term_m)
+        cap0 = cap_ref if fixed_cap else cap_ref + beta * (y0 - y_ref) / 100
+        noi0 = 100 * cap0
+        k0 = mortgage_constant(r0, amort, comp)
+        loan = min(100 * ltv_max, noi0 / (dscr_min * k0)) if size_at_origination else 100 * ltv_max
+        B = mortgage_balance(loan, r0, amort, term_m, comp)
         noi1 = noi0 * (1 + g) ** (term_m / 12)
         cap1 = cap0 + beta * (y1 - y0) / 100
         V1 = noi1 / cap1
-        k1 = annual_debt_service(1.0, r1, amort)
+        k1 = mortgage_constant(r1, amort, comp)
         by_ltv, by_dscr = ltv_max * V1, noi1 / (dscr_min * k1)
-        rows.append(dict(y0=y0, y1=y1, B=B, noi1=noi1, V1=V1, cap1=cap1, k1=k1, cover=min(by_ltv, by_dscr) / B,
-                         ltv_binds=by_ltv <= by_dscr, dscr0=noi0 / annual_debt_service(loan, r0, amort),
+        rows.append(dict(y0=y0, y1=y1, cap0=cap0, loan=loan, ltv0=loan / 100, dscr0=noi0 / (loan * k0),
+                         dscr_binds0=noi0 / (dscr_min * k0) < 100 * ltv_max, B=B, noi1=noi1, V1=V1, cap1=cap1,
+                         k1=k1, cover=min(by_ltv, by_dscr) / B, ltv_binds=by_ltv <= by_dscr,
                          dscr1=noi1 / (B * k1), ltv1=B / V1))
     return rows
 

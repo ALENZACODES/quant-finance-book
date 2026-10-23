@@ -20,13 +20,22 @@
   \vspace{0.9in}
 \end{titlepage}
 
-\chapter*{About this book}
+\tableofcontents
+
+\chapter*{Preface}\markboth{Preface}{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+\input{chapters/preface}
+
+\chapter*{About this book}\markboth{About this book}{About this book}
+\addcontentsline{toc}{chapter}{About this book}
 \input{chapters/about}
 
-\chapter*{Acknowledgements}
+\chapter*{Acknowledgements}\markboth{Acknowledgements}{Acknowledgements}
 \input{chapters/acknowledgements}
 
-\tableofcontents
+\chapter*{Notation and conventions}\markboth{Notation and conventions}{Notation and conventions}
+\addcontentsline{toc}{chapter}{Notation and conventions}
+\input{chapters/notation}
 
 \mainmatter
 \input{chapters/ch01}
@@ -43,4 +52,5 @@
 \input{chapters/ch12}
 \backmatter
 \input{chapters/references}
+\printindex
 \end{document}

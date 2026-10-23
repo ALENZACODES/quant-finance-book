@@ -159,3 +159,25 @@ def test_round2_printed_values(RAW):
     w, r, g = RAW["mkWmed"] / 100, RAW["mkRocMed"] / 100, RAW["mkGstar"] / 100
     assert abs((1 + g) * (1 - g / r) / (w - g) - RAW["mkObsMed"]) < 1e-6
     assert abs(RAW["dmLongOverPut"] - RAW["dmLong"] / RAW["dmChaffe"]) < 1e-9
+
+
+def test_finnerty_dlom():
+    # below the share price at any variance, rising in the variance, near the simulated average-strike put
+    vals = [L.finnerty_dlom(T, 0.4) for T in (0.25, 1, 4, 16, 64)]
+    assert all(0 < a < b < 1 for a, b in zip(vals, vals[1:]))
+    rng = np.random.default_rng(11)
+    m, se = L.average_strike_mc(1.0, 0.3, 100_000, 200, rng)
+    assert abs(L.finnerty_dlom(1.0, 0.3) - m) < 0.02 * m + 4 * se
+    assert abs(L.finnerty_dlom(1.0, 0.3, q=0.02) - math.exp(-0.02) * L.finnerty_dlom(1.0, 0.3)) < 1e-15
+
+
+def test_interest_cap():
+    import lbo
+    base = lbo.deal()
+    p = dict(lbo.BASE); p["int_cap"] = 10.0          # a cap that never binds changes nothing
+    loose = lbo.deal(p)
+    assert abs(loose["moic"] - base["moic"]) < 1e-12
+    p["int_cap"] = 0.0; p["carry_forward"] = False   # no deduction at all: the same as a zero tax shield
+    none = lbo.deal(p)
+    assert all(abs(r["tax"] - max(r["ebit"], 0) * p["tax"]) < 1e-12 for r in none["rows"])
+    assert none["moic"] < base["moic"]

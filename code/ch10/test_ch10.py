@@ -162,3 +162,11 @@ def test_round2_slopes_and_ratios_reproduce(RAW):
     assert abs(RAW["lvIlSd"] / RAW["lvIuSd"] - RAW["lvSdRatio"]) < 1e-10 and round(RAW["lvSdRatio"], 2) == 1.87
     for t in ("Bill", "Cre", "Hpi", "Reit", "Mkt", "Farm", "Timber", "Oil"):
         assert RAW[f"ihEse{t}"] > 0
+
+
+def test_ontario_ltt():
+    # the province's worked example: $4,475 on $400,000, and its quick formula above $400,000
+    assert abs(L.ontario_ltt(400_000) - 4_475) < 1e-9
+    for v in (500_000, 3e6, 26.3e6):
+        assert abs(L.ontario_ltt(v) - (0.02 * v - 3525)) < 1e-6
+    assert abs(L.ontario_ltt(55_000) - 275) < 1e-9

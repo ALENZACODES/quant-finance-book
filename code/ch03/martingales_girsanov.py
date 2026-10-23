@@ -93,7 +93,7 @@ def girsanov(rng):
     RAW["isVarIS"] = var_is; RAW["isEmpRatio"] = float((ps[-1] / iss[-1]) ** 2)
     fig, ax = plt.subplots(1, 2, figsize=(6.4, 2.6))
     x = np.linspace(-4, 7, 600)
-    ax[0].plot(x, stats.norm.pdf(x), color=BLUE, lw=1.1, label=r"law of $W_1$ under $P$")
+    ax[0].plot(x, stats.norm.pdf(x), color=BLUE, lw=1.1, label=r"law of $W_1$ under $\mathbb{P}$")
     ax[0].plot(x, stats.norm.pdf(x, c), color=RED, lw=1.1, label=r"law of $W_1$ under $Q$")
     xx = x[x > c]; ax[0].fill_between(xx, 0, stats.norm.pdf(xx), color=BLUE, alpha=0.5, lw=0)
     ax[0].axvline(c, color=GREY, ls=":", lw=0.8); ax[0].set_xlabel("$x$"); ax[0].legend(fontsize=7.0, loc="upper right")

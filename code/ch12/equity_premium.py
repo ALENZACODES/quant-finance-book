@@ -152,7 +152,7 @@ def main():
         w = L.mv_weights(f, var, GAMMA, WLO, WHI); port = w * rx
         sr = port.mean() / port.std(ddof=1)
         s = dict(r2=L.r2_os(r, f, F["hm"]) if k != "hm" else 0.0, ce=L.ce_annual(rx, w, rf, GAMMA) - ce_hm, sr=sr,
-                 skew=float(pd.Series(port).skew()), kurt=float(pd.Series(port).kurt() + 3),
+                 skew=float(pd.Series(port).skew()), exkurt=float(pd.Series(port).kurt()),
                  r2a=L.r2_os(r[early], f[early], F["hm"][early]), r2b=L.r2_os(r[late], f[late], F["hm"][late]))
         if k != "hm":
             s["cw"], s["p"] = L.clark_west(r, f, F["hm"])

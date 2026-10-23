@@ -42,7 +42,7 @@
 \RequirePackage{graphicx}
 \graphicspath{{figures/}}
 \DeclareGraphicsExtensions{.png}   % figures are PNG at 300 dpi; no PDF files live in the repository
-\RequirePackage{booktabs,array,tabularx}
+\RequirePackage{booktabs,array,tabularx,longtable}
 \RequirePackage[font=small,labelfont={bf,color=qbblue},labelsep=period,format=hang]{caption}
 \RequirePackage{float}
 \RequirePackage{placeins}
@@ -98,12 +98,18 @@
 \setlist{itemsep=2pt,topsep=4pt}
 \RequirePackage[backend=biber,style=authoryear,maxcitenames=2,maxbibnames=10,uniquename=false,
   uniquelist=false,dashed=false,giveninits=true,doi=true,url=true,isbn=false]{biblatex}
+\RequirePackage{imakeidx}
+\makeindex[intoc,columns=2,title=Index]
 \RequirePackage[colorlinks=true,linkcolor=qbblue,citecolor=qbblue,urlcolor=qbred,
   pdfcreator={},pdfproducer={},pdfauthor={John Khan},pdftitle={},pdfsubject={},pdfkeywords={}]{hyperref}
 \setcounter{biburllcpenalty}{7000}
 \setcounter{biburlucpenalty}{8000}
 \setcounter{biburlnumpenalty}{9000}
 \RequirePackage[capitalise,noabbrev]{cleveref}
+% One reference list for the whole book. A chapter built on its own (\chapteronly) keeps its own list.
+\newenvironment{chapterrefs}{\ifdefined\chapteronly\begin{refsection}\fi}{\ifdefined\chapteronly
+  {\emergencystretch=2em\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]}%
+  \end{refsection}\fi}
 \crefname{example}{Example}{Examples}
 % the only labelled list items in the book are exercises
 \crefname{enumi}{Exercise}{Exercises}\Crefname{enumi}{Exercise}{Exercises}

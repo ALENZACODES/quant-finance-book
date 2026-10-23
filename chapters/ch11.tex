@@ -1,7 +1,7 @@
 % Chapter 11. All quoted numbers come from chapters/ch11-numbers.tex, written by code/ch11/run_all.py.
 \input{chapters/ch11-numbers}
 \raggedbottom % this chapter only: short pages stay short; \flushbottom is restored at the end
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{10}
 \chapter{Private Equity and Business Valuation}
 \label{ch:pe}
@@ -14,7 +14,7 @@ should it compare them with what the stock market would have paid? And what is a
 on the day the fund buys it, on the day it sells it, and on every reporting date between?
 
 Chapters 1 and 2 have already done part of the work. Chapter~1 defined the IRR, the modified IRR, the
-multiples DPI and TVPI, the Kaplan and Schoar public market equivalent and the J-curve of a single
+multiples DPI and TVPI, the Kaplan and Schoar public market equivalent and the J-curve\index{J-curve} of a single
 fund. Chapter~2 took the fee contract apart: the management fee, the hurdle balance, the size of the
 catch-up, carry as an option on a single exit, deal by deal carry and the clawback, and the
 Takahashi and Alexander model of a fund's cash flows. This chapter builds on those results without
@@ -33,7 +33,7 @@ identities that must hold exactly. An independent R script recomputes the waterf
 IRRs with \texttt{uniroot}, the PME and direct alpha of the listing in \cref{sec11:perf}, the CalPERS
 multiples and implied durations from the raw columns, the buyout model with its own loop, the cost of
 capital and the DCF, and the two discounts by numerical integration. GNU Octave recomputes the
-leverage proposition, the value driver, the Miles and Ezzell cost of capital and the adjusted present
+leverage proposition, the value driver\index{value driver}, the Miles and Ezzell cost of capital and the adjusted present
 value by its own recursion, the lookback value by quadrature of the law of the maximum, and the
 exercise answers.
 
@@ -60,7 +60,7 @@ weighted average cost of capital, $r_U$ the cost of capital of the unlevered fir
 debt and $L$ the ratio of debt to value. The letter $E$ has four uses: $\E$ is an expectation,
 $E(t)$ in \cref{prop11:timing} is whole fund carry, $E$ in \cref{lem11:bridge} is EBITDA, and $E$ in
 \cref{sec11:value} is the value of equity. Rates are annual and compounded once a year unless they are
-marked as continuous.
+marked as continuous. $\Phi$ and $\varphi$ are the standard normal distribution and density functions.
 \end{keybox}
 
 \FloatBarrier
@@ -73,20 +73,20 @@ are found, usually over an investment period of about five years. The limited pa
 management fee through capital calls, commonly a percentage of commitments during the investment
 period and afterwards a percentage of the cost of the deals still held; the precise base varies by
 fund. When a company
-is sold, the proceeds pass through a \emph{distribution waterfall}. Chapter~2 worked out each tier
+is sold, the proceeds pass through a \emph{distribution waterfall}\index{distribution waterfall}. Chapter~2 worked out each tier
 for a fund with a single contribution and a single exit. A real fund calls and returns money many
 times, and the tiers are tested again on each distribution date against everything that has happened
 so far. That cumulative test is what the waterfall below formalises.
 
 \begin{definition}[Whole fund waterfall]\label{def11:waterfall}
 Let contributions $C_t\ge0$ and gross distributable proceeds $X_t\ge0$ occur at dates $t_0<t_1<\dots$.
-The \emph{hurdle balance} accrues at the hurdle rate and rises with each contribution,
+The \emph{hurdle balance}\index{hurdle balance} accrues at the hurdle rate and rises with each contribution,
 $B_{t_j}=B_{t_{j-1}}(1+h)^{t_j-t_{j-1}}+C_{t_j}$, and falls by whatever is paid to the LPs in the first two
 tiers. On each date the proceeds $X_{t_j}$ are paid in order:
 \begin{enumerate}[label=(\roman*)]
   \item to the LPs until all contributed capital has been returned;
   \item to the LPs until the hurdle balance, already reduced by the capital returned in (i), is zero,
-        the \emph{preferred return};
+        the \emph{preferred return}\index{preferred return};
   \item a \emph{catch-up}, in which a share $k>c$ of each dollar goes to the GP until the GP holds a share
         $c$ of the cumulative profit, $G=c\,(\text{LP distributions}+G-\text{contributions})$, with
         profit measured after fees and expenses, the convention of this chapter; agreements differ in
@@ -342,7 +342,7 @@ almost anywhere; by five, large moves are rare.
 
 A fund reports an IRR and a TVPI side by side, and the pair carries information that neither number
 has alone. If a single payment of 1 grew into a single payment of $M$ after $\mathcal D$ years at the rate $r$,
-then $M=(1+r)^{\mathcal D}$. For a real fund, define the \emph{implied duration} by the same relation,
+then $M=(1+r)^{\mathcal D}$. For a real fund, define the \emph{implied duration}\index{implied duration} by the same relation,
 $\mathcal D=\ln\mathrm{TVPI}/\ln(1+r)$, with the NAV counted as a distribution on the reporting date.
 
 \begin{proposition}[Implied duration]\label{prop11:duration}
@@ -424,7 +424,7 @@ proposed the rate that goes with it.
 Carry each contribution and distribution of a fund to the end date $T$ with the index,
 $\tilde C_t=C_tI_T/I_t$ and $\tilde D_t=D_tI_T/I_t$, and count the NAV at $T$ once, as a final distribution
 that is not also part of $\tilde D_T$. With time measured from the first cash flow, $t=0$, the
-\emph{direct alpha} $a$ is the continuously compounded IRR of the carried flows, the root of
+\emph{direct alpha}\index{direct alpha} $a$ is the continuously compounded IRR of the carried flows, the root of
 $\sum_t(\tilde D_t-\tilde C_t)e^{-at}+\mathrm{NAV}_Te^{-aT}=0$.
 \end{definition}
 
@@ -442,7 +442,7 @@ $a$, and the flow is negative; a flow at $t>t^*$ is multiplied by $e^{-a(t-t^*)}
 with $a$, and the flow is positive. So $\psi$ is strictly decreasing, it tends to $-\infty$ as
 $a\to\infty$ and to $+\infty$ as $a\to-\infty$, and it has exactly one root. Since $\psi$ decreases,
 the root is positive if and only if $\psi(0)>0$. And $\psi(0)=f(0)=\sum\tilde D-\sum\tilde C$, which is
-positive exactly when the KS-PME, $\sum\tilde D/\sum\tilde C$, exceeds one.
+positive exactly when the KS-PME\index{Kaplan-Schoar}, $\sum\tilde D/\sum\tilde C$, exceeds one.
 \end{proof}
 
 The condition is sufficient and not necessary. In the simulated funds, fees are called after the
@@ -526,7 +526,7 @@ fund's risk loads on the index in that way.
 \section{When does debt raise a buyout's return?}
 \label{sec11:lbo}
 
-In a leveraged buyout the fund pays for a company partly with equity and partly with debt raised
+In a leveraged buyout\index{leveraged buyout} the fund pays for a company partly with equity and partly with debt raised
 against the company's own cash flows, and the company repays the debt from those cash flows. Without
 taxes and frictions, \textcite{modigliani1958} showed that the mix of debt and equity does not change
 the value of the firm; with tax deductible interest the debt adds the value of its tax shields
@@ -536,7 +536,7 @@ exact form.
 \begin{proposition}[Leverage and the equity multiple]\label{prop11:lbo}
 A buyer pays $P_0$ for a company, fees included. Without debt, the company would at $T$ be worth
 $\mathit{EV}_T$ plus its free cash flows $F_t$, each held to $T$ at the rate $j=i(1-\tau)$, and its
-\emph{asset multiple} is $U=\bigl(\mathit{EV}_T+\sum_tF_t(1+j)^{T-t}\bigr)/P_0$. Suppose instead that debt
+\emph{asset multiple}\index{asset multiple} is $U=\bigl(\mathit{EV}_T+\sum_tF_t(1+j)^{T-t}\bigr)/P_0$. Suppose instead that debt
 $\lambda P_0$ is borrowed at the rate $i$, that interest is deductible at the tax rate $\tau$ against
 taxable income that stays positive, and that all cash after interest either repays debt or earns $j$.
 If the equity is worth something at $T$, its multiple is
@@ -631,7 +631,7 @@ For $V=mE$, with $\bar m=\frac12(m_0+m_T)$ and $\bar E=\frac12(E_0+E_T)$,
   m_TE_T-m_0E_0=\bar m\,(E_T-E_0)+\bar E\,(m_T-m_0),
 \]
 and each term is the average of the two contributions that factor makes when it is changed first and
-when it is changed second, which is its Shapley value in the two player game.
+when it is changed second, which is its Shapley\index{Shapley} value in the two player game.
 \end{lemma}
 
 \begin{proof}
@@ -701,6 +701,37 @@ magnitude of any beta effect must be estimated for the actual funds and periods.
   \label{fig11:lbomc}
 \end{figure}
 
+\subsection{A cap on deductible interest}
+\label{sec11:intcap}
+
+The model so far deducts every dollar of interest, which is the assumption behind the factor
+$1+i(1-\tau)$ in \cref{prop11:lbo}. Many tax systems now limit the deduction. The OECD recommended a
+fixed ratio rule that caps net interest at between 10\% and 30\% of a tax measure of
+EBITDA\index{interest deductibility cap} \parencite{oecd2015}. Canada adopted 30\% for taxation years
+beginning on or after 1 January 2024 \parencite{ita182}, and interest denied in one year is carried
+forward and can be deducted in a later year in which the company has room under the cap. The code
+applies a cap of \lxCap\% of EBITDA, with EBITDA standing in for the tax measure, and carries the
+excess forward.
+
+In the base deal the first year's interest is \lxCapIntOne{} million, \lxCapIntShareOne\% of that
+year's EBITDA, so only \lxCapDedOne{} million is deducted. The cap binds in the first \lxCapBinds{}
+years, the amount carried forward peaks at \lxCapCarryPeak{} million, and the sweep pays the debt down
+fast enough that the carryforward is used before exit. The cap therefore moves about \lxCapTaxEarly{}
+million of tax into the early years without changing much the total paid, and the equity multiple
+falls only from \lxMoicThree{} to \lxCapMoic, with the IRR lower by less than two basis points.
+Without a carryforward the denied interest would be lost for good, the multiple would be
+\lxCapNoCfMoic{} and the IRR \lxCapNoCfIrrDropBp{} basis points lower than without the cap. In this deal the cap
+stops binding in the first year once debt at entry is below \lxCapLevFree{} times EBITDA.
+
+The effect depends on how long the cap binds. A deal with seven times EBITDA of debt at 9\% exceeds the
+cap in all \lxCapHvBinds{} years and still has \lxCapHvCarry{} million carried forward at exit, which
+is worth something to a buyer only if the buyer can use it. Its IRR falls from \lxCapHvIrrNo\% to
+\lxCapHvIrr\%, \lxCapHvIrrDropBp{} basis points. The cap also breaks the identity of
+\cref{prop11:lbo}, since part of the interest is paid without a shield; the code checks that the
+proposition overstates the capped multiple. The rules themselves have more parts than this sketch,
+including a group ratio election and an exclusion for small entities, and the tax measure of EBITDA
+differs from the accounting one.
+
 \FloatBarrier
 % =====================================================================================
 \section{What is a private company worth?}
@@ -715,7 +746,7 @@ firm, and the cash flow it discounts is defined first.
 The \emph{free cash flow to the firm} in year $t$ is $F_t=\mathit{NOPAT}_t-R_t$, where
 $\mathit{NOPAT}_t=\mathit{EBIT}_t(1-\tau)$ is operating profit after tax at the marginal rate, as if the firm
 had no debt, and the \emph{reinvestment} $R_t$ is capital spending less depreciation plus the increase in
-working capital. The \emph{reinvestment rate} is $R_t/\mathit{NOPAT}_t$, and the \emph{return on new capital}
+working capital. The \emph{reinvestment rate}\index{reinvestment rate} is $R_t/\mathit{NOPAT}_t$, and the \emph{return on new capital}\index{return on new capital}
 is the extra NOPAT that a dollar of reinvestment produces a year later.
 \end{definition}
 
@@ -849,7 +880,7 @@ satisfies $V_{t-1}=(F_t+V_t)/(1+W)$ with
 \begin{proof}
 The tax shield paid at $t$ is $\tau r_DLV_{t-1}$. It is known at $t-1$, so it is discounted for its last
 year at $r_D$, while the firm's own cash flow and its value at $t$ have the risk of the assets and are
-discounted at $r_U$. The adjusted present value of \textcite{myers1974} over one year is therefore
+discounted at $r_U$. The adjusted present value\index{adjusted present value} of \textcite{myers1974} over one year is therefore
 $V_{t-1}=(F_t+V_t)/(1+r_U)+\tau r_DLV_{t-1}/(1+r_D)$. Collecting $V_{t-1}$,
 $V_{t-1}\bigl(1-\tau r_DL/(1+r_D)\bigr)(1+r_U)=F_t+V_t$, and the factor on the left is $1+W$ with $W$ as
 in \cref{eq11:me}. The recursion is a valuation relation under these discount rates; it need not
@@ -869,7 +900,7 @@ inconsistencies and gives \cref{eq11:me}.
 even with no debt, \wrHamZero\% and \wrHpZero\%, because they unlever the industry beta differently.
 With a riskless debt beta, the rule of Harris and Pringle gives $W=r_U+\frac DV\,(r_D-r_f-\tau r_D)$,
 which rises slightly with leverage here because the spread of \wkSpread{} points is larger than the tax
-saving $\tau r_D$; the rule of Hamada falls, and Miles and Ezzell falls fastest. At the \wkTarget\% target
+saving $\tau r_D$; the rule of Hamada\index{Hamada} falls, and Miles and Ezzell falls fastest. At the \wkTarget\% target
 the three are \wrSpreadTarget{} points apart and at 60\% they are \wrSpreadSixty{} points apart, so the
 choice matters more the more the company borrows.
 
@@ -1013,8 +1044,8 @@ at the medians, typed in to the digits shown, it prints \mkGstar\% both ways.
 The DCF of \cref{sec11:value} values the whole company as a buyer with control would run it, with the
 pay and rent restated. A minority stake in the same company is worth less for two reasons. Its owner
 cannot set the pay, the dividends or the date of sale, and there is no market in which to sell it.
-The first is the \emph{discount for lack of control} (DLOC) and the second the \emph{discount for
-lack of marketability} (DLOM). Because the two discounts multiply, their order does not change the
+The first is the \emph{discount for lack of control}\index{discount for lack of control} (DLOC) and the second the \emph{discount for
+lack of marketability\index{marketability}} (DLOM). Because the two discounts multiply, their order does not change the
 result; what matters is that the DLOC is taken from a control value and the DLOM from a marketable
 minority value, without counting either twice.
 
@@ -1034,14 +1065,14 @@ the put does not restore the right to sell at an earlier date. The price of that
 share price, is a model-based proxy for what the restriction costs. It is neither an exact DLOM nor a
 discount observed in transactions. In the model of
 \textcite{black1973} and \textcite{merton1973} with no dividends, an at the money put on a share of
-price one is $e^{-rT}N(-d_2)-N(-d_1)$ with $d_{1,2}=(r\pm\sigma^2/2)\sqrt T/\sigma$. For a volatility of
+price one is $e^{-rT}\Phi(-d_2)-\Phi(-d_1)$ with $d_{1,2}=(r\pm\sigma^2/2)\sqrt T/\sigma$. For a volatility of
 \dmSig\% and a restriction of \dmT{} years it is \dmChaffe\% at the Treasury yield of \wkRf\%, used as a continuous rate, and
 \dmChaffeZero\% at a zero rate. The put cannot cost more than the share, so this measure stays below
 100\%, and it treats the holder as if the only loss were the inability to avoid a fall.
 
 \paragraph{The lookback value.}
 \textcite{longstaff1995} asked instead what an owner would give up against an investor who could sell
-at the best moment during the restriction. Longstaff presented this as an upper bound on the discount, but it is a bound only inside his
+at the best moment during the restriction. Longstaff\index{Longstaff} presented this as an upper bound on the discount, but it is a bound only inside his
 frictionless model with perfect timing; read here, it is the value of an idealised right and sets no ceiling
 on a DLOM measured in transactions.
 
@@ -1049,7 +1080,7 @@ on a DLOM measured in transactions.
 Let $Z$ be a standard Brownian motion, let the discounted share price be
 $S_t=\exp(\sigma Z_t-\sigma^2t/2)$, and let $v=\sigma^2T$. Then
 \begin{equation}\label{eq11:longstaff}
-  \E\Bigl[\max_{0\le t\le T}S_t\Bigr]-1=\Bigl(2+\frac v2\Bigr)N\Bigl(\frac{\sqrt v}2\Bigr)
+  \E\Bigl[\max_{0\le t\le T}S_t\Bigr]-1=\Bigl(2+\frac v2\Bigr)\Phi\Bigl(\frac{\sqrt v}2\Bigr)
   +\sqrt{\frac v{2\pi}}\,e^{-v/8}-1,
 \end{equation}
 which depends on $\sigma$ and $T$ only through $v$ and grows without bound in $v$. It is measured against
@@ -1060,15 +1091,15 @@ the initial price and can exceed one.
 Write $X_t=\sigma Z_t-\sigma^2t/2$, a Brownian motion with drift $\nu=-\sigma^2/2$ and variance $\sigma^2$,
 and $M=\max_{t\le T}X_t\ge0$. With $s=\sqrt v$, the law of the maximum of a Brownian motion with drift gives
 \[
-  \Pr(M>m)=N\Bigl(\frac{-m+\nu T}{s}\Bigr)+e^{2\nu m/\sigma^2}N\Bigl(\frac{-m-\nu T}{s}\Bigr)
-  =N\Bigl(-\frac ms-\frac s2\Bigr)+e^{-m}N\Bigl(-\frac ms+\frac s2\Bigr)
+  \mathbb P(M>m)=\Phi\Bigl(\frac{-m+\nu T}{s}\Bigr)+e^{2\nu m/\sigma^2}\Phi\Bigl(\frac{-m-\nu T}{s}\Bigr)
+  =\Phi\Bigl(-\frac ms-\frac s2\Bigr)+e^{-m}\Phi\Bigl(-\frac ms+\frac s2\Bigr)
 \]
-for $m\ge0$. Since $\E[e^M]-1=\int_0^\infty e^m\Pr(M>m)\,dm$, there are two integrals. The second term
-gives $I_2=\int_0^\infty N(s/2-m/s)\,dm=s\int_{-\infty}^{s/2}N(u)\,du=s\bigl(\tfrac s2N(\tfrac s2)+\varphi(\tfrac s2)\bigr)$.
+for $m\ge0$. Since $\E[e^M]-1=\int_0^\infty e^m\mathbb P(M>m)\,dm$, there are two integrals. The second term
+gives $I_2=\int_0^\infty \Phi(s/2-m/s)\,dm=s\int_{-\infty}^{s/2}\Phi(u)\,du=s\bigl(\tfrac s2\Phi(\tfrac s2)+\varphi(\tfrac s2)\bigr)$.
 For the first, integration by parts gives
-$I_1=-N(-\tfrac s2)+\tfrac1s\int_0^\infty e^m\varphi(\tfrac ms+\tfrac s2)\,dm$, and since
-$e^m\varphi(\tfrac ms+\tfrac s2)=\varphi(\tfrac ms-\tfrac s2)$, the integral is $sN(\tfrac s2)$ and
-$I_1=2N(\tfrac s2)-1$. Adding, $I_1+I_2=(2+\tfrac{s^2}2)N(\tfrac s2)+s\varphi(\tfrac s2)-1$, which is
+$I_1=-\Phi(-\tfrac s2)+\tfrac1s\int_0^\infty e^m\varphi(\tfrac ms+\tfrac s2)\,dm$, and since
+$e^m\varphi(\tfrac ms+\tfrac s2)=\varphi(\tfrac ms-\tfrac s2)$, the integral is $s\Phi(\tfrac s2)$ and
+$I_1=2\Phi(\tfrac s2)-1$. Adding, $I_1+I_2=(2+\tfrac{s^2}2)\Phi(\tfrac s2)+s\varphi(\tfrac s2)-1$, which is
 \cref{eq11:longstaff}. As $v\to\infty$ the right side grows like $v/2$.
 \end{proof}
 
@@ -1082,6 +1113,25 @@ lookback value from \dmLsThirtyOne\% to \dmLsThirtyFour\%; at 60\% the lookback 
 one, since only $v$ matters. The two models value different idealised rights, so they are not a
 calibrated interval for a DLOM: at \dmSig\% over \dmT{} years they give \dmChaffe\% and \dmLong\%. The
 choice of measure and of volatility moves the answer more than any other input of the minority valuation below.
+
+\paragraph{An average-strike put.}
+Neither benchmark matches a seller with no special timing ability. \textcite{finnerty2012} models the
+lost right as a put that pays the average price over the restriction period in exchange for the
+price at its end, an investor who sells at random dates during the period receiving on average the
+mean price. Approximating the law of the average by a lognormal with matched moments gives
+\begin{equation}\label{eq11:finnerty}
+  D_F=e^{-\delta T}\bigl(2\Phi(\tfrac{w}{2})-1\bigr),\qquad
+  w^2=v+\ln\bigl(2(e^{v}-v-1)\bigr)-2\ln(e^{v}-1),
+\end{equation}
+with $v=\sigma^2T$ and $\delta$ the dividend yield, here zero. Since $\Phi(w/2)<1$, $D_F$ stays below the
+share price whatever the variance, unlike the lookback value. At \dmSig\% over \dmT{} years it gives
+\dmFin\%, below the put at a zero rate of \dmChaffeZero\%. A simulation of the average-strike payoff
+with 250 steps a path gives \dmFinMc\% (standard error \dmFinMcSE), so the moment-matched closed form
+is slightly low; at 60\% over four years the gap widens to \dmFinSixtyFour\% against
+\dmFinMcSixFour\%. At 30\% the measure runs from \dmFinThirtyOne\% for a year to \dmFinThirtyFour\% for
+four. \textcite{finnerty2012} reports that the model tends to understate the discounts observed in
+private placements of restricted stock, although it is a significant explanatory variable for them.
+Used in place of the put, it values the minority stake below at \dmStakeFin{} million.
 
 \begin{figure}[!tb]
   \centering
@@ -1241,6 +1291,24 @@ beta. The DLOM measures are model benchmarks, not estimates fitted to transactio
   lower the value?
 \end{enumerate}
 
+\subsection*{Computing projects}
+\label{sec11:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch11/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch11/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P11.\arabic*}, leftmargin=*, ref=P11.\arabic*]
+\item Rerun the buyout of \cref{sec11:intcap} for caps on deductible interest of 10\%, 20\%, 30\% and 40\% of
+EBITDA, with and without a carryforward, and debt of four, five and six times EBITDA. Report the loss of
+IRR in basis points. Where does the carryforward matter, and at what leverage does a 30\% cap start to
+cost more than a few basis points?
+\item Tabulate the protective put at a zero rate, Finnerty's average-strike put and Longstaff's lookback value
+for volatilities of 20\% to 80\% and restrictions of one to five years with \texttt{chaffe\_dlom},
+\texttt{finnerty\_dlom} and \texttt{longstaff\_bound}. In which cells does the lookback value exceed the
+share price, and how wide is the range of discounts for a given cell?
+\end{enumerate}
+
 \subsection*{Answers}
 \begin{enumerate}[label=\textbf{11.\arabic*}, leftmargin=*]
   \item The first distribution is all return of capital, \yaRocThree, and leaves a hurdle balance of
@@ -1295,8 +1363,10 @@ The irrelevance of leverage and the value of the tax shield are from \textcite{m
 the adjusted present value from \textcite{myers1974}, and the cost of capital with annual rebalancing from
 \textcite{miles1980}. The rules for unlevering betas are from \textcite{hamada1972} and \textcite{harris1985},
 the growing perpetuity from \textcite{gordon1956}, the protective put from \textcite{chaffe1993}, priced
-with the model of \textcite{black1973} and \textcite{merton1973}, and the lookback value from
-\textcite{longstaff1995}. The waterfall share and timing results, the duration bound, the sign agreement
+with the model of \textcite{black1973} and \textcite{merton1973}, the average-strike put from
+\textcite{finnerty2012}, and the lookback value from \textcite{longstaff1995}. The fixed ratio rule for
+interest is described in \textcite{oecd2015}, and the Canadian ratio is in section 18.2 of the
+Income Tax Act \parencite{ita182}. The waterfall share and timing results, the duration bound, the sign agreement
 of the PME and direct alpha, the leverage identity, the bridge, the value driver and the proof of the
 lookback formula are short derivations given here for completeness.
 
@@ -1322,6 +1392,5 @@ rebuilds the chapter's data files. The ten year Treasury yield is from the Feder
 on FRED \parencite{fredch11}, and ships with the code. The fund, the buyout, the manufacturer and the
 exercise inputs are illustrations.
 
-{\emergencystretch=2em\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]}
-\end{refsection}
+\end{chapterrefs}
 \flushbottom

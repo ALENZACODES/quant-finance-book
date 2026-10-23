@@ -88,7 +88,7 @@ def main():
     act = {m: (w(m) - w("hm")) * f.rx.values for m in models}
     srs = {m: a.mean() / a.std(ddof=1) for m, a in act.items()}
     best = max(srs, key=srs.get); a = act[best]; T = len(a)
-    sk = float(pd.Series(a).skew()); ku = float(pd.Series(a).kurt() + 3)
+    sk = float(pd.Series(a).skew()); ku = float(pd.Series(a).kurt())   # excess kurtosis, as everywhere in the book
     put("ovEqModels", len(models), "{:.0f}"); N["ovEqBest"] = LABEL.get(best, best)
     put("ovEqSr", srs[best], "{:.4f}"); put("ovEqSrAnn", a12 * srs[best], "{:.2f}"); put("ovEqT", T, "{:.0f}")
     put("ovEqSkew", sk, "{:.2f}"); put("ovEqKurt", ku, "{:.1f}")

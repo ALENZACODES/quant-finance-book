@@ -40,7 +40,7 @@ code/common/             shared plotting style and helpers
 code/chNN/               chapter scripts, run_all.py, test_*.py, crosscheck.R, octave/*.m, snippets/
 data/                    data snapshot used by the case studies, with its source
 scripts/                 cover art and metadata stripping
-references.bib           bibliography (biblatex, one reference list per chapter)
+references.bib           bibliography (biblatex, one consolidated reference list at the end of the book)
 ```
 
 ## Building

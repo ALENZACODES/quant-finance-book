@@ -11,6 +11,7 @@ from numbers_ch11 import L, plt, BLUE, RED, GREY, SKY, ROSE, PALE, put, pct, fin
 BASE = dict(rev0=250.0, years=5, growth=[0.06, 0.06, 0.05, 0.05, 0.04], margin=[0.205, 0.21, 0.215, 0.22, 0.22],
             da=0.03, capex=0.035, nwc=0.10, tax=0.25, rate=0.08, sweep=1.0)
 M0, MT, LEV, FEES = 10.0, 10.5, 5.0, 0.02      # entry and exit EV/EBITDA, debt/EBITDA, fees as share of EV
+CAP = 0.30                                      # deductible net interest as a share of EBITDA
 
 
 def deal(p=None, m0=M0, mT=MT, lev=LEV, fees=FEES):
@@ -82,6 +83,41 @@ def base_case():
     return d
 
 
+def interest_cap(base):
+    """The base deal when deductible net interest is capped at 30% of EBITDA, the fixed ratio in force in
+    Canada for taxation years from 2024, with the excess carried forward."""
+    p = dict(BASE); p["int_cap"] = CAP
+    c = deal(p); rows = c["rows"]; b = base["rows"]
+    pct("lxCap", CAP, 0)
+    put("lxCapIntOne", rows[0]["interest"], "{:.1f}"); put("lxCapDedOne", rows[0]["deduct"], "{:.1f}")
+    pct("lxCapIntShareOne", rows[0]["interest"] / rows[0]["ebitda"], 0)
+    binds = sum(r["deduct"] < r["interest"] - 1e-9 for r in rows)
+    put("lxCapBinds", binds, "{:.0f}")
+    put("lxCapCarryPeak", max(r["carry"] for r in rows), "{:.1f}")
+    early = sum(r["tax"] - q["tax"] for r, q in zip(rows[:binds], b[:binds]))
+    extra = sum(r["tax"] for r in rows) - sum(r["tax"] for r in b)
+    put("lxCapTaxEarly", early, "{:.1f}"); put("lxCapTaxExtra", extra, "{:.2f}")
+    put("lxCapMoic", c["moic"], "{:.3f}"); put("lxMoicThree", base["moic"], "{:.3f}")
+    put("lxCapIrrDropBp", 1e4 * (base["irr"] - c["irr"]), "{:.0f}")
+    assert 0 < 1e4 * (base["irr"] - c["irr"]) < 2          # the text: lower by less than two basis points
+    # the carryforward is used up before exit, so the cap moves tax earlier and costs only the time value
+    assert binds >= 1 and early > 0 and rows[-1]["carry"] < 1e-9 and abs(extra) < 0.1 * early and c["moic"] < base["moic"]
+    # without a carryforward the excess interest is lost for good
+    p2 = dict(p); p2["carry_forward"] = False; n = deal(p2)
+    lost = sum(r["tax"] for r in n["rows"]) - sum(r["tax"] for r in b)
+    put("lxCapNoCfTax", lost, "{:.1f}"); put("lxCapNoCfMoic", n["moic"], "{:.3f}")
+    put("lxCapNoCfIrrDropBp", 1e4 * (base["irr"] - n["irr"]), "{:.0f}")
+    assert lost > 0 and n["moic"] < c["moic"]
+    # a heavier deal: seven times EBITDA at 9%
+    p3 = dict(p); p3["rate"] = 0.09; h = deal(p3, lev=7.0); p4 = dict(BASE); p4["rate"] = 0.09; h0 = deal(p4, lev=7.0)
+    put("lxCapHvBinds", sum(r["deduct"] < r["interest"] - 1e-9 for r in h["rows"]), "{:.0f}")
+    put("lxCapHvCarry", h["rows"][-1]["carry"], "{:.1f}")
+    put("lxCapHvIrrDropBp", 1e4 * (h0["irr"] - h["irr"]), "{:.0f}"); pct("lxCapHvIrr", h["irr"], 1); pct("lxCapHvIrrNo", h0["irr"], 1)
+    R.RAW["lxCapHvCarryRaw"] = h["rows"][-1]["carry"]
+    # the debt at entry, in turns of entry EBITDA, at which year one interest just meets the cap
+    put("lxCapLevFree", CAP * rows[0]["ebitda"] / (BASE["rate"] * base["e0"]), "{:.1f}")
+
+
 def grid():
     ms = np.arange(8.0, 12.01, 0.5); Z = np.zeros((len(ms), len(ms)))
     for a, m0 in enumerate(ms):
@@ -131,7 +167,7 @@ def monte_carlo(rng, n=20_000):
 
 
 def main():
-    leverage_figure(); base_case(); grid(); monte_carlo(rng_for(4))
+    leverage_figure(); d = base_case(); interest_cap(d); grid(); monte_carlo(rng_for(4))
     return finish("lbo")
 
 

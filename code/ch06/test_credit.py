@@ -104,7 +104,25 @@ def test_refinance_reduces_to_threshold(RAW):
     """With income and value both proportional to the shock, failure is a threshold on the shock."""
     assert abs(RAW["csMcElZ"]) < 4 and RAW["csChi"] < 0.005
     close(RAW["csMcMeanFail"], RAW["csMeanFail"], 4 * RAW["csMcMeanFailSE"])
-    assert RAW["csFails"] == 0 and RAW["csCoverMin"] > 1
+    assert RAW["csFails"] >= 1 and RAW["csCoverMin"] < 1 < RAW["csCoverMed"]
+    assert RAW["csDscrBindsZero"] == RAW["csN"] and RAW["csLtvZeroMax"] <= RAW["csLtv"]
+
+
+def test_refinance_origination_tests():
+    """Every vintage starts at the coverage the refinancing test needs, and half-yearly compounding
+    matches the Interest Act example: 6% compounded half-yearly is 6.09% effective."""
+    assert abs((1 + L.monthly_rate(6.0)) ** 12 - 1.0609) < 1e-12
+    assert abs(L.monthly_rate(6.0, "monthly") - 0.005) < 1e-15
+    y = np.r_[np.full(60, 1.0), np.full(60, 4.0), np.full(60, 6.0)]
+    rows = L.refi_vintages(y)
+    for r in rows:
+        assert r["dscr0"] >= 1.25 - 1e-12 and r["ltv0"] <= 0.65 + 1e-12
+        assert abs(r["B"] - L.mortgage_balance(r["loan"], r["y0"] + 2.25, 25, 60)) < 1e-12
+    # with coverage binding at both ends the cover does not depend on the cap rate path
+    a = L.refi_vintages(y, beta=0.5)[0]["cover"]; b = L.refi_vintages(y, beta=0.8)[0]["cover"]
+    assert abs(a - b) < 1e-12
+    # zero amortisation horizon check: balance after 300 payments is zero
+    assert abs(L.mortgage_balance(100, 5.0, 25, 300)) < 1e-9
 
 
 def test_exercise_answers(RAW):
@@ -142,3 +160,14 @@ def test_senior_claim(RAW):
     assert 0 < RAW["csSenEl"] < RAW["csMcEl"]
     assert abs(RAW["csSenElOwn"] - RAW["csSenEl"] / 0.99) < 1e-12
     assert RAW["csSenElSE"] < 0.02 and RAW["csSenScen"] >= 2_000_000
+
+
+def test_standard_coupon_upfront(RAW):
+    # the upfront is zero when the quote equals the coupon, and (s - C) x annuity otherwise
+    assert abs(RAW["cdUpZero"]) < 1e-12
+    P = lambda t: np.exp(-0.03 * np.asarray(t, float))
+    lc = L.flat_hazard(5.0, 0.012, 0.4, P)
+    up, ann = L.cds_upfront(5.0, 0.01, [np.inf], [lc], 0.4, P)
+    assert abs(up - 0.002 * ann) < 1e-12 and up > 0
+    # with a flat hazard and continuous premium the triangle holds, so the flat hazard is near s/(1-R)
+    assert abs(lc - 0.012 / 0.6) < 2e-4

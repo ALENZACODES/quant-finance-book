@@ -26,7 +26,7 @@ def pytest_collection_modifyitems(config, items):
     if not all(p.exists() for p in DATA):
         skip = pytest.mark.skip(reason="data missing: run python scripts/build_french.py --download")
         for item in items:
-            if "code/ch08" in str(item.fspath):
+            if "code/ch08" in str(item.fspath) and item.fspath.basename != "test_projects.py":
                 item.add_marker(skip)
 
 

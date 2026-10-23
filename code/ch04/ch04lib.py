@@ -129,10 +129,12 @@ def forward_price(S, r, T, q=0.0, u=0.0, y=0.0):
     return S * math.exp((r + u - q - y) * T)
 
 
-def forward_band(S_bid, S_ask, r_lend, r_borrow, T, q=0.0):
+def forward_band(S_bid, S_ask, r_lend, r_borrow, T, q=0.0, fee=0.0):
     """No-arbitrage band for a forward price when borrowing costs more than lending and the spot has
-    a bid-ask spread: reverse cash and carry gives the lower end, cash and carry the upper end."""
-    return S_bid * math.exp((r_lend - q) * T), S_ask * math.exp((r_borrow - q) * T)
+    a bid-ask spread: reverse cash and carry gives the lower end, cash and carry the upper end. A
+    lending fee charged to the short seller as a continuous rate on the value borrowed lowers the
+    lower end as if it were extra income on the asset."""
+    return S_bid * math.exp((r_lend - q - fee) * T), S_ask * math.exp((r_borrow - q) * T)
 
 
 def cip_forward(S, i_dom, i_for, tau):

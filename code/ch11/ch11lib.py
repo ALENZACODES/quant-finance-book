@@ -142,19 +142,23 @@ def lbo_schedule(p):
     Cash left after the sweep (or drawn on a revolver when negative) earns the after-tax debt rate, so
     net debt compounds at i(1 - tau) less free cash flow, which is the setting of the leverage
     proposition in the text."""
-    rows = []; rev = p["rev0"]; debt = p["debt0"]; cash = 0.0
+    rows = []; rev = p["rev0"]; debt = p["debt0"]; cash = 0.0; carry = 0.0
+    cap = p.get("int_cap")                                  # deductible interest as a share of EBITDA, None for no cap
     cash_rate = p["rate"] * (1 - p["tax"])                  # cash, or a revolver, at the after-tax debt rate
     for y in range(1, p["years"] + 1):
         cash *= 1 + cash_rate
         rev_prev = rev; rev = rev * (1 + p["growth"][y - 1])
         ebitda = rev * p["margin"][y - 1]; da = p["da"] * rev; ebit = ebitda - da
         interest = p["rate"] * debt
-        tax = max(ebit - interest, 0.0) * p["tax"]
+        # with a cap, interest above cap x EBITDA is not deducted this year and is carried forward
+        deduct = interest if cap is None else min(interest + carry, cap * max(ebitda, 0.0))
+        carry = 0.0 if cap is None or not p.get("carry_forward", True) else interest + carry - deduct
+        tax = max(ebit - deduct, 0.0) * p["tax"]
         capex = p["capex"] * rev; dnwc = p["nwc"] * (rev - rev_prev)
         fcf = ebitda - tax - capex - dnwc - interest          # cash left after paying interest
         repay = min(max(fcf, 0.0), debt) * p["sweep"]
         debt -= repay; cash += fcf - repay
-        rows.append(dict(year=y, rev=rev, ebitda=ebitda, da=da, ebit=ebit, interest=interest, tax=tax,
+        rows.append(dict(year=y, rev=rev, ebitda=ebitda, da=da, ebit=ebit, interest=interest, deduct=deduct, carry=carry, tax=tax,
                          capex=capex, dnwc=dnwc, fcf=fcf, repay=repay, debt=debt, cash=cash))
     return rows
 
@@ -250,6 +254,26 @@ def bs_put(S, K, T, sigma, r=0.0, q=0.0):
 def chaffe_dlom(T, sigma, r=0.0, q=0.0):
     """Price of an at the money put over the restriction period, as a share of the share price."""
     return bs_put(1.0, 1.0, T, sigma, r, q)
+
+
+def finnerty_dlom(T, sigma, q=0.0):
+    """Finnerty (2012): the average-strike put, the right to receive the average price over the
+    restriction period in place of the price at its end, as a share of the share price. The average is
+    approximated by a lognormal law with matched moments, which gives a closed form."""
+    w = sigma ** 2 * T
+    v2 = w + math.log(2 * (math.exp(w) - w - 1)) - 2 * math.log(math.exp(w) - 1)
+    return math.exp(-q * T) * (2 * stats.norm.cdf(math.sqrt(v2) / 2) - 1)
+
+
+def average_strike_mc(T, sigma, n_paths, n_steps, rng):
+    """Monte Carlo of E[(A_T - S_T)^+]/S_0 for dS = sigma S dW, with A_T the time average of S over
+    [0, T] by the trapezoid rule on n_steps steps."""
+    dt = T / n_steps; x = np.zeros(n_paths); A = np.zeros(n_paths)
+    for _ in range(n_steps):
+        x1 = x - 0.5 * sigma ** 2 * dt + sigma * math.sqrt(dt) * rng.standard_normal(n_paths)
+        A += 0.5 * (np.exp(x) + np.exp(x1)) * dt / T; x = x1
+    y = np.maximum(A - np.exp(x), 0.0)
+    return float(y.mean()), float(y.std(ddof=1) / math.sqrt(n_paths))
 
 
 def longstaff_bound(T, sigma):

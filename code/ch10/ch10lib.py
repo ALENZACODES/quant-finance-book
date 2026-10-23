@@ -80,6 +80,14 @@ def dcf_value(noi1, g, r, T, exit_cap, capex=0.0, sale_cost=0.0):
     return float(np.sum(cf / (1 + r) ** t) + sale / (1 + r) ** T)
 
 
+def ontario_ltt(v):
+    """Ontario land transfer tax on a consideration v, for land without one or two single family
+    residences, at the rates for agreements after 14 November 2016: 0.5% to $55,000, 1% to $250,000,
+    1.5% to $400,000 and 2% above."""
+    bands = [(0, 55_000, 0.005), (55_000, 250_000, 0.01), (250_000, 400_000, 0.015), (400_000, math.inf, 0.02)]
+    return sum(r * max(min(v, hi) - lo, 0.0) for lo, hi, r in bands)
+
+
 def irr(cf):
     """Internal rate of return of cash flows cf[0], cf[1], ... at yearly dates (the root above -99%)."""
     cf = np.asarray(cf, float)

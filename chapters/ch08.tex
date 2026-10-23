@@ -1,7 +1,7 @@
 % Chapter 8. All quoted numbers come from chapters/ch08-numbers.tex, written by code/ch08/run_all.py.
 \input{chapters/ch08-numbers}
 \raggedbottom % this chapter only: short pages stay short; \flushbottom is restored at the end
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{7}
 \chapter{Risk and Performance Measurement}
 \label{ch:risk}
@@ -17,7 +17,7 @@ set a one day value at risk, which ones produced the number of losses they promi
 The first half is about the size of losses. A risk measure should reward diversification, and value
 at risk does not always do so, while expected shortfall does. Daily returns have tails far heavier
 than the normal law and volatility that comes in clusters, so a measure computed from the whole
-sample is too low in a crisis and too high in calm years. A GARCH model tracks the clusters, and
+sample is too low in a crisis and too high in calm years. A GARCH\index{GARCH} model tracks the clusters, and
 extreme value theory describes the far tail with a law that has only two parameters. Backtests count
 the days on which the loss exceeded the forecast, and a little probability shows how little a year of
 such counts can reveal. The second half is about returns per unit of risk. The Sharpe ratio and its
@@ -33,7 +33,7 @@ The numbers in the text are computed by nine scripts in \texttt{code/ch08/} (\te
 \texttt{code/ch08/test\_*.py} check them, among other things against the GARCH estimates of the
 \texttt{arch} package \parencite{arch}. An independent R script recomputes the moments, the
 historical, normal and Cornish-Fisher measures, the GARCH likelihood with its own optimiser, the
-generalised Pareto fit, the backtest statistics of the case study, the ratios, the drawdowns and the
+generalised Pareto\index{generalised Pareto} fit, the backtest statistics of the case study, the ratios, the drawdowns and the
 smoothing results. GNU Octave fits the GARCH model again with \texttt{fminsearch} and checks the
 zone probabilities, the drawdown and the smoothing. The five listings printed in the chapter are
 in \texttt{code/ch08/snippets/}; each prints figures quoted in the text, and
@@ -60,7 +60,7 @@ $z_\alpha=\Phi^{-1}(\alpha)$. $\theta$ is a Sharpe ratio, $\beta$ a beta on the 
 observations and $I_t$ the indicator of an exception, a day on which the loss exceeded the VaR.
 A few letters are reused locally and redefined where they appear: $\beta$ is also the scale of the
 generalised Pareto law, $s$ the scale of a $t$ law, $\rho$ a risk measure, an autocorrelation or a
-risk aversion, and $\lambda$ a scale factor, the EWMA decay or a drawdown rate. The threshold of the
+risk aversion, and $\lambda$ a scale factor, the EWMA\index{EWMA} decay or a drawdown rate. The threshold of the
 Omega ratio is $\tau$, and $\gamma_3$ and $\gamma_4$ are the skewness and excess kurtosis of returns
 throughout.
 \end{keybox}
@@ -72,13 +72,13 @@ throughout.
 
 Volatility is the oldest measure of risk and still the most used. It treats a gain and a loss of the
 same size alike, and it says nothing about the tail unless the law of returns is known. Downside
-measures look only at losses. The \emph{value at risk} at level $\alpha$ is the loss that is exceeded
+measures look only at losses. The \emph{value at risk}\index{value at risk} at level $\alpha$ is the loss that is exceeded
 with probability at most $1-\alpha$,
 \begin{equation}\label{eq8:var}
-  \mathrm{VaR}_\alpha(L) = \inf\{\ell : \Pr(L>\ell)\le 1-\alpha\},
+  \mathrm{VaR}_\alpha(L) = \inf\{\ell : \mathbb P(L>\ell)\le 1-\alpha\},
 \end{equation}
 so a one day 99\% VaR of 2\% says that on one day in a hundred the loss should exceed 2\% of the
-position. It says nothing about how large the loss is on that day. The \emph{expected shortfall}
+position. It says nothing about how large the loss is on that day. The \emph{expected shortfall}\index{expected shortfall}
 averages the VaR over the tail beyond $\alpha$,
 \begin{equation}\label{eq8:es}
   \mathrm{ES}_\alpha(L) = \frac{1}{1-\alpha}\int_\alpha^1 \mathrm{VaR}_u(L)\dd u ,
@@ -87,7 +87,7 @@ and for a loss with a continuous distribution it equals $\E[L\mid L\ge\mathrm{Va
 mean loss on the bad days.
 
 \textcite{artzner1999} asked what properties a measure $\rho$ of the risk of a loss should have, and
-called a measure \emph{coherent} when it is monotone (a loss that is larger in every state has larger
+called a measure \emph{coherent}\index{coherent} when it is monotone (a loss that is larger in every state has larger
 risk), translation invariant ($\rho(L+c)=\rho(L)+c$ for a sure amount $c$), positively homogeneous
 ($\rho(\lambda L)=\lambda\rho(L)$ for $\lambda\ge0$) and subadditive,
 \begin{equation}\label{eq8:subadd}
@@ -129,7 +129,7 @@ sum of the two ES figures at every $p$.
 \begin{proposition}[Expected shortfall is coherent]\label{prop8:es}
 Let $L$ have a continuous distribution and a finite mean, and let $q=\mathrm{VaR}_\alpha(L)$. Then
 \begin{equation}\label{eq8:esmax}
-  \mathrm{ES}_\alpha(L) = \max\bigl\{\E[L\mid A] : \Pr(A)=1-\alpha\bigr\},
+  \mathrm{ES}_\alpha(L) = \max\bigl\{\E[L\mid A] : \mathbb P(A)=1-\alpha\bigr\},
 \end{equation}
 the largest mean loss over all events of probability $1-\alpha$, attained by $A=\{L\ge q\}$.
 Consequently $\mathrm{ES}_\alpha$ is subadditive, and it is coherent.
@@ -138,7 +138,7 @@ Consequently $\mathrm{ES}_\alpha$ is subadditive, and it is coherent.
 With $U=F_L(L)$, which is uniform on $(0,1)$, the loss is $L=F_L^{-1}(U)$ almost surely, and
 $\{L\ge q\}=\{U\ge\alpha\}$ up to a null set. So
 $\E[L\,\mathbf 1\{L\ge q\}]=\int_\alpha^1F_L^{-1}(u)\dd u=(1-\alpha)\,\mathrm{ES}_\alpha(L)$, and the
-event $\{L\ge q\}$ attains the value in \cref{eq8:esmax}. For any event $A$ with $\Pr(A)=1-\alpha$,
+event $\{L\ge q\}$ attains the value in \cref{eq8:esmax}. For any event $A$ with $\mathbb P(A)=1-\alpha$,
 \[
   (L-q)\bigl(\mathbf 1\{L\ge q\}-\mathbf 1_A\bigr)\ge0
 \]
@@ -197,7 +197,7 @@ the quantile of \cref{eq8:var} for the empirical law. When it is a whole number,
 \cref{eq8:var} is the next smaller loss, the $(k+1)$th largest, and the rule used here deliberately
 takes the more conservative $k$th. The mean of the $k$ largest losses is the
 ES of the empirical law when $n(1-\alpha)$ is whole, and otherwise a close approximation that gives the
-$k$th loss a full weight where the exact value gives it part of one. The \emph{Cornish-Fisher} method
+$k$th loss a full weight where the exact value gives it part of one. The \emph{Cornish-Fisher}\index{Cornish-Fisher} method
 corrects the normal quantile for the sample skewness $\gamma_3$ and excess kurtosis $\gamma_4$ of returns
 \parencite{cornish1938},
 \begin{equation}\label{eq8:cf}
@@ -283,7 +283,7 @@ the historical quantile. It is a tool for
 the mild non-normality of monthly fund returns, and even there the moments it needs are poorly
 estimated from a short record.
 
-A daily VaR is often turned into a ten day one by the square root of time. If daily returns are
+A daily VaR is often turned into a ten day one by the square root of time\index{square root of time}. If daily returns are
 independent and identically distributed, the variance of a ten day sum is ten times the daily
 variance, so for normal returns $\mathrm{VaR}$ over ten days is $\sqrt{10}$ times the daily VaR when the
 mean is ignored. For heavy-tailed returns the rule is only approximate even under independence: with a
@@ -452,7 +452,7 @@ infinite, and for the normal law the limit has $\xi=0$. \textcite{embrechts1997}
 
 \begin{proposition}[Value at risk and expected shortfall from a fitted tail]\label{prop8:gpd}
 Suppose that $n$ losses include $n_u$ above $u$ and that for $y\ge0$,
-$\Pr(L>u+y)=\frac{n_u}{n}\bigl(1-G_{\xi,\beta}(y)\bigr)$ with $0<\xi<1$. Then for $\alpha>1-n_u/n$,
+$\mathbb P(L>u+y)=\frac{n_u}{n}\bigl(1-G_{\xi,\beta}(y)\bigr)$ with $0<\xi<1$. Then for $\alpha>1-n_u/n$,
 \[
   \mathrm{VaR}_\alpha=u+\frac{\beta}{\xi}\Bigl[\Bigl(\frac{n}{n_u}(1-\alpha)\Bigr)^{-\xi}-1\Bigr],\qquad
   \mathrm{ES}_\alpha=\frac{\mathrm{VaR}_\alpha+\beta-\xi u}{1-\xi}.
@@ -462,7 +462,7 @@ $\Pr(L>u+y)=\frac{n_u}{n}\bigl(1-G_{\xi,\beta}(y)\bigr)$ with $0<\xi<1$. Then fo
 Setting $\frac{n_u}{n}(1+\xi y/\beta)^{-1/\xi}=1-\alpha$ and solving for $y$ gives the VaR as $u+y$.
 For $v\ge u$ the excess of a generalised Pareto variable $Y$ over $w=v-u$ satisfies
 \[
-  \Pr(Y>w+x\mid Y>w)=\Bigl(\frac{\beta+\xi(w+x)}{\beta+\xi w}\Bigr)^{-1/\xi}
+  \mathbb P(Y>w+x\mid Y>w)=\Bigl(\frac{\beta+\xi(w+x)}{\beta+\xi w}\Bigr)^{-1/\xi}
   =\Bigl(1+\frac{\xi x}{\beta+\xi w}\Bigr)^{-1/\xi},
 \]
 so it is generalised Pareto with the same $\xi$ and scale $\beta+\xi w$, and its mean is
@@ -505,7 +505,7 @@ October 1987 has a return period of about \evYears{} years. Under the normal law
   \label{fig8:threshold}
 \end{figure}
 
-Two cautions. The first is that the estimate of $\xi$ depends on the threshold. The Hill estimator \parencite{hill1975},
+Two cautions. The first is that the estimate of $\xi$ depends on the threshold. The Hill estimator\index{Hill estimator} \parencite{hill1975},
 which assumes an exact power tail above the $k$th largest loss, puts the tail index $1/\xi$ at
 \evHillTwoHundred{} with $k=200$ and \evHillEight{} with $k=800$, below the generalised Pareto value of
 \evAlphaTail, and the right panel of \cref{fig8:evt} drifts with $k$ instead
@@ -543,11 +543,11 @@ $\mathrm{VaR}_t$. Then $I_1,\dots,I_T$ are independent Bernoulli variables with 
 $1-\alpha$, and the number of exceptions $x=\sum_t I_t$ is binomial with parameters $T$ and $1-\alpha$.
 \end{proposition}
 \begin{proof}
-By assumption $\Pr(I_t=1\mid\mathcal F_{t-1})=1-\alpha$, a constant. The hits $I_1,\dots,I_{t-1}$ are
+By assumption $\mathbb P(I_t=1\mid\mathcal F_{t-1})=1-\alpha$, a constant. The hits $I_1,\dots,I_{t-1}$ are
 known at $t-1$, so for any values $i_1,\dots,i_t$,
 \[
-  \Pr(I_1=i_1,\dots,I_t=i_t)=\E\bigl[\mathbf 1\{I_1=i_1,\dots,I_{t-1}=i_{t-1}\}\,
-  \Pr(I_t=i_t\mid\mathcal F_{t-1})\bigr],
+  \mathbb P(I_1=i_1,\dots,I_t=i_t)=\E\bigl[\mathbf 1\{I_1=i_1,\dots,I_{t-1}=i_{t-1}\}\,
+  \mathbb P(I_t=i_t\mid\mathcal F_{t-1})\bigr],
 \]
 and the conditional probability is $(1-\alpha)^{i_t}\alpha^{1-i_t}$ whatever happened before. Induction
 on $t$ gives the product of $T$ Bernoulli probabilities.
@@ -588,12 +588,12 @@ red almost impossible, and the price is weak power. At a true exception rate of 
 nominal, the model is still green with probability \znGreenTwo\% and red with probability
 \znRedTwo\%; at 3\% the figures are \znGreenThree\% and \znRedThree\%.
 
-The Kupiec test at the 5\% level does no better over one year. It accepts any count from \kpLo{} to
+The Kupiec\index{Kupiec} test at the 5\% level does no better over one year. It accepts any count from \kpLo{} to
 \kpHi{} out of 250; six exceptions give $\mathrm{LR}_{\mathrm{uc}}=\kpSixLR$ and a $p$ value of \kpSixP.
 Because the count is discrete, rejecting whenever the chi-square $p$ value is below 5\% rejects a
 correct model over 250 days with probability \pwSizeOne\%, not 5\%. \Cref{fig8:power}
 shows the exact rejection probability as the sample grows (a year here is 250 trading days, as in
-the Basel count; the curves are jagged because the acceptance region moves by whole exceptions, so
+the Basel\index{Basel} count; the curves are jagged because the acceptance region moves by whole exceptions, so
 power can dip when a year is added). A model with a true rate of 2\% is rejected
 with probability \pwOneTwo\% after one year, and a model at 1.5\% with probability \pwOneFifteen\%,
 \pwFiveFifteen\% after five years and \pwTenFifteen\% after ten. Power of 80\% needs \pwYearsTwo{}
@@ -611,7 +611,7 @@ model and very little else.
 \end{figure}
 
 Expected shortfall is harder to test because it is an average over the tail, so a single day says
-little about it. It is also not \emph{elicitable} \parencite{gneiting2011}: no scoring function of an ES forecast and the outcome has the
+little about it. It is also not \emph{elicitable}\index{elicitable} \parencite{gneiting2011}: no scoring function of an ES forecast and the outcome has the
 true ES as the minimiser of its expected value, a point that \textcite{acerbi2014} discuss before proposing tests that
 use the size of the losses on exception days. The pair of VaR and ES is jointly elicitable
 \parencite{fissler2016}, which is what makes comparisons of competing forecasts of the pair possible. One of the Acerbi-Sz\'ekely statistics, in the sign convention used here, is
@@ -627,7 +627,7 @@ $\mathrm{ES}_t$ are its true $\alpha$ quantile and expected shortfall, then $\E[
 VaR is right but its ES is too low on every day, $\E[Z_2]>0$.
 \end{proposition}
 \begin{proof}
-For a continuous law $\Pr(I_t=1\mid\mathcal F_{t-1})=1-\alpha$ and
+For a continuous law $\mathbb P(I_t=1\mid\mathcal F_{t-1})=1-\alpha$ and
 $\mathrm{ES}_t=\E[L_t\mid L_t>\mathrm{VaR}_t,\mathcal F_{t-1}]$, so
 $\E[L_tI_t\mid\mathcal F_{t-1}]=(1-\alpha)\mathrm{ES}_t$. Dividing by the known $\mathrm{ES}_t$ and taking
 expectations gives $\E[L_tI_t/\mathrm{ES}_t]=1-\alpha$ for every $t$, and $\E[Z_2]=0$. If the model
@@ -676,16 +676,16 @@ risk free rate, with mean $\mu$, volatility $\sigma$ and beta $\beta$ on the mar
 $R_m$, and $e$ for the residual of the regression of $R$ on $R_m$, with intercept $a_J$. The common
 measures are:
 \begin{itemize}
-  \item the \emph{Sharpe ratio} $\mu/\sigma$ \parencite{sharpe1966,sharpe1994};
-  \item the \emph{Treynor ratio} $\mu/\beta$, return per unit of market risk \parencite{treynor1965};
-  \item \emph{Jensen's alpha} $a_J=\mu-\beta\mu_m$ \parencite{jensen1968};
-  \item the \emph{appraisal} or \emph{information ratio} $a_J/\sigma_e$, alpha per unit of the
+  \item the \emph{Sharpe ratio}\index{Sharpe ratio} $\mu/\sigma$ \parencite{sharpe1966,sharpe1994};
+  \item the \emph{Treynor ratio}\index{Treynor ratio} $\mu/\beta$, return per unit of market risk \parencite{treynor1965};
+  \item \emph{Jensen's alpha}\index{Jensen's alpha} $a_J=\mu-\beta\mu_m$ \parencite{jensen1968};
+  \item the \emph{appraisal} or \emph{information ratio}\index{information ratio} $a_J/\sigma_e$, alpha per unit of the
         residual risk $\sigma_e$, which is the tracking error against the beta adjusted market;
   \item $M^2=(\mu/\sigma)\,\sigma_m$, the excess return of the portfolio levered or delevered to the
         market's volatility \parencite{modigliani1997};
-  \item the \emph{Sortino ratio} $\mu/\sqrt{\E[\min(R,0)^2]}$, which counts only returns below a
+  \item the \emph{Sortino ratio}\index{Sortino ratio} $\mu/\sqrt{\E[\min(R,0)^2]}$, which counts only returns below a
         target, here zero \parencite{sortino1994};
-  \item the \emph{Omega ratio} $\Omega(\tau)=\E[(R-\tau)^+]/\E[(\tau-R)^+]$ at a threshold $\tau$
+  \item the \emph{Omega ratio}\index{Omega ratio} $\Omega(\tau)=\E[(R-\tau)^+]/\E[(\tau-R)^+]$ at a threshold $\tau$
         \parencite{keating2002}.
 \end{itemize}
 In practice the information ratio is also computed from returns in excess of a benchmark, with no
@@ -826,7 +826,7 @@ from \tdFirst{} to \tdLast{} is \ddMax\%, from a peak on \ddPeak{} to a trough o
 \ddThirdPeak{} to \ddThirdTrough. The market was below a previous peak on \ddShareUnder\% of all days,
 more than 10\% below on \ddShareTen\% and more than 20\% below on \ddShareTwenty\%. The compound growth
 rate over the whole period is \ddCagr\% a year, and its ratio to the maximum drawdown is \ddCalmar.
-This is a whole period form of the \emph{Calmar ratio}, which \textcite{young1991} defined over the
+This is a whole period form of the \emph{Calmar ratio}\index{Calmar ratio}, which \textcite{young1991} defined over the
 last 36 months and which in practice is still usually computed that way, so it gives a different number
 for the same fund.
 
@@ -846,7 +846,7 @@ directly. For a random walk in logs it has a simple long run law.
 Let $X_t=\ln W_t=\mu t+\sigma B_t$ with $B$ a standard Brownian motion and $\mu>0$, and let
 $Y_t=\max_{s\le t}X_s-X_t$ be the log drawdown. As $t\to\infty$ the law of $Y_t$ converges to the
 exponential law with mean $\sigma^2/(2\mu)$, so that
-$\Pr(D_t>d)\to(1-d)^{2\mu/\sigma^2}$ for $0<d<1$.
+$\mathbb P(D_t>d)\to(1-d)^{2\mu/\sigma^2}$ for $0<d<1$.
 \end{proposition}
 \begin{proof}
 For fixed $t$, $Y_t=\max_{0\le u\le t}\bigl(X_{t-u}-X_t\bigr)=\max_{0\le u\le t}(-\tilde X_u)$ with
@@ -857,7 +857,7 @@ $Z^*=\sup_{u\ge0}Z_u$, so $Y_t$ converges in law to $Z^*$. With $\lambda=2\mu/\s
 $e^{\lambda Z_u}$ is a martingale, because $-\lambda\mu+\lambda^2\sigma^2/2=0$. For $a>0$ let $H_a$ be
 the first time $Z$ reaches $a$. The stopped martingale $e^{\lambda Z_{u\wedge H_a}}$ is bounded by
 $e^{\lambda a}$ and tends to $e^{\lambda a}$ on $\{H_a<\infty\}$ and to zero elsewhere, because $Z_u\to-\infty$.
-Optional stopping gives $1=e^{\lambda a}\Pr(H_a<\infty)$, so $\Pr(Z^*\ge a)=e^{-\lambda a}$, the
+Optional stopping gives $1=e^{\lambda a}\mathbb P(H_a<\infty)$, so $\mathbb P(Z^*\ge a)=e^{-\lambda a}$, the
 exponential law with mean $1/\lambda=\sigma^2/(2\mu)$. Finally $D_t>d$ exactly when
 $Y_t>-\ln(1-d)$.
 \end{proof}
@@ -1045,7 +1045,7 @@ test period runs from \cyFirst{} to \cyLast, \cyN{} days with \cyExpected{} expe
   \centering
   \small
   \caption{Backtests of seven daily VaR models. Exceptions are days on which the loss exceeded the 99\%
-  VaR; $p_K$ and $p_C$ are the $p$ values of the Kupiec test and the Christoffersen independence
+  VaR; $p_K$ and $p_C$ are the $p$ values of the Kupiec test and the Christoffersen\index{Christoffersen} independence
   test; red is the share of 250 day windows with ten or more exceptions, in percent; $Z_2$ is
   \cref{eq8:z2} at 97.5\%, whose approximate 5\% critical value under each model's own law, treating the fitted parameters as
   fixed, is between \caCritNor{} and \caCritEmp{} (see the text). These are reference values and do
@@ -1225,6 +1225,24 @@ Every result in this chapter rests on a model, and each model leaves something o
   compare them with the market's.
 \end{enumerate}
 
+\subsection*{Computing projects}
+\label{sec8:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch08/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch08/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P8.\arabic*}, leftmargin=*, ref=P8.\arabic*]
+\item Forecast the one day 99\% VaR of a long US dollar position against the Canadian dollar from 2012 with
+normal and Student t GARCH(1,1) refitted each year on the previous 1,000 days, with EWMA and with
+historical simulation. Count exceptions and apply \texttt{kupiec} and \texttt{christoffersen}. Which models
+pass, and which fail by too many or too few exceptions?
+\item For each of the six markets of \texttt{market\_returns}, report the annualised Sharpe ratio, its standard
+error from \texttt{sharpe\_se} with and without skewness and excess kurtosis, and the largest drawdown.
+Which Sharpe ratios are more than two standard errors from zero, and for which market does the moment
+correction matter most?
+\end{enumerate}
+
 \subsection*{Answers}
 
 \begin{enumerate}[label=\textbf{8.\arabic*}, leftmargin=*]
@@ -1315,6 +1333,5 @@ dollar: the noon rate, \texttt{IEXE0101}, to 30 December 2016, joined to the dai
 \texttt{FXUSDCAD}, from 3 January 2017, ending on \cyLast. The two loan example, the laws of \cref{fig8:ratios}, the simulated paths and the exercise
 inputs are illustrations.
 
-\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
-\end{refsection}
+\end{chapterrefs}
 \flushbottom

@@ -1,6 +1,6 @@
 % Chapter 12. All quoted numbers come from chapters/ch12-numbers.tex, written by code/ch12/run_all.py.
 \input{chapters/ch12-numbers}
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{11}
 \chapter{Machine Learning in Finance}
 \label{ch:ml}
@@ -13,28 +13,28 @@ sentences will usually find structure in a sample of returns too, whether or not
 there. This chapter is about telling the two apart.
 
 It takes six questions in turn. Why does a biased estimator often predict better than an unbiased one,
-and how do ridge regression and the lasso decide how much bias to take on? How should a model be validated when the
+and how do ridge\index{ridge} regression and the lasso\index{lasso} decide how much bias to take on? How should a model be validated when the
 observations are ordered in time and their labels overlap? What do trees, forests and boosting add to
-a linear model, and what limits each of them? How is a neural network trained, and can such models learn
+a linear model, and what limits each of them? How is a neural network\index{neural network} trained, and can such models learn
 a price, its delta and a hedge when trading is costly? Can any of these methods forecast the equity premium out of
 sample, and what would a small forecasting gain be worth to an investor? And how much of a good
 backtest is the search that produced it?
 
 Several earlier chapters are used without being repeated. The standard error of a Sharpe ratio, with
 its corrections for skewness and kurtosis, is derived in Chapter~8, and screening many managers with
-false discovery control is in Chapter~7; \cref{sec12:overfit} builds the deflated Sharpe ratio and
-Holm's procedure on top of them. The discrete hedging error of a Black-Scholes delta is in Chapter~5,
+false discovery control is in Chapter~7; \cref{sec12:overfit} builds the deflated Sharpe ratio\index{deflated Sharpe ratio},
+Holm\index{Holm}'s procedure and the bootstrap tests of data snooping on top of them. The discrete hedging error of a Black-Scholes delta is in Chapter~5,
 and \cref{sec12:hedge} uses it as the benchmark a learned hedge has to match.
 
 \begin{keybox}[How to read this chapter]
-The numbers in the text are computed by eight scripts in \texttt{code/ch12/} (\texttt{regularise},
+The numbers in the text are computed by nine scripts in \texttt{code/ch12/} (\texttt{regularise},
 \texttt{cv\_time}, \texttt{trees}, \texttt{neural}, \texttt{equity\_premium}, \texttt{hedging},
-\texttt{overfit} and \texttt{exercises}). Every method is written out in the chapter's library
+\texttt{overfit}, \texttt{snooping} and \texttt{exercises}). Every method is written out in the chapter's library
 \texttt{ch12lib.py} with NumPy and SciPy: ridge through the singular value decomposition, the lasso by
-coordinate descent, regression trees, bagging, forests and boosting, a feed-forward network with its
+coordinate descent\index{coordinate descent}, regression trees, bagging\index{bagging}, forests and boosting, a feed-forward network with its
 backward pass and the Adam optimiser, the out-of-sample statistics, the learned hedges and the
 overfitting statistics. The tests in \texttt{code/ch12/test\_*.py} check the library against closed
-forms, finite differences and identities, and compare the lasso and the regression tree with
+forms, finite differences and identities, and compare the lasso and the regression tree\index{regression tree} with
 scikit-learn \parencite{sklearn2011}, which is used for that comparison only; ridge is checked against
 the normal equations. An independent R script
 rebuilds the fourteen predictors from the data file and recomputes every least squares forecast, the
@@ -126,7 +126,7 @@ $X=UDV^\top$ gives the sum. (ii) In the rotated coordinates $\hat\alpha=V^\top\h
 components $\hat\alpha_j=d_j(u_j^\top y)/(d_j^2+\lambda)$, and $u_j^\top y=d_j\alpha_j+u_j^\top\varepsilon$
 with $\operatorname{Var}(u_j^\top\varepsilon)=\sigma^2$. So $\E\hat\alpha_j-\alpha_j=-\lambda\alpha_j/(d_j^2+\lambda)$
 and $\operatorname{Var}\hat\alpha_j=\sigma^2d_j^2/(d_j^2+\lambda)^2$. The rotation preserves length, and the sum
-of squared bias and variance over $j$ is \cref{eq12:ridgemse}. (iii) The derivative of the $j$th term is
+of squared bias and variance\index{bias and variance} over $j$ is \cref{eq12:ridgemse}. (iii) The derivative of the $j$th term is
 \[
   \frac{2\lambda\alpha_j^2(d_j^2+\lambda)-2(\sigma^2d_j^2+\lambda^2\alpha_j^2)}{(d_j^2+\lambda)^3},
 \]
@@ -145,7 +145,7 @@ $\lambda=0$ to 4.76 at $\lambda=25$ and 1.72 at $\lambda=250$.
 \lstinputlisting[language=Python]{code/ch12/snippets/ridge_svd.py}
 
 Part (iii) is the existence result of \textcite{hoerl1970}. It does not say which $\lambda$ to use, and
-the best one depends on the unknown $\alpha$; in practice $\lambda$ is chosen by cross-validation. The
+the best one depends on the unknown $\alpha$; in practice $\lambda$ is chosen by cross-validation\index{cross-validation}. The
 trace of the hat matrix, $\sum_jd_j^2/(d_j^2+\lambda)$, falls from $p$ to zero as $\lambda$ grows and is
 called the effective degrees of freedom of the fit.
 
@@ -290,8 +290,8 @@ and the test labels together use $r_{a+1},\dots,r_{b+h}$. The two sets are disjo
 $s+1\ge b+h+1$. Labels built from disjoint sets of independent returns are independent.
 \end{proof}
 
-Removing the overlapping labels is called purging, and dropping a further stretch after each test block,
-to allow for dependence in the predictors, is called an embargo \parencite{lopezdeprado2018}. The
+Removing the overlapping labels is called purging\index{purging}, and dropping a further stretch after each test block,
+to allow for dependence in the predictors, is called an embargo\index{embargo} \parencite{lopezdeprado2018}. The
 simulated correlations of twelve month labels one, six and eleven months apart are \kfCorrOne, \kfCorrSix{}
 and \kfCorrEleven, against \kfCorrThOne, \kfCorrThSix{} and \kfCorrThEleven{} from part (i).
 \Cref{fig12:folds} shows the scheme.
@@ -406,7 +406,7 @@ answer with a brute force search over all cuts on simulated data with a step at 
 
 \subsection{Averaging and boosting}
 
-Bagging \parencite{breiman1996} fits trees to bootstrap samples and averages them. A random forest
+Bagging \parencite{breiman1996} fits trees to bootstrap samples and averages them. A random forest\index{random forest}
 \parencite{breiman2001} also lets each split consider only a random subset of $m$ of the $p$ predictors, which
 makes the trees less alike. The next result says why that helps.
 
@@ -422,7 +422,7 @@ $\operatorname{Var}\bigl(\tfrac1B\sum_b\hat f_b\bigr)=\tfrac1{B^2}\bigl(Bs^2+B(B
 More trees remove the second term and leave the first, so the variance of a forest is limited by how
 correlated its trees are, and the averaging does nothing for bias. Boosting attacks the bias instead.
 For squared loss $\tfrac12(y-F)^2$, the negative gradient with respect to the current fit $F(x_i)$ is the
-residual $y_i-F(x_i)$, and gradient boosting \parencite{friedman2001} fits a small tree to the residuals,
+residual $y_i-F(x_i)$, and gradient boosting\index{gradient boosting} \parencite{friedman2001} fits a small tree to the residuals,
 adds a fraction $\nu$ of it to $F$, and repeats. Each step is a step of gradient descent in the space of
 functions, taken along the direction that a small tree can represent.
 
@@ -569,10 +569,10 @@ largest error is \nnMax, found where $v$ is small and the price has a sharp bend
 (\cref{fig12:nnerr}). A polynomial of degree \nnPolyDeg{} in the two scaled inputs, \nnPolyTerms{} terms fitted
 by least squares on the same points, has errors of \nnPolyRmse{} and \nnPolyMax{}. The network's delta,
 $\partial c/\partial m$, is available from the same backward pass by \cref{prop12:backprop}, taking the input
-gradient and dividing by the scaling. Its root mean square error against $N(d_1)$ is \nnDeltaRmse, and its
+gradient and dividing by the scaling. Its root mean square error against $\Phi(d_1)$ is \nnDeltaRmse, and its
 largest error, \nnDeltaMax, is at moneyness \nnDeltaMaxM{} and total volatility \nnDeltaMaxV, the corner of the training range where both are
 highest. \Cref{fig12:nntrain} shows the same failure on the line $\sigma\sqrt T=0.1$, where the
-network's delta falls below $N(d_1)$ as $m$ approaches \nnMhi. The delta was not part of the training loss; here a small price error came with a
+network's delta falls below $\Phi(d_1)$ as $m$ approaches \nnMhi. The delta was not part of the training loss; here a small price error came with a
 small delta error over most of the range, but nothing guarantees it, and the edges are where it fails first.
 
 \begin{figure}[!tb]
@@ -588,7 +588,7 @@ small delta error over most of the range, but nothing guarantees it, and the edg
   \centering
   \includegraphics[width=0.96\textwidth]{ch12/fig08_nn_training}
   \caption{Left: mean squared error of the network on the training and validation points during training.
-  Right: the network's delta, from backpropagation to the inputs, at two total volatilities, with the
+  Right: the network's delta, from backpropagation\index{backpropagation} to the inputs, at two total volatilities, with the
   Black-Scholes delta.}
   \label{fig12:nntrain}
 \end{figure}
@@ -1055,13 +1055,13 @@ every case.
   \caption{Combinatorially symmetric cross-validation of \ovRules{} rules on one simulated price with no
   predictability, with \ovSFig{} blocks and \ovSplits{} splits. Left: in-sample and out-of-sample annual Sharpe
   ratios of the chosen rule. Right: the logit of its relative rank out of sample; the share at or left of
-  zero is the probability of backtest overfitting.}
+  zero is the probability of backtest overfitting\index{backtest overfitting}.}
   \label{fig12:pbo}
 \end{figure}
 
 \subsection{Deflating a Sharpe ratio}
 
-The probabilistic Sharpe ratio of \textcite{bailey2012} is
+The probabilistic Sharpe ratio\index{probabilistic Sharpe ratio} of \textcite{bailey2012} is
 $\Phi\bigl((\hat\theta-\theta^*)/\hat\sigma(\hat\theta)\bigr)$, a normal-approximation score for the evidence
 that the underlying ratio exceeds a benchmark $\theta^*$, and not a literal posterior probability, which
 would need a Bayesian model; with $\hat\sigma(\hat\theta)$ the standard error of Chapter~8 that allows for skewness and
@@ -1073,7 +1073,7 @@ Apply it to \cref{sec12:premium}. Each of the \ovEqModels{} models defines a tim
 over the portfolio of the historical mean is a monthly return series over the same \ovEqT{} months, with the same definition for every model. Least squares and its floored version hold the same portfolio,
 since a negative forecast gives a zero weight either way, so there are \ovEqDistinct{} distinct series. The best of them
 is the \ovEqBest, with a monthly Sharpe ratio of \ovEqSr{} on the difference, \ovEqSrAnn{} a year, skewness
-\ovEqSkew{} and kurtosis \ovEqKurt. Taken alone the ratio has a standard error of \ovEqSe{} and a probabilistic
+\ovEqSkew{} and excess kurtosis \ovEqKurt. Taken alone the ratio has a standard error of \ovEqSe{} and a probabilistic
 Sharpe ratio of \ovEqPsr{} against zero. The Sharpe ratios of the \ovEqModels{} models have a standard deviation
 of \ovEqSrSd, so the benchmark is \ovEqBench, and the deflated Sharpe ratio is \ovEqDsr. Counting the two identical series once, $N=\ovEqDistinct$
 with the spread over the distinct series, gives \ovEqDsrDistinct; the conclusion does not change. Once the search is counted, the
@@ -1090,7 +1090,7 @@ whether there were more than a handful of trials, and there were.
   \centering
   \includegraphics[width=0.84\textwidth]{ch12/fig20_dsr}
   \caption{The deflated Sharpe ratio of the best timing portfolio, the \ovEqBest, against the assumed
-  number of independent trials $N$, with the observed Sharpe ratio, skewness, kurtosis and cross-trial
+  number of independent trials $N$, with the observed Sharpe ratio, skewness, excess kurtosis and cross-trial
   standard deviation held at their sample values. The dashed line is 0.95; the dotted line marks the
   \ovEqModels{} models.}
   \label{fig12:dsr}
@@ -1124,6 +1124,108 @@ $0.10/14=\ovHolmFirst$, so Holm rejects \ovHolmTen, Bonferroni \ovBonfTen{} and 
 create evidence; here the single-predictor results do not meet the corrected thresholds, which does
 not show that no predictor has genuine forecasting power.
 \textcite{harvey2016} argue for thresholds of this kind on new factors in the cross-section.
+
+\subsection{Testing the best of many rules}
+\label{sec12:snoop}
+
+Holm's procedure and the rule of \textcite{benjamini1995} take the p-values as given. When the tests are
+of trading rules run over one shared history, the p-values are strongly dependent, and a test built on
+their joint distribution can keep its error rate while rejecting more. Let $d_{k,t}$ be the return of
+rule $k=1,\dots,m$ in month $t=1,\dots,n$ over a benchmark, here cash, with mean $\mu_k$ and sample mean
+$\bar d_k$. The question is whether any rule beats the benchmark, so the overall null hypothesis is
+$H_0:\max_k\mu_k\le0$, and the hypothesis for rule $k$ is $H_k:\mu_k\le0$.
+
+Each procedure below resamples the $n\times m$ matrix of the $d_{k,t}$ by whole months, which keeps the
+dependence across rules, and in blocks, which keeps some of the dependence over time. The stationary
+bootstrap\index{stationary bootstrap} of \textcite{politis1994} draws blocks that start at random months and have geometric lengths with mean $b$,
+wrapping round the end of the sample. With $B$ resamples it gives bootstrap means $\bar d^{*}_{k,j}$,
+$j=1,\dots,B$, and the bootstrap standard deviation $\hat\omega_k$ of $\sqrt n\,\bar d_k$.
+
+\paragraph{The reality check}
+\textcite{white2000} tests $H_0$ with $V=\max_k\sqrt n\,\bar d_k$\index{reality check}. Its bootstrap values are
+$V^{*}_j=\max_k\sqrt n\,(\bar d^{*}_{k,j}-\bar d_k)$; centring each rule at its own sample mean imposes the
+case $\mu_k=0$ for every rule, the least favourable one for the test. The p-value is the share of the
+$V^{*}_j$ at or above $V$. \textcite{sullivan1999} applied the test to thousands of technical rules on a century of
+US stock prices.
+
+\paragraph{Superior predictive ability}
+\textcite{hansen2005} changes two things\index{superior predictive ability}. He studentizes, with $t_k=\sqrt n\,\bar d_k/\hat\omega_k$ and
+$T=\max(\max_kt_k,0)$, so that a volatile rule does not dominate the maximum, and he centres the bootstrap
+at $\hat\mu_k=\bar d_k\mathbf 1\{t_k\ge-\sqrt{2\ln\ln n}\}$, so that a rule that is clearly worse than the
+benchmark no longer raises the critical value. The bootstrap statistic is
+$T^{*}_j=\max\bigl(\max_k\sqrt n\,(\bar d^{*}_{k,j}-\hat\mu_k)/\hat\omega_k,\,0\bigr)$, and its p-value is the share of
+the $T^{*}_j$ at or above $T$. Centring at $\bar d_k$ instead gives his upper p-value, and centring at
+$\max(\bar d_k,0)$ his lower one.
+
+\paragraph{Stepwise testing}
+The reality check and the SPA test ask whether the best rule beats the benchmark. The StepM\index{StepM} of
+\textcite{romano2005} asks which rules do, and controls the familywise error. With
+$t^{*}_{k,j}=\sqrt n\,(\bar d^{*}_{k,j}-\bar d_k)/\hat\omega_k$, its first step rejects every $H_k$ whose $t_k$
+exceeds $c_1$, the $1-\alpha$ quantile over $j$ of $\max_kt^{*}_{k,j}$. Each later step recomputes the
+quantile over the rules not yet rejected, rejects those above it, and the procedure stops at the first
+step that rejects nothing.
+
+\paragraph{False discoveries under any dependence}
+The rule of \textcite{benjamini1995} controls the false discovery rate for independent tests and for some
+forms of positive dependence. \textcite{benjamini2001} show that running the same rule at level $q/c(m)$,
+with $c(m)=\sum_{i=1}^m1/i$, controls the false discovery rate at $q$ whatever the dependence between the
+tests. The price is power: for $m=\mtRules$, $c(m)=\mtCm$.
+
+\begin{proposition}[Ordering of the bootstrap tests]\label{prop12:snoop}
+Computed from the same bootstrap draws, Hansen's lower, consistent and upper p-values satisfy
+$p_l\le p_c\le p_u$. The critical values of the StepM do not increase from one step to the next, so a
+hypothesis rejected at one step stays rejected and the procedure ends after at most $m+1$ steps.
+\end{proposition}
+
+\begin{proof}
+For each rule the three centring values are ordered, $\max(\bar d_k,0)\ge\hat\mu_k\ge\bar d_k$: if
+$\bar d_k\ge0$ the first two are equal; if $\bar d_k<0$ and $t_k$ is at or above the threshold,
+$\hat\mu_k=\bar d_k$; and below it $\hat\mu_k=0>\bar d_k$. Each $T^{*}_j$ decreases as the centring
+values increase, while $T$ is the same for all three, so the share of draws with $T^{*}_j\ge T$ is
+smallest for the lower centring and largest for the upper one. In the StepM the set of rules not yet
+rejected only shrinks, so for each draw the maximum of $t^{*}_{k,j}$ over that set can only fall, and so
+can its quantile. A statistic above one critical value is above every later one. Each step that does not
+stop rejects at least one new hypothesis, which bounds the number of steps.
+\end{proof}
+
+\paragraph{Trend rules in managed futures}
+Take the six markets of the trend programme of Chapter~9 whose data the repository ships: WTI crude oil,
+the US and Canadian 10 year government bonds, and the euro, the yen and the Canadian dollar against the
+US dollar. Returns are monthly, from month-end prices, in excess of the bill rate, from \mtFirst{} to
+\mtLast, \mtN{} months. The oil and currency returns are spot returns, without the roll yield or the
+interest differential that a futures position would earn, so they differ from what a programme would
+have made. A rule is long a market when its cumulative excess return is above its moving average over
+$L$ months and short when it is below, for $L$ from \mtLookMin{} to \mtLookMax, which gives \mtRules{}
+rules. A change of position costs \mtCost\% of the position each way; the average rule changes position
+\mtTurn{} times a year. The bootstrap has $B=\mtB$ resamples with a mean block length of \mtBlock{} months.
+
+Of the \mtRules{} rules, \mtPos{} have a positive mean. The highest mean belongs to the rule on
+\mtBestAsset{} with $L=\mtBestLook$, \mtBestMean\% a year, and the highest studentized statistic,
+\mtTopT, to the rule on the \mtTopAsset{} with $L=\mtTopLook$, whose bootstrap p-value taken alone is
+\mtTopP. One at a time, \mtNaiveFive{} rules pass at 5\% and \mtNaiveTen{} at 10\%. Once the search is
+counted, the reality check gives $p=\mtRcP$, the SPA test $p=\mtSpaP$ (lower \mtSpaPl, upper \mtSpaPu),
+and the StepM rejects \mtStepM{} hypotheses at 5\%. On the same individual p-values, Holm rejects
+\mtHolmFive, the rule of \textcite{benjamini1995} \mtBhFive{} and its version for any dependence
+\mtBhyFive; at 10\% the three reject \mtHolmTen, \mtBhTen{} and \mtBhyTen. The first critical value of the
+StepM is \mtCrit, against 1.645 for a single one-sided test at 5\% (\cref{fig12:snoop}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\textwidth]{ch12/fig22_snooping}
+  \caption{Studentized mean returns $t_k$ of the \mtRules{} trend rules, \mtFirst{} to \mtLast, by market and
+  moving average length. Dotted line: 1.645, the 5\% critical value of one test. Dashed line: \mtCrit,
+  the first-step critical value of the StepM at 5\%.}
+  \label{fig12:snoop}
+\end{figure}
+
+To see what the corrections buy, draw \mtSimReps{} samples of the same length from these excess returns
+by the stationary bootstrap, after removing each rule's mean so that no rule beats cash, and run every
+procedure on each sample with \mtSimB{} resamples. The best rule passes a 5\% test on its own in
+\mtSimNaive\% of the samples. The reality check finds a winner in \mtSimRc\%, the SPA test in
+\mtSimSpa\%, the StepM in \mtSimStepM\% and the rule of \textcite{benjamini2001} in \mtSimBhy\%. The last
+three are somewhat above the nominal 5\%. They divide by bootstrap estimates of each rule's standard
+deviation, which are themselves noisy in fewer than 300 months of heavy-tailed returns; the reality
+check does not studentize and stays below 5\% here.
 
 \FloatBarrier
 % =====================================================================================
@@ -1181,7 +1283,9 @@ with memory might do better.
         markup by \hdPriceCutWw\%, against \hdPriceCutCost\% for the re-optimised rule without memory.
   \item The best of $N$ trials with no skill has an expected value below $\sqrt{2\ln N}$ standard errors.
         The deflated Sharpe ratio, the probability of backtest overfitting and Holm's procedure all
-        discount a result for the search that produced it.
+        discount a result for the search that produced it. On \mtRules{} trend rules in six markets,
+        \mtNaiveFive{} pass a single 5\% test, while the reality check ($p=\mtRcP$), the SPA test
+        ($p=\mtSpaP$) and the StepM find none that beats cash once the search is counted.
 \end{itemize}
 
 \FloatBarrier
@@ -1215,10 +1319,27 @@ with memory might do better.
   \item\label{exr12:ten} Five p-values are 0.001, 0.008, 0.012, 0.04 and 0.2. At 5\%, how many hypotheses do
   Holm, Bonferroni and the rule of \textcite{benjamini1995} reject?
   \item\label{exr12:eleven} A strategy has a monthly Sharpe ratio of 0.25 over 120 months, skewness $-0.5$
-  and kurtosis 4. Find the standard error of the ratio and its probabilistic Sharpe ratio against zero.
+  and excess kurtosis 1. Find the standard error of the ratio and its probabilistic Sharpe ratio against zero.
   \item\label{exr12:twelve} Over one period a claim's change has variance 0.6, the stock's change variance 1.6
   and their covariance 0.9. Find the hedge ratio that minimises the variance of the hedged position and the
   share of the variance it removes.
+\end{enumerate}
+
+\subsection*{Computing projects}
+\label{sec12:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch12/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch12/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P12.\arabic*}, leftmargin=*, ref=P12.\arabic*]
+\item Rerun the tests of \cref{sec12:snoop} with costs of 0, 10 and 50 basis points per change of position
+and mean block lengths of 3, 6 and 12 months. How sensitive are the reality check and SPA p-values to each
+choice, and is there any combination in which StepM rejects? Discuss whether such a combination would be
+an honest finding.
+\item Take the rule with the highest Sharpe ratio among the 66 and compute its probabilistic Sharpe ratio
+against zero with \texttt{psr} and its deflated Sharpe ratio for 66 trials with \texttt{dsr}, using the
+skewness and excess kurtosis of its returns. Compare the conclusion with that of the bootstrap tests.
 \end{enumerate}
 
 \subsection*{Answers}
@@ -1265,7 +1386,10 @@ with the statistics of \textcite{campbell2008} and \textcite{clark2007}, the com
 \textcite{rapach2010} and the comparison with \textcite{gu2020}. Deep hedging is from
 \textcite{buehler2019} and the no-trade band from \textcite{whalley1997}. The probabilistic and deflated
 Sharpe ratios are from \textcite{bailey2012,bailey2014}, the probability of backtest overfitting from
-\textcite{bailey2017}, and the step-down test from \textcite{holm1979}. The proofs of the propositions are
+\textcite{bailey2017}, and the step-down test from \textcite{holm1979}. The reality check is from
+\textcite{white2000} and its use on trading rules from \textcite{sullivan1999}, the test for superior
+predictive ability from \textcite{hansen2005}, the StepM from \textcite{romano2005}, the false discovery
+rule under dependence from \textcite{benjamini2001}, and the stationary bootstrap from \textcite{politis1994}. The proofs of the propositions are
 standard and are given here in the chapter's notation.
 
 \paragraph{Software used}
@@ -1287,5 +1411,4 @@ carry no licence for redistribution, so they are not shipped with the code, and
 from them are not shipped either. Every other input is simulated, with the seed in
 \texttt{code/ch12/numbers\_ch12.py}.
 
-{\emergencystretch=2em\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]}
-\end{refsection}
+\end{chapterrefs}

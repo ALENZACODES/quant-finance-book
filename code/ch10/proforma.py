@@ -16,6 +16,40 @@ SPREAD_EXIT = 0.0025  # exit cap above the going-in cap, for an older building a
 SALE_COST = 0.02
 
 
+CLOSING = 0.01        # legal, survey and due diligence costs on purchase, an assumption
+FUND_FEE = 0.01       # annual fee of a pooled fund, share of the property value, an assumption
+
+
+def frictions(noi, value, cap, exitc, cf, sale):
+    """From the property's IRR to an investor's: Ontario land transfer tax and closing costs on purchase,
+    the sale cost already in the DCF, and an annual fee on value when the building is held in a fund.
+    The round trip costs fall as a share of the annual return as the holding period lengthens."""
+    ltt = L.ontario_ltt(value)
+    assert abs(ltt - (0.02 * value - 3525)) < 1e-6          # the province's quick formula above $400,000
+    put("frLtt", ltt / 1e6, "{:.2f}"); pct("frLttShare", ltt / value, 2); pct("frClosing", CLOSING, 0)
+    pct("frFee", FUND_FEE, 0)
+    buy = value + ltt + CLOSING * value
+    t = np.arange(1, T + 1)
+    f0 = np.concatenate([[-value], cf]); f0[-1] += sale
+    f1 = np.concatenate([[-buy], cf]); f1[-1] += sale
+    fee = FUND_FEE * value * (1 + G) ** (t - 0.5)            # fee on a value that grows with the rents
+    f2 = f1.copy(); f2[1:] -= fee
+    i0, i1, i2 = L.irr(f0), L.irr(f1), L.irr(f2)
+    pct("frIrrGross", i0, 2); pct("frIrrBuy", i1, 2); pct("frIrrNet", i2, 2)
+    put("frDragBuy", 1e4 * (i0 - i1), "{:.0f}"); put("frDragFee", 1e4 * (i1 - i2), "{:.0f}"); put("frDragAll", 1e4 * (i0 - i2), "{:.0f}")
+    assert i0 > i1 > i2
+    pct("frFeeShare", (i1 - i2) / i1, 0)
+    # the same costs over five and twenty years, with the exit at the same cap rate
+    drag = {}
+    for TT, nm in ((5, "Five"), (20, "Twenty")):
+        tt = np.arange(1, TT + 1); c = noi * (1 + G) ** (tt - 1) * (1 - CAPEX)
+        sl = noi * (1 + G) ** TT / exitc * (1 - SALE_COST)
+        g0 = np.concatenate([[-value], c]); g0[-1] += sl
+        g1 = np.concatenate([[-buy], c]); g1[-1] += sl
+        drag[TT] = L.irr(g0) - L.irr(g1); put(f"frDragBuy{nm}", 1e4 * drag[TT], "{:.0f}")
+    assert drag[5] > i0 - i1 > drag[20] > 0
+
+
 def main():
     egi = GPR * (1 - VAC) + OTHER
     noi = egi - OPEX
@@ -44,6 +78,7 @@ def main():
     pct("pfIrr", L.irr(flows), 2)
     flows0 = np.concatenate([[-value], cf]); flows0[-1] += noi * (1 + G) ** T / cap
     pct("pfIrrSame", L.irr(flows0), 2)
+    frictions(noi, value, cap, exitc, cf, sale)
     # elasticity of value to the exit cap, and a 100 basis point exit cap shock
     el = L.exit_cap_elasticity(RREQ, G, T, cap, CAPEX)
     assert abs(el + share) < 1e-12

@@ -1,6 +1,6 @@
 % Chapter 6. All quoted numbers come from chapters/ch06-numbers.tex, written by code/ch06/run_all.py.
 \input{chapters/ch06-numbers}
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{5}
 \chapter{Interest Rates, Credit Risk, Private Credit and Structured Products}
 \label{ch:credit}
@@ -16,7 +16,7 @@ mortgage originated in any month from \csFirst{} through \csLast{} have been ref
 The rate half starts with a single bond. Duration and convexity say how its price responds to a
 change in yield, and the same algebra tells a lender how to fund a loan so that a parallel move in
 rates cannot hurt. Models of the short rate then combine today's curve with assumptions about how rates move to give a
-whole distribution of future curves, which is what a cap or a refinancing test needs; a swap, it turns out, needs only today's curve. The credit
+whole distribution of future curves, which is what a cap or a refinancing\index{refinancing} test needs; a swap, it turns out, needs only today's curve. The credit
 half starts with a firm whose debt is a short put on its assets, moves to a description of default
 as a sudden event with an intensity that can be read from credit default swaps, and ends with pools:
 how a common factor makes defaults arrive together, and how a structure cuts the pool's losses into
@@ -28,7 +28,7 @@ The numbers in the text are computed by nine scripts in \texttt{code/ch06/}
 (\texttt{bonds\_duration}, \texttt{short\_rates}, \texttt{swaps\_caps}, \texttt{merton\_model},
 \texttt{hazard\_cds}, \texttt{copula\_tranches}, \texttt{private\_credit}, \texttt{case\_refinance} and
 \texttt{exercises}); the tests in \texttt{code/ch06/test\_*.py} check them. An independent R script
-recomputes the duration tests, refits the curve, prices caplets, calibrates the Merton model,
+recomputes the duration tests, refits the curve, prices caplets, calibrates the Merton model\index{Merton model},
 bootstraps the hazard curve, evaluates the copula by its own quadrature, rescores the screener's
 example loans and rebuilds the case study from the data file. GNU Octave solves the CIR equations
 numerically and checks the caplet, the calibration and the large-pool losses. The screener's own
@@ -47,7 +47,8 @@ quarterly or semi-annual schedule are simple. Loan rates in the private credit s
 rates compounded monthly, the convention of the screener used there. Canadian mortgages repaid in
 blended payments must state their rate calculated yearly or half-yearly under section 6 of the
 Interest Act, so a quoted 6\% compounded half-yearly is 6.09\% effective a year, while 6\% compounded
-monthly is 6.17\% effective; the stylised loans here keep the screener's monthly convention.
+monthly is 6.17\% effective. The stylised loans of \cref{sec6:private} keep the screener's monthly
+convention; the case study of \cref{sec6:case} compounds half-yearly, as a Canadian mortgage would.
 
 A few letters change meaning between sections. $D$ and $C$ are a bond's modified duration and
 convexity. $r_t$ is the short rate in \cref{sec6:short,sec6:swaps}; in \cref{sec6:merton} $r$ is a
@@ -82,11 +83,11 @@ $t_i$. At yield $y$, compounded twice a year, its price is
 The price falls as the yield rises, and the question for anyone holding the bond is by how much.
 
 \begin{definition}\label{def6:duration}
-The \emph{modified duration} and \emph{convexity} of the bond at yield $y$ are
+The \emph{modified duration}\index{modified duration} and \emph{convexity} of the bond at yield $y$ are
 \[
   D=-\frac{p'(y)}{p(y)},\qquad C=\frac{p''(y)}{p(y)} .
 \]
-The \emph{Macaulay duration} is $D_{\mathrm{mac}}=\sum_it_i\,\mathrm{CF}_i(1+y/2)^{-i}/p(y)$, the
+The \emph{Macaulay duration}\index{Macaulay duration} is $D_{\mathrm{mac}}=\sum_it_i\,\mathrm{CF}_i(1+y/2)^{-i}/p(y)$, the
 present-value weighted average time of the payments, and $D=D_{\mathrm{mac}}/(1+y/2)$.
 \end{definition}
 
@@ -265,7 +266,7 @@ which the price at $t$ of a payment of 1 at $T$ is
 \end{equation}
 The two models below were met in Chapters 3 and 4 as processes; here they produce bond prices.
 
-\begin{proposition}[Vasicek bond prices]\label{prop6:vasicek}
+\begin{proposition}[Vasicek\index{Vasicek} bond prices]\label{prop6:vasicek}
 Under $Q$ let $dr_t=\kappa(\bar r-r_t)\,dt+\sigma\,dW_t$ with $\kappa>0$ and $\sigma>0$
 \parencite{vasicek1977}. Then $P(t,T)=A(x)e^{-B(x)r_t}$ with $x=T-t$,
 \[
@@ -361,8 +362,10 @@ volatility the curve is almost entirely the deterministic pull of $r_0$ towards 
 $\kappa$ of \srVasNowKap{} a year means a half-life of the pull, $\ln2/\kappa$, of \srHalfNow{} months. On \srDateInv{} the short rate sits far above its long-run level, and the inverted shape is
 fitted less well, with errors up to \srVasInvMax{} basis points. One factor and three parameters can
 make a curve that rises, falls or has one hump; they cannot follow every wiggle of a real curve, and
-models used for pricing add a time-dependent drift so that today's curve is matched exactly
-\parencite{brigo2006}.
+models used for pricing add a time-dependent drift so that today's curve is matched exactly. The
+best known is the extended Vasicek model of \textcite{hullwhite1990}, in which $\bar r$ becomes a
+function of time chosen to reprice every zero-coupon bond on the day of the fit while bond prices keep
+the form $A e^{-Br}$ \parencite{brigo2006}.
 
 \begin{figure}[t]
   \centering
@@ -394,7 +397,7 @@ promised the size of the gap for contracts on rates. The cleanest case is the mo
 chosen to fit today's curve.
 
 \begin{proposition}[Convexity adjustment]\label{prop6:holee}
-In the Ho-Lee model, let $R(T_1,T_2)$ be the continuously compounded rate fixed at $T_1$ for the period
+In the Ho-Lee\index{Ho-Lee} model, let $R(T_1,T_2)$ be the continuously compounded rate fixed at $T_1$ for the period
 to $T_2$ and $f(0;T_1,T_2)$ the forward rate for that period,
 \[
   R(T_1,T_2)=-\frac{\ln P(T_1,T_2)}{T_2-T_1},\qquad f(0;T_1,T_2)=\frac{\ln\bigl(P(0,T_1)/P(0,T_2)\bigr)}{T_2-T_1}.
@@ -553,7 +556,7 @@ The model of \textcite{merton1974} treats a firm as a pool of assets worth $V_t$
 and by one zero-coupon debt issue with face value $K$ due at $T$. At $T$ the owners repay if
 $V_T\ge K$ and hand over the assets otherwise. Equity is worth $(V_T-K)^+$ at $T$ and debt
 $\min(V_T,K)=K-(K-V_T)^+$, so the lender holds a riskless bond and has written a put on the firm's
-assets. Write the \emph{quasi-leverage} as $\ell=Ke^{-rT}/V_0$, the face of the debt discounted at the
+assets. Write the \emph{quasi-leverage}\index{quasi-leverage} as $\ell=Ke^{-rT}/V_0$, the face of the debt discounted at the
 riskless rate as a fraction of the assets.
 
 \begin{proposition}[Merton spreads]\label{prop6:merton}
@@ -652,7 +655,7 @@ describes the timing directly, which makes short spreads easy to match and fitti
 routine.
 
 \begin{definition}\label{def6:hazard}
-A default time $\tau$ has \emph{hazard rate} $\lambda(t)\ge0$ under $Q$ if its survival function is
+A default time $\tau$ has \emph{hazard rate}\index{hazard rate} $\lambda(t)\ge0$ under $Q$ if its survival function is
 \[
   S(t)=Q(\tau>t)=e^{-H(t)},\qquad H(t)=\int_0^t\lambda(u)\,du .
 \]
@@ -660,7 +663,7 @@ Then $Q(\tau\le t+h\mid\tau>t)=\lambda(t)h+o(h)$ at points where $\lambda$ is co
 the rate of default per unit of time for a name that has survived to $t$.
 \end{definition}
 
-A credit default swap on a name with maturity $T$ has two legs. The protection buyer pays a spread
+A credit default swap\index{credit default swap} on a name with maturity $T$ has two legs. The protection buyer pays a spread
 $s$ a year, quarterly, on the notional for as long as the name survives, plus the premium accrued
 since the last payment date if it defaults. The seller pays the loss $1-R$ per unit of notional at
 $\tau$ if $\tau\le T$, where $R$ is the recovery rate. If $\tau$ is independent of interest rates under
@@ -754,6 +757,34 @@ formula for $\mathrm{Prot}(5)$, a gap of \hzMcProtZ{} standard errors. The indep
 the rates is what lets the formula multiply $P(0,u)$ by $S(u)$; a name whose default risk rises when
 rates fall would need a joint model.
 
+\subsection{How single-name contracts are quoted}
+\label{sec6:cdsquote}
+
+The par spread is the natural output of the model, but since 2009 North American single-name contracts
+have not traded at par. They carry a fixed running coupon of 100 basis points, usual for investment
+grade names, or 500 for high yield, and the difference is settled by an upfront payment
+\parencite{markit2009}\index{credit default swap!upfront payment}. The buyer also pays a full coupon on each quarterly date,
+and the seller rebates at the trade the premium accrued before it. With a coupon $C$ the upfront paid by
+the buyer per unit of notional is
+\[
+  U=\mathrm{Prot}(T)-C\,\mathcal A_\tau(T)=\bigl(s-C\bigr)\mathcal A_\tau(T),
+\]
+where $s$ is the par spread on the same hazard curve, so a name trading inside its coupon has a negative
+upfront and the buyer receives cash. Dealers quote a 100 basis point name by a conventional spread, and
+the upfront is computed from it with a standard model that assumes one flat hazard for all horizons and
+standard recoveries; a 500 basis point name is usually quoted in points upfront.
+
+For the five year quote of \hzQFive{} basis points the flat hazard that reprices it is \cdFlatLam\%, the
+risky annuity is \cdAnnFlat{} years, and on a 100 basis point coupon the buyer receives \cdUpIg{} per
+100 of notional. Valued on the bootstrapped curve of \cref{tab6:hazard} instead, the annuity is
+\cdAnnCurve{} and the buyer receives \cdUpIgCurve, a gap of \cdUpIgGapBp{} basis points of notional
+that comes from the flat hazard putting more of the default risk early. A high yield name quoted at
+\cdQHy{} basis points has a flat hazard of \cdLamHy\%, an annuity of \cdAnnHy{} and, on the 500 basis
+point coupon, an upfront of \cdUpHy{} points paid by the buyer; on a 100 basis point coupon it would
+need \cdUpHyOne. The code checks the identity above on both curves and that the upfront is zero
+when the quoted spread equals the coupon. Real conversions also fix the discount curve, the trade and
+settlement dates and the day count, which the sketch here leaves out.
+
 % =====================================================================================
 \section{Why do defaults in a pool arrive together?}
 \label{sec6:copula}
@@ -761,7 +792,7 @@ rates fall would need a joint model.
 A loan fund, a CLO or a bank's book holds many names. If their defaults were independent, the share
 that defaults in a large pool would be close to its expectation, so a big pool would carry little risk beyond its expected loss.
 Real pools carry more, because borrowers share an economy. The standard way to put that into numbers is a
-one-factor Gaussian model, the form of the Gaussian copula of \textcite{li2000} that the market adopted.
+one-factor Gaussian model, the form of the Gaussian copula\index{Gaussian copula} of \textcite{li2000} that the market adopted.
 
 \begin{definition}\label{def6:copula}
 In a pool of $n$ names, name $i$ defaults by the horizon if
@@ -827,7 +858,7 @@ stated.
 
 \subsection{Cutting the pool into tranches}
 
-A tranche with attachment $a$ and detachment $d$, $0\le a<d\le1$, absorbs the part of the pool loss
+A tranche\index{tranche} with attachment $a$ and detachment $d$, $0\le a<d\le1$, absorbs the part of the pool loss
 between $a$ and $d$. Its loss as a fraction of its size is
 \[
   L_{[a,d]}=\frac{\min(L,d)-\min(L,a)}{d-a}=\frac{\min\bigl((L-a)^+,\,d-a\bigr)}{d-a}.
@@ -964,13 +995,13 @@ A loan of amount $\mathcal L$ against a property of value $V$ with net operating
 year carries an annual rate $r_{\mathcal L}$, compounded monthly, and amortises over $n_{\mathrm{am}}$ years or pays
 interest only. Its annual debt service is $\mathcal L r_{\mathcal L}$ if interest only, and otherwise
 $12\mathcal L r_{\mathrm m}/\bigl(1-(1+r_{\mathrm m})^{-12n_{\mathrm{am}}}\bigr)$ with $r_{\mathrm m}=r_{\mathcal L}/12$; dividing by $\mathcal L$ gives the
-\emph{loan constant} $k$. The screen computes
+\emph{loan constant}\index{loan constant} $k$. The screen computes
 \[
   \mathrm{LTV}=\frac{\mathcal L}{V},\qquad \mathrm{DSCR}=\frac{\mathcal N}{k\mathcal L},\qquad
   \mathrm{DY}=\frac{\mathcal N}{\mathcal L},\qquad
   \text{exit LTV}=\frac{b}{\mathcal N(1+g)^T/(q_{\mathrm{in}}+\Delta q)},
 \]
-the loan to value, debt service coverage, debt yield and loan to value at maturity. Here $b$ is the
+the loan to value\index{loan to value}, debt service coverage\index{debt service coverage}, debt yield and loan to value at maturity. Here $b$ is the
 balance due at the loan's term of $T$ years, $g$ is the annual growth of income, compounded annually,
 $q_{\mathrm{in}}$ is the going-in capitalisation rate entered for the property and $\Delta q$ the
 assumed rise in that rate by the exit.
@@ -1079,30 +1110,47 @@ on it. The study takes a stylised loan written at every month-end from \csFirst{
 enough to repay it.
 
 \paragraph{The loan}
-At origination the property is worth 100 and earns $\mathcal N_0=6$, a cap rate of \csCap\%. The loan is
-\csLtv\% of value at the five year Government of Canada yield $y_0$ plus \csSpread{} points,
-compounded monthly, amortising over \csAmort{} years. The five year yield is a semi-annual bond yield
-and is used as a monthly compounded rate without conversion. Converting it would lower the rate by at
-most \csConvMax{} basis points over the yields in the file, would leave the count of vintages failing
-the test without shocks at \csConvFails, and would move the largest failure probability below from \csPdMax\% to
-\csConvPdMax\%. The loan amortises, so its balance at maturity is
-$b$. Over the term income grows by \csG\% a year, so $\mathcal N_1=6(1.02)^5$. Cap rates move with
-yields but less than one for one: $q_1=q_0+\beta(y_1-y_0)$ with $\beta=\csBeta$, where $y_1$ is the
-five year yield at maturity, so the property is worth $V_1=\mathcal N_1/q_1$. A new lender quotes the
-yield then plus the same spread and lends the smaller of \csLtv\% of $V_1$ and the amount whose
-coverage is \csDscrMin, $\mathcal N_1/(\csDscrMin\,k_1)$, with $k_1$ the new loan constant. The
-\emph{cover} $\gamma$ is that amount divided by $b$, and the loan refinances if $\gamma\ge1$. The data are
-the month-end five year yields from the file of Chapter~4, which runs to \csMatLast.
+At origination the property is worth 100. Its cap rate depends on the rates of the day: it is
+\csCap\% when the five year Government of Canada yield is \csYRef\% and moves by $\beta=\csBeta$ points
+for each point of yield, $q_0=\csCap\%+\beta(y_0-\csYRef\%)$, so income is $\mathcal N_0=100\,q_0$.
+Over the vintages $q_0$ runs from \csCapZeroMin\% to \csCapZeroMax\%. The mortgage rate is $y_0$ plus
+\csSpread{} points, stated as a yearly rate compounded half-yearly, as Canadian mortgage rates are,
+and paid monthly over a \csAmort{} year amortisation, so the monthly rate is $(1+j/2)^{1/6}-1$ for a
+quoted rate $j$. The lender applies two tests at origination and lends the smaller of \csLtv\% of value
+and the amount whose debt service coverage is \csDscrMin, $\mathcal N_0/(\csDscrMin\,k_0)$, with $k_0$
+the annual payment per unit of loan. Coverage sets the loan in \csDscrBindsZero{} of the \csN{}
+vintages, and loan to value at origination runs from \csLtvZeroMin\% to \csLtvZeroMax\%. Without the
+coverage test, a loan of \csLtv\% at a fixed \csCap\% cap rate would start below a coverage of
+\csDscrMin{} whenever the yield is above \csOldYCut\%, which is the case for \csOldBelow{} vintages; no
+lender would write those loans, and a refinancing test that the original loan could not pass says
+little about refinancing risk.
+
+The loan amortises, so its balance at maturity is $b$. Over the term income grows by \csG\% a year,
+so $\mathcal N_1=\mathcal N_0(1.02)^5$. Cap rates keep moving with yields,
+$q_1=q_0+\beta(y_1-y_0)$, where $y_1$ is the five year yield at maturity, so the property is worth
+$V_1=\mathcal N_1/q_1$. A new lender quotes the yield then plus the same spread and applies the same
+two tests: it lends the smaller of \csLtv\% of $V_1$ and $\mathcal N_1/(\csDscrMin\,k_1)$, with $k_1$ the
+new annual payment per unit of loan. The \emph{cover} $\gamma$ is that amount divided by $b$, and the
+loan refinances if $\gamma\ge1$. The data are the month-end five year yields from the file of
+Chapter~4, which runs to \csMatLast. Reading the quoted rates as compounded monthly instead would raise
+the effective rate by at most \csConvMax{} basis points and change the number of vintages that fail the
+test without shocks from \csFails{} to \csMonthlyFails.
 
 \paragraph{Without shocks}
-On these assumptions every vintage refinances: \csFails{} of the \csN{} have a cover below 1. The
-median cover is \csCoverMed, and the loan to value test binds in \csLtvBinds{} vintages. The lowest
-cover, \csCoverMin, belongs to the last vintage, \csLast. That loan was written at a yield of
-\csLastYZero\% and a rate of \csRateZero\%, with a coverage of \csLastDscrZero, and by maturity the
-yield was \csLastYOne\%. Its balance was \csLastB{} of the original 65, its income had grown, and a new
-loan equal to that balance would have had a coverage of \csLastDscrOne. What hurt was the value: the cap rate rose
-to \csLastCapOne\%, the loan to value of the balance was \csLastLtvOne\%, and the \csLtv\% limit left
-little room. \Cref{fig6:refi} shows the yield and the cover for every vintage.
+On these assumptions \csFails{} of the \csN{} vintages have a cover below 1, all written between
+\csFailFirst{} and \csFailLast, when the five year yield was at most \csFailYMax\%. The median cover is
+\csCoverMed, and the coverage test sets the new loan in \csDscrBindsOne{} vintages. When coverage
+sets both the original and the new loan, the cap rate drops out of the cover: the loan is proportional
+to $\mathcal N_0$, and so are $b$ and $\mathcal N_1$, so $\gamma$ depends only on the two loan constants
+and on income growth. A loan written when rates were low and refinanced when they had risen is then
+the one at risk. The lowest cover, \csCoverMin, belongs to the vintage of \csCoverMinDate. The last
+vintage, \csLast, was written at a yield of \csLastYZero\% and a rate of \csRateZero\%, with a cap rate
+of \csLastCapZero\%, so coverage limited the loan to \csLastLoan{} with a coverage of \csLastDscrZero.
+By maturity the yield was \csLastYOne\% and the annual payment per 100 of loan had gone from
+\csLastKZero{} to \csLastKOne. The balance was \csLastB, and a new loan equal to it would have had a
+coverage of \csLastDscrOne, just short of \csDscrMin, while its loan to value at the new cap rate of
+\csLastCapOne\% was \csLastLtvOne\%, inside the \csLtv\% limit. The cover is \csLastCover, and what stops the
+refinancing is the higher rate. \Cref{fig6:refi} shows the yield and the cover for every vintage.
 
 \begin{figure}[t]
   \centering
@@ -1141,9 +1189,11 @@ $Z_i=\sqrt\rho\,M+\sqrt{1-\rho}\,\varepsilon_i$ with $\sqrt\rho=\sigma_M/\sigma$
 With $\sigma_M=\csSigM\%$ and $\sigma_\varepsilon=\csSigE\%$, $\sigma=\csSig\%$ and $\rho=\csRho$. The
 dashed line in \cref{fig6:refi} is $p$ for each vintage. Its median over all vintages is
 \csPdMed\%, and over the vintages written before 2020 it is \csPdPreMed\%. The largest, \csPdMax\%,
-belongs to the vintage of \csPdMaxDate: a loan that passes the refinancing test with no shock fails it with a probability above two in five once income is uncertain. The answer depends heavily on how
-cap rates follow yields. For the last vintage, $\beta=0$ gives a cover of \csCoverBetaZero{} and a
-failure probability of \csPdBetaZero\%, while $\beta=1$ gives \csCoverBetaOne{} and \csPdBetaOne\%.
+belongs to the vintage of \csPdMaxDate, which fails even without a shock. The answer depends on how
+cap rates follow yields, but only through which test binds. For the last vintage, $\beta=1$ leaves the
+cover at \csCoverBetaOne{} and the failure probability at \csPdBetaOne\%, since coverage still sets
+both loans. With $\beta=0$ every cap rate is \csCap\%, value sets the original loan at \csLtv\%, and
+the cover is \csCoverBetaZero{} with a failure probability of \csPdBetaZero\%.
 
 \paragraph{From failure to loss}
 A loan that cannot refinance is assumed to be sold, the lender receiving $\eta\zeta$ with
@@ -1280,6 +1330,29 @@ while with uncertain income the failure probability for the vintage of \csLast{}
   coverage of 1.25 on a 25 year amortisation. Find the balance due, the largest new loan and the cover.
 \end{enumerate}
 
+\subsection*{Computing projects}
+\label{sec6:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch06/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch06/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P6.\arabic*}, leftmargin=*, ref=P6.\arabic*]
+\item Rerun the refinancing case study with \texttt{refi\_vintages} for loan-to-value limits of 60\%, 65\% and
+75\%, coverage tests of 1.20, 1.25 and 1.35, and cap rate sensitivities $\beta$ of 0, 0.5 and 1. Count the
+vintages whose loan cannot be refinanced in full. Explain why, with $\beta$ fixed, the count barely moves
+with the lending standards when the same standards apply at origination and at maturity, and why it moves
+with $\beta$.
+\item For each quoted maturity of \cref{tab6:hazard}, compute the upfront on a 100 basis point coupon from the
+flat hazard that reprices the quote, with \texttt{flat\_hazard} and \texttt{cds\_upfront}, and from the
+bootstrapped curve. Why do the two agree exactly at one year, and why does the gap widen with maturity on
+this rising curve?
+\item For each month since 2000, price a 10 year Government of Canada par bond at the month-end yield and a
+month later, and compare the exact price change with the duration and the duration and convexity
+approximations from \texttt{mod\_duration} and \texttt{convexity}. Report the root mean square error of each
+in cents per 100 and the size and month of the largest miss of the duration approximation.
+\end{enumerate}
+
 \subsection*{Answers}
 
 \begin{enumerate}[label=\textbf{6.\arabic*}, leftmargin=*]
@@ -1349,5 +1422,4 @@ published values, and the numbers here use the saved file. The CDS quotes in \cr
 firm in \cref{sec6:merton} and the loans in \cref{sec6:private} are illustrations and describe no real
 borrower.
 
-\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
-\end{refsection}
+\end{chapterrefs}

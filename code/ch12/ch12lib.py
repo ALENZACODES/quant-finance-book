@@ -433,22 +433,22 @@ def expected_max_approx(N):
     return (1 - EULER) * norm.ppf(1 - 1 / N) + EULER * norm.ppf(1 - 1 / (N * math.e))
 
 
-def sharpe_se(sr, T, skew=0.0, kurt=3.0):
+def sharpe_se(sr, T, skew=0.0, exkurt=0.0):
     """Standard error of a per-period Sharpe ratio from T observations with the given skewness and
-    kurtosis (not excess), as in Chapter 8."""
-    return math.sqrt((1 - skew * sr + (kurt - 1) / 4 * sr ** 2) / (T - 1))
+    excess kurtosis, the form of Chapter 8: 1 + sr^2/2 - skew sr + exkurt sr^2/4 over T - 1."""
+    return math.sqrt((1 + 0.5 * sr ** 2 - skew * sr + exkurt / 4 * sr ** 2) / (T - 1))
 
 
-def psr(sr, T, skew=0.0, kurt=3.0, bench=0.0):
+def psr(sr, T, skew=0.0, exkurt=0.0, bench=0.0):
     """Probabilistic Sharpe ratio: probability that the true Sharpe ratio exceeds bench."""
-    return float(norm.cdf((sr - bench) / sharpe_se(sr, T, skew, kurt)))
+    return float(norm.cdf((sr - bench) / sharpe_se(sr, T, skew, exkurt)))
 
 
-def dsr(sr, T, N, var_sr, skew=0.0, kurt=3.0):
+def dsr(sr, T, N, var_sr, skew=0.0, exkurt=0.0):
     """Deflated Sharpe ratio: PSR against the expected maximum of N zero-skill Sharpe ratios whose
     cross-sectional variance is var_sr."""
     bench = math.sqrt(var_sr) * expected_max_approx(N)
-    return psr(sr, T, skew, kurt, bench), bench
+    return psr(sr, T, skew, exkurt, bench), bench
 
 
 def holm(p, alpha):
@@ -516,3 +516,73 @@ def ww_width(S, K, T, sig, kappa, gamma):
     """Whalley and Wilmott's asymptotic half-width of the no-trade band, (3 kappa S Gamma^2 / (2 gamma))^(1/3),
     for proportional cost kappa and absolute risk aversion gamma."""
     return (1.5 * kappa * S * bs_gamma(S, K, T, sig) ** 2 / gamma) ** (1 / 3)
+
+
+# ----------------------------------------------------------------------------- data-snooping tests
+def bhy(p, alpha):
+    """Benjamini and Yekutieli (2001): the Benjamini-Hochberg step-up rule run at alpha / c(m), with
+    c(m) = 1 + 1/2 + ... + 1/m, which controls the false discovery rate under any dependence."""
+    m = len(p)
+    return bh(p, alpha / np.sum(1.0 / np.arange(1, m + 1)))
+
+
+def stationary_bootstrap(n, B, mean_block, rng):
+    """B x n index arrays of the stationary bootstrap of Politis and Romano (1994): blocks start at a
+    uniform position and their lengths are geometric with mean mean_block, wrapping round the sample."""
+    q = 1.0 / mean_block
+    idx = np.empty((B, n), dtype=np.int64)
+    idx[:, 0] = rng.integers(0, n, B)
+    new = rng.random((B, n)) < q                     # start a new block at t with probability q
+    fresh = rng.integers(0, n, (B, n))
+    for t in range(1, n):
+        idx[:, t] = np.where(new[:, t], fresh[:, t], (idx[:, t - 1] + 1) % n)
+    return idx
+
+
+def boot_means(d, idx):
+    """Bootstrap means of the columns of d (n x m) for each row of the index array idx (B x n)."""
+    return np.stack([d[i].mean(0) for i in idx])
+
+
+def snooping_tests(d, idx, alpha=0.05):
+    """White's reality check, Hansen's SPA test (with its lower and upper p-values) and the studentized
+    StepM of Romano and Wolf (2005), for the n x m matrix d of performance of m rules relative to a
+    benchmark; the null is that no rule has a positive mean. idx are stationary bootstrap indices.
+    Returns a dict with the statistics, p-values, per-rule bootstrap p-values and the StepM rejections."""
+    n, m = d.shape
+    dbar = d.mean(0)
+    db = boot_means(d, idx)                                   # B x m
+    rn = math.sqrt(n)
+    omega = rn * db.std(0, ddof=1)                            # bootstrap standard deviation of sqrt(n) dbar
+    # reality check: max of sqrt(n) dbar against the recentred bootstrap
+    V = rn * dbar.max()
+    Vb = rn * (db - dbar).max(1)
+    p_rc = float(np.mean(Vb >= V))
+    # SPA: studentized, with the recentring of Hansen (2005)
+    t = rn * dbar / omega
+    T = max(t.max(), 0.0)
+    thr = -math.sqrt(2 * math.log(math.log(n)))
+    mu_c = np.where(t >= thr, dbar, 0.0)
+    mu_l = np.maximum(dbar, 0.0)
+    out = {}
+    for nm, mu in [("c", mu_c), ("l", mu_l), ("u", dbar)]:
+        Tb = np.maximum((rn * (db - mu) / omega).max(1), 0.0)
+        out[f"p_spa_{nm}"] = float(np.mean(Tb >= T))
+    # individual bootstrap p-values (studentized, recentred at the sample mean)
+    tb = rn * (db - dbar) / omega
+    p_ind = np.mean(tb >= t, axis=0)
+    # StepM: step down on the studentized statistics until no new rejection
+    rej = np.zeros(m, bool); steps = 0
+    while True:
+        act = ~rej
+        if not act.any():
+            break
+        c = np.quantile(tb[:, act].max(1), 1 - alpha)
+        new = act & (t > c)
+        steps += 1
+        if not new.any():
+            break
+        rej |= new
+    out.update(V=float(V), p_rc=p_rc, T=float(T), t=t, omega=omega, dbar=dbar, p_ind=p_ind, stepm=rej,
+               stepm_steps=steps, thr=thr)
+    return out

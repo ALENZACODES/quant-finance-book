@@ -1,6 +1,6 @@
 % Chapter 1. All quoted numbers come from chapters/ch01-numbers.tex, written by code/ch01/run_all.py.
 \input{chapters/ch01-numbers}
-\begin{refsection}
+\begin{chapterrefs}
 \chapter{Returns, Rates and the Shape of Risk}
 \label{ch:returns}
 
@@ -24,12 +24,12 @@ Canada yields.
 
 \begin{keybox}[How to read this chapter]
 Most results are proved where they are stated and then checked with a number; a few standard
-theorems, such as Descartes' rule of signs, Chebyshev's inequality and the central limit theorem, are
+theorems, such as Descartes' rule of signs, Chebyshev\index{Chebyshev}'s inequality and the central limit theorem, are
 used without proof. The worked examples can be done with a calculator. The figures and the
 quoted numbers come from the scripts in \texttt{code/ch01/}, and every simulation draws from NumPy's
 default generator with seed 101. The scripts share one generator, \texttt{default\_rng(101)}, which
 \texttt{run\_all.py} passes from script to script in a fixed order; a script run on its own first
-replays the draws made before it, so it prints the same numbers. The short Jarque-Bera listing starts
+replays the draws made before it, so it prints the same numbers. The short Jarque-Bera\index{Jarque-Bera} listing starts
 a fresh \texttt{default\_rng(101)}, and the Jarque-Bera run at $n=60$ uses
 \texttt{default\_rng([101, 60])}, the same seed with a stream number. A test checks that no script
 draws from any other generator.
@@ -60,13 +60,13 @@ appraised instead of traded, and fees that make comparison with a public portfol
 
 \subsection{Quoted rates and growth}
 
-Let $P$ be an amount invested for $T$ years at an annual rate $r$. Under \emph{simple interest} the
+Let $P$ be an amount invested for $T$ years at an annual rate $r$. Under \emph{simple interest}\index{simple interest} the
 interest is paid on the principal only, so the terminal value is $P(1+rT)$. Under \emph{compound
 interest} with $m$ compounding periods per year, interest earns interest at the end of each period:
 \begin{equation}\label{eq:periodic}
   V_T = P\left(1+\frac{r}{m}\right)^{mT}.
 \end{equation}
-The rate $r$ in \cref{eq:periodic} is a \emph{nominal} or quoted rate. The \emph{effective annual rate}
+The rate $r$ in \cref{eq:periodic} is a \emph{nominal} or quoted rate. The \emph{effective annual rate}\index{effective annual rate}
 is the growth over one year, $r_{\mathrm{eff}} = (1+r/m)^m - 1$. For a positive quoted rate, the case
 used throughout, the effective rate rises as $m$ grows, but it does not grow without bound.
 
@@ -78,7 +78,7 @@ For $m>\lvert r\rvert$ the base $1+r/m$ is positive, so $(1+r/m)^m = \exp\{m\ln(
 $x=r/m$ gives $m\ln(1+r/m) = r - r^2/(2m) + O(m^{-2}) \to r$, and the exponential is continuous.
 \end{proof}
 
-The limit defines \emph{continuous compounding}: $V_T = Pe^{rT}$. Continuous rates are the natural
+The limit defines \emph{continuous compounding}\index{continuous compounding}: $V_T = Pe^{rT}$. Continuous rates are the natural
 language of derivatives pricing and of the stochastic models in later chapters. Converting between
 conventions only requires that the two give the same growth over a year: a continuously compounded
 rate $r_c$ and an annual effective rate $r_a$ are equivalent when $e^{r_c} = 1+r_a$, so
@@ -107,7 +107,7 @@ annual and continuous compounding is closed by quarterly compounding.
 
 Let a position be worth $V_{t-1}>0$ at the start of a period and $V_t$ at the end, and let $D_t$ be
 any cash it pays the holder during the period. The \emph{simple} or total return is
-$R_t = (V_t+D_t-V_{t-1})/V_{t-1}$ and the \emph{log return}, or continuously compounded return, is
+$R_t = (V_t+D_t-V_{t-1})/V_{t-1}$ and the \emph{log return}\index{log return}, or continuously compounded return, is
 $r_t = \ln(1+R_t)$. The logarithm needs $1+R_t>0$, so a total loss has no finite log return. Here $D_t$ is treated as paid at the end of the period; a payment made part way
 through is handled by splitting the period at the payment date. If the cash is reinvested in the
 position, a holder's wealth $W_t$ grows by the factor $1+R_t$ each period. Each kind of return has one property the other lacks.
@@ -158,7 +158,7 @@ The gap matters for volatile strategies and for any fee or hurdle computed on ar
 
 Private funds call capital from investors when deals are found and return it when deals are sold.
 The investor does not control the timing, so a return measure for the fund should reflect the actual
-dates and sizes of the flows. The \emph{internal rate of return} does this, though on its own it
+dates and sizes of the flows. The \emph{internal rate of return}\index{internal rate of return} does this, though on its own it
 does not say whether the fund did better than a public alternative; \cref{sec:multiples} returns to
 that question.
 
@@ -176,7 +176,7 @@ The IRR is a money-weighted return: it depends jointly on the amounts and dates 
 distributions and the terminal value. For
 a fund that has not finished, the \emph{since-inception} or \emph{interim} IRR treats the current net
 asset value (NAV) as if it were a final distribution received today. That makes the interim IRR only
-as good as the NAV, a point that drives the J-curve in \cref{sec:jcurve}.
+as good as the NAV, a point that drives the J-curve\index{J-curve} in \cref{sec:jcurve}.
 
 \subsection{Fund A}
 
@@ -337,7 +337,7 @@ IRR ranks the short project first. Their NPVs are equal where
   \iff (1+r)^2 = \frac{200}{130}
   \iff r = \sqrt{200/130}-1 = \crossRate\% ,
 \end{equation*}
-the \emph{crossover rate}. At any cost of capital below \crossRate\% the long project creates more
+the \emph{crossover rate}\index{crossover rate}. At any cost of capital below \crossRate\% the long project creates more
 value; at 10\% its NPV is \npvLongTenAbs{} against \npvShortTenAbs{} for the short one
 (\cref{fig:crossover}). The decision rule here is NPV at the cost of capital, and it needs no
 assumption about what happens to the 130. Reinvestment enters only if we ask a different question,
@@ -381,7 +381,7 @@ IRR makes the reinvestment rate explicit.
 
 \subsection{The modified IRR}
 
-The \emph{modified internal rate of return} builds one annualised rate from explicit financing and
+The \emph{modified internal rate of return}\index{modified internal rate of return} builds one annualised rate from explicit financing and
 reinvestment rates: a finance rate $f>-1$ at which outflows are discounted to date $0$, and a
 reinvestment rate $\rho>-1$ at which inflows are compounded to date $T>0$. With $\mathrm{CF}_t^- = \min(\mathrm{CF}_t,0)$
 and $\mathrm{CF}_t^+ = \max(\mathrm{CF}_t,0)$,
@@ -434,10 +434,10 @@ cost of capital, as \cref{prop:uniqueirr} also implies from its IRR.
 
 \subsection{Whose timing counts}
 
-A \emph{time-weighted return} links the returns of successive sub-periods, $\prod_k(1+R_k)-1$, with
+A \emph{time-weighted return}\index{time-weighted return} links the returns of successive sub-periods, $\prod_k(1+R_k)-1$, with
 sub-periods cut at every external flow. It measures what one unit invested at the start would have
 earned and is therefore independent of when the investor added or withdrew money. A
-\emph{money-weighted return} is the IRR of the investor's own flows and does depend on that timing.
+\emph{money-weighted return}\index{money-weighted return} is the IRR of the investor's own flows and does depend on that timing.
 The independence assumes that the position can be valued reliably on each flow date, which is easy
 for a listed fund and hard for an appraised one.
 Time weighting is the right way to judge a manager who does not control flows, such as a mutual fund
@@ -472,7 +472,7 @@ distributions even though waiting lowers their present value. For Fund A at the 
 the end of its life, all value has been distributed and DPI equals TVPI at \tvpiEnd.
 
 Neither the IRR nor the multiples say whether the fund beat what the same money could have earned in
-public markets. A \emph{public market equivalent} (PME) answers that by pricing the fund's flows with
+public markets. A \emph{public market equivalent}\index{public market equivalent} (PME) answers that by pricing the fund's flows with
 a public index. Let $I_t$ be the index level at date $t$, $C_t$ the contributions and $D_t$ the
 distributions. The PME of \textcite{kaplan2005} carries every flow forward to date $T$
 with the index return:
@@ -615,7 +615,7 @@ the normal slow, so that a sum is still far from normal at the horizons an inves
 flaw as a model of simple returns is obvious: it gives positive probability to losing more than
 everything.
 
-The lognormal model fixes that flaw. If the log return $Y = \ln(1+R)$ is $\N(\mu,\sigma^2)$, then the
+The lognormal\index{lognormal} model fixes that flaw. If the log return $Y = \ln(1+R)$ is $\N(\mu,\sigma^2)$, then the
 gross return $X = 1+R = e^Y$ is lognormal and always positive. Its moments follow from the moment
 generating function of the normal.
 
@@ -650,7 +650,7 @@ where the factorisations can be checked by expanding the right-hand sides. Hence
   K_e = \frac{\mu_4}{\mu_2^{2}} - 3 = w^4+2w^3+3w^2-6 ,
 \end{equation*}
 and $m$ cancels in both, so the shape depends on $\sigma$ alone. The exponential is increasing, so
-$P(X\le e^\mu)=P(Y\le\mu)=\tfrac12$ and the median is $e^\mu$. The density of $X$ is
+$\mathbb P(X\le e^\mu)=\mathbb P(Y\le\mu)=\tfrac12$ and the median is $e^\mu$. The density of $X$ is
 $g(x) = \varphi\bigl((\ln x-\mu)/\sigma\bigr)/(\sigma x)$ for $x>0$, where
 $\varphi(z)=(2\pi)^{-1/2}e^{-z^2/2}$ is the standard normal density, and
 \begin{equation*}
@@ -689,7 +689,7 @@ For a random return $R$ with mean $\mu = \E[R]$ and variance $\sigma^2 = \E[(R-\
   S = \frac{\E[(R-\mu)^3]}{\sigma^3},\qquad
   K = \frac{\E[(R-\mu)^4]}{\sigma^4},\qquad K_e = K - 3 .
 \end{equation}
-The normal distribution has $S=0$ and $K=3$, and the \emph{excess kurtosis} $K_e$ measures the fourth
+The normal distribution has $S=0$ and $K=3$, and the \emph{excess kurtosis}\index{excess kurtosis} $K_e$ measures the fourth
 standardised moment against that benchmark.  The uniform distribution has $K_e<0$, with a flat top and no tails to speak of; the scaled
 Student $t$ law with five degrees of freedom used below has $K_e>0$ and heavier tails than the normal.
 Positive excess kurtosis does not fix the centre: many such laws have a taller, narrower peak, but
@@ -752,7 +752,7 @@ deviation of such a strategy hides most of its risk.
 
 If returns are normal, about 68\% of outcomes lie within one standard deviation of the mean, 95\% within
 two and 99.7\% within three. Without any assumption about the shape, Chebyshev's inequality still gives
-$\Pr(|R-\mu|\ge k\sigma)\le 1/k^2$. \Cref{tab:cheb} sets the two beside a pair of fat-tailed laws
+$\mathbb P(|R-\mu|\ge k\sigma)\le 1/k^2$. \Cref{tab:cheb} sets the two beside a pair of fat-tailed laws
 scaled to unit variance, the Laplace and the Student $t$ with five degrees of freedom. Beyond two or
 three standard deviations both put more probability than the normal does, though far less than
 Chebyshev allows. Beyond one standard deviation they put less: \lapOutOne\% and \tOutOne\% against
@@ -806,24 +806,24 @@ Appraisal-based returns, such as those of private real estate or private equity 
 to new information. A simple and widely used model \parencite{geltner1993} treats the reported return
 $R^*_t$ as a weighted average of the economic return $R_t$ and last period's reported return:
 \begin{equation}\label{eq:smooth}
-  R^*_t = (1-\alpha)R_t + \alpha R^*_{t-1},\qquad 0\le\alpha<1 .
+  R^*_t = (1-\phi)R_t + \phi R^*_{t-1},\qquad 0\le\phi<1 .
 \end{equation}
 
 \begin{proposition}\label{prop:smooth}
 If the economic returns are independent with mean $\mu$ and variance $\sigma^2$, the stationary reported
-returns of \cref{eq:smooth} have mean $\mu$, variance $\sigma^2(1-\alpha)/(1+\alpha)$ and
-autocorrelation $\alpha^k$ at lag $k$.
+returns of \cref{eq:smooth} have mean $\mu$, variance $\sigma^2(1-\phi)/(1+\phi)$ and
+autocorrelation $\phi^k$ at lag $k$.
 \end{proposition}
 \begin{proof}
-Iterating \cref{eq:smooth} gives $R^*_t = (1-\alpha)\sum_{j\ge0}\alpha^jR_{t-j}$, whose mean is
-$(1-\alpha)\mu\sum_j\alpha^j = \mu$. By independence its variance is
-$(1-\alpha)^2\sigma^2\sum_j\alpha^{2j} = (1-\alpha)^2\sigma^2/(1-\alpha^2) = \sigma^2(1-\alpha)/(1+\alpha)$.
-\Cref{eq:smooth} also gives $\Cov(R^*_t,R^*_{t-k}) = \alpha\Cov(R^*_{t-1},R^*_{t-k})$ for $k\ge1$, since
-$R_t$ is independent of the past, so the autocovariance shrinks by a factor $\alpha$ per lag.
+Iterating \cref{eq:smooth} gives $R^*_t = (1-\phi)\sum_{j\ge0}\phi^jR_{t-j}$, whose mean is
+$(1-\phi)\mu\sum_j\phi^j = \mu$. By independence its variance is
+$(1-\phi)^2\sigma^2\sum_j\phi^{2j} = (1-\phi)^2\sigma^2/(1-\phi^2) = \sigma^2(1-\phi)/(1+\phi)$.
+\Cref{eq:smooth} also gives $\Cov(R^*_t,R^*_{t-k}) = \phi\Cov(R^*_{t-1},R^*_{t-k})$ for $k\ge1$, since
+$R_t$ is independent of the past, so the autocovariance shrinks by a factor $\phi$ per lag.
 \end{proof}
 
 Smoothing leaves the mean return unchanged and hides volatility: the economic risk is still there,
-but it no longer shows in the reported numbers. With $\alpha = 0.6$, reported
+but it no longer shows in the reported numbers. With $\phi = 0.6$, reported
 volatility is $\sqrt{0.4/1.6} = \smTheoryRatio\%$ of the true value. A simulation of 240 months, with economic
 returns drawn as $\N(0.8\%,\,(4\%)^2)$ from the chapter's shared generator, has sample economic volatility of \smTrueSD\% and reported volatility of \smObsSD\%, a ratio of \smRatioSample{}
 against the theoretical \smRatioTheory{} (\cref{fig:smoothing}). Annualised naively with $\sqrt{12}$, the
@@ -833,10 +833,10 @@ separate from the bias that smoothing introduces. The estimated
 first-order autocorrelation is \smRhoOne, the Durbin-Watson statistic is \smDW{} and $2(1-\hat\rho_1)$ is
 \smDWapprox. Inverting \cref{eq:smooth} recovers an estimate of the economic return,
 \begin{equation}\label{eq:unsmooth}
-  \hat R_t = \frac{R^*_t - \alpha R^*_{t-1}}{1-\alpha},
+  \hat R_t = \frac{R^*_t - \phi R^*_{t-1}}{1-\phi},
 \end{equation}
-and here, inverting with the true $\alpha=0.6$, the unsmoothed series has volatility \smUnSD\% and lag-one autocorrelation \smUnRho. In practice
-$\alpha$ is unknown and is set to the estimated $\hat\rho_1$. That estimate identifies $\alpha$ only under
+and here, inverting with the true $\phi=0.6$, the unsmoothed series has volatility \smUnSD\% and lag-one autocorrelation \smUnRho. In practice
+$\phi$ is unknown and is set to the estimated $\hat\rho_1$. That estimate identifies $\phi$ only under
 the smoothing model with serially independent economic returns; if the economic returns are
 themselves autocorrelated, it does not. \textcite{getmansky2004} develop a richer
 version for hedge funds holding illiquid assets. The same unsmoothing returns in Chapter~8 for risk
@@ -846,7 +846,7 @@ measures and in Chapter~10 for real estate indices.
   \centering
   \includegraphics[width=\textwidth]{ch01/fig11_smoothing}
   \caption{(a) Simulated economic returns and the reported returns produced by smoothing with
-  $\alpha = 0.6$ (first 120 of 240 months). (b) Sample autocorrelations with the theoretical $\alpha^k$; the shaded band is $\pm1.96/\sqrt{n}$. Both
+  $\phi = 0.6$ (first 120 of 240 months). (b) Sample autocorrelations with the theoretical $\phi^k$; the shaded band is $\pm1.96/\sqrt{n}$. Both
   panels show one simulated path; the theoretical autocorrelations and the fall in volatility follow
   from the smoothing model.}
   \label{fig:smoothing}
@@ -884,7 +884,7 @@ correlation,
 so the annual volatility implied by this stationary AR(1) model is \vrTwelveSixSqrt{} times the naive
 figure. As the horizon grows the ratio of variances approaches $(1+0.6)/(1-0.6)=\vrLimitSix$, a
 volatility multiplier of two. Applied to data, $\rho$ is estimated, so the correction carries its own
-sampling error. The variance ratio is also the basis of a classic test of the random walk
+sampling error. The variance ratio\index{variance ratio} is also the basis of a classic test of the random walk
 hypothesis \parencite{lo1988}.
 
 \begin{figure}[t]
@@ -962,7 +962,7 @@ by the continuous mapping theorem it converges to the sum of two independent squ
 which is $\chi^2_2$.
 \end{proof}
 
-The $\chi^2_2$ distribution has survival function $P(\chi^2_2>x)=e^{-x/2}$, so the 5\% critical value is
+The $\chi^2_2$ distribution has survival function $\mathbb P(\chi^2_2>x)=e^{-x/2}$, so the 5\% critical value is
 $-2\ln 0.05 = \jbCrit$ and the null of normality is rejected when $\mathrm{JB} > \jbCrit$. The listing
 below computes the statistic and its asymptotic $p$-value:
 \Needspace*{15\baselineskip}
@@ -998,9 +998,9 @@ $\mathrm{JB} = \pwJB$, far beyond any critical value.
 \subsection{Three measures of co-movement}
 
 The \emph{covariance} of returns $R_i$ and $R_j$ is $\sigma_{ij} = \E[(R_i-\mu_i)(R_j-\mu_j)]$, estimated
-by $s_{ij} = (n-1)^{-1}\sum_t (R_{i,t}-\bar R_i)(R_{j,t}-\bar R_j)$. The \emph{Pearson correlation}
+by $s_{ij} = (n-1)^{-1}\sum_t (R_{i,t}-\bar R_i)(R_{j,t}-\bar R_j)$. The \emph{Pearson correlation}\index{Pearson correlation}
 $\rho_{ij} = \sigma_{ij}/(\sigma_i\sigma_j)$ rescales covariance to $[-1,1]$ and measures the strength of
-a linear relation. The \emph{Spearman rank correlation} \parencite{spearman1904} is the Pearson
+a linear relation. The \emph{Spearman rank correlation}\index{Spearman rank correlation} \parencite{spearman1904} is the Pearson
 correlation of the ranks of the observations. It measures the strength of any monotone relation and is
 far less sensitive to a few extreme observations. When there are no ties it has the closed form
 $\rho_S = 1 - 6\sum_t d_t^2/\bigl(n(n^2-1)\bigr)$, where $d_t$ is the difference between the two ranks of
@@ -1087,11 +1087,11 @@ With $\sigma = 20\%$ and $\rho = 0.2$, ten assets bring volatility down to \divT
 \divFloorTwo\%. The appeal of many alternatives rests on a low correlation with the rest of the portfolio, and
 smoothing makes that correlation look lower than it is. Take the smoothing model \cref{eq:smooth}
 with true returns $R_t=\beta M_t+e_t$, where the market return $M_t$ and the noise $e_t$ are
-independent of each other and over time and the smoothing parameter is fixed.  Since $R^*_t=(1-\alpha)\sum_{j\ge0}\alpha^jR_{t-j}$ and only
-the $j=0$ term moves with $M_t$, $\Cov(R^*_t,M_t)=(1-\alpha)\beta\Var M$, so the measured beta is
-$(1-\alpha)\beta$. Dividing by the standard deviations, with $\Var R^*=\Var R\,(1-\alpha)/(1+\alpha)$ from
+independent of each other and over time and the smoothing parameter is fixed.  Since $R^*_t=(1-\phi)\sum_{j\ge0}\phi^jR_{t-j}$ and only
+the $j=0$ term moves with $M_t$, $\Cov(R^*_t,M_t)=(1-\phi)\beta\Var M$, so the measured beta is
+$(1-\phi)\beta$. Dividing by the standard deviations, with $\Var R^*=\Var R\,(1-\phi)/(1+\phi)$ from
 \cref{prop:smooth}, the measured correlation is the true one times
-$(1-\alpha)\sqrt{(1+\alpha)/(1-\alpha)}=\sqrt{1-\alpha^2}$. At $\alpha=\smAlpha$ the factors are
+$(1-\phi)\sqrt{(1+\phi)/(1-\phi)}=\sqrt{1-\phi^2}$. At $\phi=\smAlpha$ the factors are
 \smBetaFactor{} for beta and \smCorrFactor{} for correlation, and a simulation in the chapter's tests reproduces both. Other appraisal processes attenuate beta and
 correlation by amounts that depend on how the appraisals are made.
 
@@ -1248,7 +1248,7 @@ ten, and it reaches one only in the limit.
         the fund then falls 10\%. Find the time-weighted and money-weighted returns per period and explain
         why they differ.
   \item\label{exr:6} Prove that the variance of the smoothed series in \cref{eq:smooth} is
-        $\sigma^2(1-\alpha)/(1+\alpha)$ without iterating the recursion, by taking variances of both sides
+        $\sigma^2(1-\phi)/(1+\phi)$ without iterating the recursion, by taking variances of both sides
         under stationarity.
   \item\label{exr:7} Using \cref{eq:vr}, find the variance ratio at $q=2$ for a series with $\rho_1 = -0.3$
         and interpret it.
@@ -1256,6 +1256,26 @@ ten, and it reaches one only in the limit.
         the Jarque-Bera statistic and state whether normality is rejected at 5\%. Use \cref{fig:jb}
         to say how much weight the result deserves, and give one reason the asymptotic 5\% critical value may mislead here, given that it assumes a
         large sample of independent, identically distributed returns.
+\end{enumerate}
+
+\subsection*{Computing projects}
+\label{sec1:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch01/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch01/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P1.\arabic*}, leftmargin=*, ref=P1.\arabic*]
+\item Take month-end yields on Canadian 90 day bills from \texttt{data/goc\_bills\_bonds.csv}. Treat each
+quote as a simple rate on an actual/365 basis for 91 days and convert it to an effective annual rate and
+to a continuously compounded rate. How large is the largest gap between the quote and its effective
+equivalent, in basis points, and in what month did it occur? Then compare the arithmetic and geometric
+annualised returns of rolling the bill each month, and explain why they are so close.
+\item Compute quarterly log changes of the Z.1 commercial real estate index in
+\texttt{data/real\_assets\_quarterly.csv}. Report the sample moments and the Jarque-Bera test with
+\texttt{sample\_moments} and \texttt{jarque\_bera}, estimate the first autocorrelation with \texttt{acf}, and
+unsmooth the series with \texttt{unsmooth} at that coefficient. By what factor does the standard deviation
+rise, and how does the result change if you start in 1996, when the index changes method?
 \end{enumerate}
 
 \subsection*{Answers}
@@ -1277,7 +1297,7 @@ ten, and it reaches one only in the limit.
         $1+r = (30+\sqrt{900+4500})/100 = 1.0348$, an MWR of $3.48\%$ per period. The investor took money out
         before the loss, so their own experience beat the fund's.
   \item Under stationarity $\Var(R^*_t) = \Var(R^*_{t-1}) = v$ and $R_t$ is independent of $R^*_{t-1}$, so
-        $v = (1-\alpha)^2\sigma^2 + \alpha^2 v$, which gives $v = (1-\alpha)^2\sigma^2/(1-\alpha^2) = \sigma^2(1-\alpha)/(1+\alpha)$.
+        $v = (1-\phi)^2\sigma^2 + \phi^2 v$, which gives $v = (1-\phi)^2\sigma^2/(1-\phi^2) = \sigma^2(1-\phi)/(1+\phi)$.
   \item $VR(2) = 1 + 2(1/2)(-0.3) = 0.7$. Two-period variance is 30\% below twice the one-period variance; negative
         autocorrelation (mean reversion) makes longer-horizon risk smaller.
   \item $\mathrm{JB} = 10(0.36 + 0.36) = 7.2 > 5.991$, so normality is rejected at 5\%. The $\chi^2_2$ critical value is only asymptotic, but with 60 independent normal observations the
@@ -1314,5 +1334,4 @@ enters any result, in Python, R or Octave. The
 observations themselves are the Bank of Canada's, published through its Valet service; the snapshot
 only collects them.
 
-\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
-\end{refsection}
+\end{chapterrefs}

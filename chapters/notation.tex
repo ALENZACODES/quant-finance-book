@@ -1,0 +1,87 @@
+% Book-wide notation and conventions. Each chapter's own notation box adds the letters it uses locally.
+The symbols below keep the same meaning in every chapter. Letters that a chapter uses for something
+else are listed in the last part of the table and are defined again in that chapter's notation box.
+
+\begingroup\small
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{0pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.70\textwidth}@{}}
+\toprule
+Symbol & Meaning\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\multicolumn{2}{@{}l}{\textbf{Probability}}\\
+$\mathbb P$, $Q$ & Real-world probability and a risk-neutral measure; $Q^T$ is the $T$-forward measure.\\
+$\E$, $\E_Q$, $\E_{\mathbb P}$ & Expectation, and expectation under the measure in the subscript.\\
+$\E_t$ & Expectation given the information available at $t$.\\
+$\Var$, $\Cov$, $\Corr$ & Variance, covariance and correlation.\\
+$\Phi$, $\varphi$ & Standard normal distribution and density functions.\\
+$\N(\mu,\sigma^2)$ & Normal law with mean $\mu$ and variance $\sigma^2$.\\
+$\mathbf 1\{A\}$, $x^+$ & Indicator of the event $A$, and $\max(x,0)$.\\
+$W_t$ & Standard Brownian motion ($Z_t$ in Chapter~11).\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{Time}}\\
+$t$, $T$ & Calendar time in years, and a maturity or horizon.\\
+$\tau$ & Time to expiry or term, $T-t$, in Chapters~4, 5, 9 and~12; a stopping time in Chapter~3 and
+\cref{sec4:american}, and a default time in Chapter~6.\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{Returns and rates}}\\
+$R_t$ & Simple return over a period, $(V_t+D_t-V_{t-1})/V_{t-1}$.\\
+$r_t$ & Log return $\ln(1+R_t)$ in Chapter~1; a daily return in Chapter~8, a monthly excess return
+in Chapter~9 and a true, unsmoothed return in Chapter~10.\\
+$r$ & A continuously compounded riskless rate in the pricing chapters, 3 to~6; $r_f$ is the riskless
+rate in Chapter~7.\\
+$y$ & A yield. Its compounding is stated with it; see the conventions below.\\
+$\delta$ & Continuous dividend or income yield of an asset (Chapters~4 and~5).\\
+$\sigma$ & Volatility, annual unless the period is given.\\
+$\mu$ & Mean return or drift.\\
+$\theta$ & Sharpe ratio in Chapters~7, 8, 9 and~12; the market price of risk in Chapters~3 and~5.\\
+$\gamma_3$, $\gamma_4$ & Skewness and \emph{excess} kurtosis. Every kurtosis printed in the book is excess
+kurtosis, which is zero for a normal law; Chapter~1 writes $S$ and $K_e$ for the same quantities.\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{Funds, fees and smoothing}}\\
+$h$ & Hurdle rate. A \emph{soft} hurdle pays the manager a share of the whole gain once the hurdle is
+passed; a \emph{hard} hurdle pays a share of the gain above it only.\\
+$c$, $k$ & Carried interest rate and catch-up rate (Chapters~2 and~11).\\
+$m$, $p$, $f$ & Management fee rate, and incentive fee rate ($p$ in Chapter~2, $f$ in Chapter~9).\\
+$M_t$ & High-water mark: the highest value per unit after fees at an earlier crystallisation date, or
+the starting value if that is higher.\\
+$\phi$ & Smoothing parameter of reported returns, $r^*_t=(1-\phi)r_t+\phi r^*_{t-1}$ (Chapters~1, 7, 8
+and~10; Chapter~1 writes $R$ for $r$).\\
+$C_t$, $D_t$ & Contributions to and distributions from a fund (Chapter~11; Chapter~2 writes $C_i$ and $L_j$).\\
+$\mathit{NOI}$, $V$, $c$ & Net operating income, value and cap rate of a property (Chapter~10; $q$ in the
+case study of Chapter~6).\\[3pt]
+\multicolumn{2}{@{}l}{\textbf{Letters with local meanings}}\\
+$\lambda$ & Hazard rate (Chapter~6), jump intensity $\lambda_J$ (Chapter~5), storage rate (Chapter~4),
+EWMA decay or drawdown rate (Chapter~8), loan to value (Chapter~10), debt share (Chapter~11),
+penalty (Chapter~12).\\
+$\tau$ & Also the date of the last contribution (Chapter~2), the prior scale of Black-Litterman
+(Chapter~7), the Omega threshold (Chapter~8) and a tax rate (Chapter~11).\\
+$\alpha$ & Regression intercept (Chapter~7) and a confidence level (Chapter~8).\\
+$\beta$ & Regression slope or market beta; the rate at which cap rates follow yields in the case study of
+Chapter~6.\\
+$q$ & A risk-neutral probability (Chapter~4); a number of lags or a vector of views (Chapter~7);
+a cap rate (Chapter~6).\\
+$\eta$, $y$ & Convenience yield: $\eta$ in Chapter~4, $y$ in Chapters~9 and~10.\\
+\end{longtable}
+\endgroup
+
+\paragraph{Compounding and units}
+Rates are quoted per year. Each chapter keeps one convention for each kind of rate and states the
+conversion where two meet:
+\begin{itemize}[nosep]
+  \item Chapters 1 and 2: effective annual rates unless another compounding is named; an IRR is an
+        effective annual rate on dated flows, and $\ln(1+R)$ converts to continuous compounding.
+  \item Chapters 3 to 5: continuously compounded rates; Chapter~4 also uses simple money market rates
+        and yields compounded $m$ times a year, $D(t)=(1+y/m)^{-mt}$.
+  \item Chapter 6: bond yields compounded twice a year, Treasury bill yields simple on an actual/365
+        basis, continuously compounded rates inside the short-rate models, loan rates compounded
+        monthly in the private credit screen, and half-yearly in the mortgage case study, as the
+        Interest Act requires a Canadian mortgage rate to be stated.
+  \item Chapters 7 to 9 and 12: monthly or daily returns, simple unless they are called log returns,
+        as the forecasting target of Chapter~12 is; annualised figures say how they were annualised.
+  \item Chapter 10: log returns in the smoothing model and regressions, simple annual rates in the
+        valuation and loan formulas, mortgage payments compounded monthly, continuous rates in the
+        forest and storage sections.
+  \item Chapter 11: annual rates compounded once a year unless marked as continuous.
+\end{itemize}
+Percentages in the text are of the quantity named; a basis point is 0.01 percentage point. Money
+amounts carry their currency where it matters and are otherwise per 100 of a stated base.

@@ -43,3 +43,11 @@ def test_simulated_futures_within_one_se(RAW):
     # 4.058: both simulated log ratios lie within one standard error of the formula
     for mc, se, f in (("ffMCFivePos", "ffMCFivePosSE", "ffFivePos"), ("ffMCFiveNeg", "ffMCFiveNegSE", "ffFiveNeg")):
         assert abs(RAW[mc] - RAW[f]) < RAW[se], (mc, RAW[mc], RAW[f], RAW[se])
+
+
+def test_band_with_lending_fee():
+    # a lending fee lowers only the reverse cash and carry bound, and acts like extra income on the asset
+    lo0, hi0 = L.forward_band(99.95, 100.05, 0.038, 0.044, 2.0)
+    lo1, hi1 = L.forward_band(99.95, 100.05, 0.038, 0.044, 2.0, fee=0.01)
+    assert hi1 == hi0 and lo1 < lo0
+    assert abs(lo1 - L.forward_band(99.95, 100.05, 0.038, 0.044, 2.0, q=0.01)[0]) < 1e-12

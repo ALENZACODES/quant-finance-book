@@ -1,7 +1,7 @@
 """Regenerate every number and figure in Chapter 12 by running each of the chapter's scripts.
 
 Usage:  python code/ch12/run_all.py
-Scripts: regularise, cv_time, trees, neural, equity_premium, hedging, overfit, exercises. Each draws from its own random
+Scripts: regularise, cv_time, trees, neural, equity_premium, hedging, overfit, snooping, exercises. Each draws from its own random
 stream (numbers_ch12.rng_for), so a script run alone reproduces exactly the numbers it contributes
 here; overfit.py reads the forecasts written by equity_premium.py, so that script must run first.
 Writes  figures/ch12/*.png, code/ch12/out/*.json, code/ch12/out/numbers.json, chapters/ch12-numbers.tex
@@ -13,7 +13,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import numbers_ch12 as R  # noqa: E402
 
-SCRIPTS = ["regularise", "cv_time", "trees", "neural", "equity_premium", "hedging", "overfit", "exercises"]
+SCRIPTS = ["regularise", "cv_time", "trees", "neural", "equity_premium", "hedging", "overfit", "snooping", "exercises"]
 
 
 def main(only=None):

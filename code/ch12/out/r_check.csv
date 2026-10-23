@@ -65,3 +65,11 @@ zjHolm,3,0
 zjBh,4,0
 zjBonf,2,0
 zlH,0.5625,1e-08
+mtN,295,0
+mtPos,30,0
+mtBestMean,10.9900688284958,1e-09
+mtBhyFive,0,0
+mtBhyTen,0,0
+mtBhFive,0,0
+mtHolmTen,0,0
+mtNaiveTen,11,0

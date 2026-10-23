@@ -154,16 +154,24 @@ add("slMezFifteen", 100 * (lnput(Bm, mm, 0.15 * sqrt(5)) - lnput(Bs, mm, 0.15 * 
 f5 <- g[!is.na(g$BD.CDN.5YR.DQ.YLD), c("date", "BD.CDN.5YR.DQ.YLD")]
 ix <- tapply(seq_len(nrow(f5)), substr(f5$date, 1, 7), max); y5 <- f5[ix, 2]
 nv <- length(y5) - 60; cover <- numeric(nv)
+# half-yearly compounding, both tests at origination and at maturity, cap rate 6% + 0.5 (y - 4)
+mi <- function(j) (1 + j / 200)^(1 / 6) - 1
+kh <- function(j, am) { i <- mi(j); 12 * i / (1 - (1 + i)^(-12 * am)) }
+bh <- function(L, j, am, m) { i <- mi(j); p <- L * kh(j, am) / 12; L * (1 + i)^m - p * ((1 + i)^m - 1) / i }
 for (i in 1:nv) {
-  B <- bal(65, y5[i] + 2.25, 25, 60); noi1 <- 6 * 1.02^5; cap1 <- 0.06 + 0.5 * (y5[i + 60] - y5[i]) / 100
-  cover[i] <- min(0.65 * noi1 / cap1, noi1 / (1.25 * ads(1, y5[i + 60] + 2.25, 25))) / B }
+  j0 <- y5[i] + 2.25; j1 <- y5[i + 60] + 2.25; q0 <- 0.06 + 0.5 * (y5[i] - 4) / 100
+  L0 <- min(65, 100 * q0 / (1.25 * kh(j0, 25))); B <- bh(L0, j0, 25, 60)
+  noi1 <- 100 * q0 * 1.02^5; q1 <- q0 + 0.5 * (y5[i + 60] - y5[i]) / 100
+  cover[i] <- min(0.65 * noi1 / q1, noi1 / (1.25 * kh(j1, 25))) / B }
 sg <- sqrt(0.1^2 + 0.15^2); pdv <- pnorm((log(1 / cover) + sg^2 / 2) / sg)
 add("csN", nv, 0); add("csCoverMin", min(cover), 1e-10); add("csCoverMed", median(cover), 1e-10)
+add("csFails", sum(cover < 1), 0)
 add("csPdLast", 100 * pdv[nv], 1e-10); add("csPdMed", 100 * median(pdv), 1e-10)
-BL <- bal(65, y5[nv] + 2.25, 25, 60); V1 <- 6 * 1.02^5 / (0.06 + 0.5 * (y5[nv + 60] - y5[nv]) / 100)
+q0 <- 0.06 + 0.5 * (y5[nv] - 4) / 100; L0 <- min(65, 100 * q0 / (1.25 * kh(y5[nv] + 2.25, 25)))
+BL <- bh(L0, y5[nv] + 2.25, 25, 60); V1 <- 100 * q0 * 1.02^5 / (q0 + 0.5 * (y5[nv + 60] - y5[nv]) / 100)
 elf <- integrate(function(x) pmax(BL - 0.9 * V1 * x, 0) * (x < 1 / cover[nv]) * dlnorm(x, -sg^2 / 2, sg), 0, 1 / cover[nv],
                  rel.tol = 1e-12)$value
-add("csEl", 1e4 * elf / BL, 1e-7)
+add("csEl", 1e4 * elf / BL, 1e-7); add("csLastB", BL, 1e-9)
 
 # ---------------------------------------------------------------- exercises
 add("xsOneEx", price(0.055, 0.04, 5), 1e-12); add("xsFiveS", 1e4 * mert(120, 100, 0.03, 0.2, 3)["s"], 1e-9)

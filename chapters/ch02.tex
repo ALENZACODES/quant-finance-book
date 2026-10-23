@@ -1,6 +1,6 @@
 % Chapter 2. All quoted numbers come from chapters/ch02-numbers.tex, written by code/ch02/run_all.py.
 \input{chapters/ch02-numbers}
-\begin{refsection}
+\begin{chapterrefs}
 \setcounter{chapter}{1}
 \chapter{Fund Structures, Fees and Distribution Waterfalls}
 \label{ch:structures}
@@ -35,9 +35,9 @@ A fund is a contract between people who supply capital and people who supply jud
 cannot watch every decision, and the manager knows more than they do about its own skill and, once it is
 investing, about the deals and its effort. After the money is
 committed the manager may serve itself, by taking too much risk, charging expenses to the fund or
-spending its time on a successor fund; economists call this hidden action \emph{moral hazard}. Before
+spending its time on a successor fund; economists call this hidden action \emph{moral hazard}\index{moral hazard}. Before
 it is committed, investors cannot tell good managers from bad ones, and the managers keenest for
-capital on easy terms may be the weakest; this hidden information creates \emph{adverse selection}. Fund contracts respond in a few ways. Carried
+capital on easy terms may be the weakest; this hidden information creates \emph{adverse selection}\index{adverse selection}. Fund contracts respond in a few ways. Carried
 interest and incentive fees tie pay to performance, and a manager that invests its own money shares
 in the losses. Investors also get rights to information, to vote on conflicts and, in the last
 resort, to remove the manager.
@@ -59,10 +59,10 @@ Investors want to lose no more than they commit, they want the fund's income tax
 own hands, and they want terms they can bargain over. No single vehicle gives every investor all of
 this, which is why one fund often uses several.
 
-The \emph{limited partnership} is the usual answer for private equity, private credit and real estate
-funds, and for hedge funds sold to domestic investors. Its \emph{limited partners} (LPs) put up most of
+The \emph{limited partnership}\index{limited partnership} is the usual answer for private equity, private credit and real estate
+funds, and for hedge funds sold to domestic investors. Its \emph{limited partners}\index{limited partners} (LPs) put up most of
 the capital and can lose that capital and any commitment still outstanding, but in general no more,
-subject to guarantees they give and to local law. One \emph{general partner} (GP) runs the fund and
+subject to guarantees they give and to local law. One \emph{general partner}\index{general partner} (GP) runs the fund and
 carries unlimited liability. Sponsors blunt that exposure by making the GP a limited liability company, so claims against the GP
 are ordinarily limited to the company's assets. That does not shield the principals from guarantees
 they sign, from their own misconduct or from statutory exceptions, and the details depend on the
@@ -89,19 +89,19 @@ countries may tax it as a company. Canada, for one, generally treats a US LLC as
 own tax purposes, with consequences that depend on the investor and on the tax treaty. Sponsors use it for the general partner,
 for the management company and to hold single assets.
 
-A manager with both kinds of investor can still run one portfolio. In the \emph{master-feeder} structure
+A manager with both kinds of investor can still run one portfolio. In the \emph{master-feeder}\index{master-feeder} structure
 of \cref{fig2:structure}, each group enters through the feeder that suits its tax position, an onshore
 partnership or an offshore company, and both feeders put all their capital into a master fund. Trades
 happen once, at the master, and are allocated pro rata, so the feeders earn the same gross return;
 their net returns still differ by the costs, taxes and fees charged in each feeder.
 
-Smaller vehicles do narrower jobs. A \emph{special purpose vehicle} (SPV) holds one property, one loan
+Smaller vehicles do narrower jobs. A \emph{special purpose vehicle}\index{special purpose vehicle} (SPV) holds one property, one loan
 pool or one co-investment, so that the asset and its debts sit apart from the rest of the sponsor's
 business. How far apart raises two separate questions: would the asset stay out of the sponsor's
 estate if the sponsor became insolvent, and must the sponsor consolidate the vehicle in its accounts?
 Documents that confine the vehicle to its purpose, limit its debts to those tied to its assets and
 require an independent director's vote for a bankruptcy filing are commonly used to make it
-\emph{bankruptcy remote}, though how well they work depends on ownership, guarantees and the
+\emph{bankruptcy remote}\index{bankruptcy remote}, though how well they work depends on ownership, guarantees and the
 insolvency law that applies. They lower the risk that the sponsor's insolvency reaches the asset
 without removing it. The securitisations of Chapter~6 depend on the first question: a true sale, and
 a vehicle that a court will not merge with the sponsor in its insolvency. Whether the sponsor
@@ -112,8 +112,8 @@ vehicles serve their investors well.
   \centering
   \includegraphics[width=0.92\textwidth]{ch02/fig01_structure}
   \caption{A master-feeder fund. Two feeders with different tax treatment invest in one master fund.
-  The general partner controls the partnership and receives the carried interest or incentive
-  allocation; the management company advises the fund and receives the management fee.}
+  The general partner controls the partnership and receives the carried interest\index{carried interest} or incentive
+  allocation; the management company advises the fund and receives the management fee\index{management fee}.}
   \label{fig2:structure}
 \end{figure}
 
@@ -131,19 +131,19 @@ value, and an auditor reports on the financial statements.
 \label{sec2:openclosed}
 
 \paragraph{Open-end funds}
-An \emph{open-end} or \emph{evergreen} fund has no fixed life. Investors subscribe and redeem at the net
+An \emph{open-end}\index{open-end} or \emph{evergreen}\index{evergreen} fund has no fixed life. Investors subscribe and redeem at the net
 asset value (NAV) on stated dealing dates, usually monthly or quarterly, after a notice period. Because
 investors can leave, the fund must manage liquidity against its redemption terms, with liquid
 assets, cash reserves, borrowing or contractual limits on redemptions. Strategies in
 liquid markets can do that, which is why most hedge funds are open-end. Liquidity terms protect the remaining investors from the cost of
-forced sales: a \emph{lock-up} bars redemptions for an initial period (a soft lock-up allows them for a
-fee), a \emph{gate} caps the share of the fund that can be redeemed on one date, and a \emph{side pocket}
+forced sales: a \emph{lock-up}\index{lock-up} bars redemptions for an initial period (a soft lock-up allows them for a
+fee), a \emph{gate} caps the share of the fund that can be redeemed on one date, and a \emph{side pocket}\index{side pocket}
 holds illiquid positions apart. An investor who redeems usually keeps its side pocket interest and is
 paid when those positions are sold, on terms the documents set. The documents also usually let the
 fund suspend redemptions in a crisis.
 
 In an open-end fund investors arrive at different times and at different NAVs. The
-\emph{high-water mark} means the manager earns an incentive fee only on gains that take the NAV above
+\emph{high-water mark}\index{high-water mark} means the manager earns an incentive fee\index{incentive fee} only on gains that take the NAV above
 its highest level at an earlier fee date, or above its starting level if that is higher. With one mark for the whole fund,
 an investor who subscribes after a loss gets a free ride: it pays no incentive fee on its own gains
 until the fund regains the old mark. If the fund falls from 100 to 80 and
@@ -155,8 +155,8 @@ accounting series for subscriptions with distinct fee histories, or with equalis
 \paragraph{Drawdown funds}
 A \emph{drawdown} fund, also called a closed-end or private equity style fund, raises
 \emph{commitments}: promises to provide capital up to a stated amount when asked. The general partner
-\emph{calls} capital as it finds investments, usually during an \emph{investment period} of about five
-years, then manages and sells the investments during a \emph{harvest period}, and distributes the
+\emph{calls} capital as it finds investments, usually during an \emph{investment period}\index{investment period} of about five
+years, then manages and sells the investments during a \emph{harvest period}\index{harvest period}, and distributes the
 proceeds. The fund has a fixed term, commonly ten years, with options to extend for one or two years to
 complete sales. Investors cannot redeem. They can sell their interest to another investor on the
 secondary market, usually at a negotiated price and with the general partner's consent. An LP that
@@ -166,8 +166,8 @@ agreement, which may include the forfeiture of part of its interest.
 \paragraph{Risks particular to drawdown funds}
 A drawdown fund exposes its investors to several risks that are larger than in a liquid public
 market investment. The investor commits
-to a \emph{blind pool}, because the investments are not known when the commitment is made. It must keep
-liquidity available for calls of uncertain size and timing, which creates \emph{funding risk}. It has no
+to a \emph{blind pool}\index{blind pool}, because the investments are not known when the commitment is made. It must keep
+liquidity available for calls of uncertain size and timing, which creates \emph{funding risk}\index{funding risk}. It has no
 contractual redemption right, although a secondary sale may offer an exit at a negotiated price, so
 it bears most of the illiquidity of the assets. Its returns depend on one team, so the departure
 of key people or a change of strategy is a large risk. And reported values in the early years are
@@ -263,7 +263,7 @@ private equity returns in his sample of funds.
 
 \subsection{When have the investors earned the hurdle?}
 
-The \emph{distribution waterfall} is the clause of the partnership agreement that splits each
+The \emph{distribution waterfall}\index{distribution waterfall} is the clause of the partnership agreement that splits each
 distribution between the LPs and the GP. Proceeds flow through a sequence of tiers, and each tier fills
 before the next receives anything. The waterfall used in this chapter, a common
 private equity design, has four.
@@ -271,7 +271,7 @@ private equity design, has four.
   \item \emph{Return of capital}: everything goes to the LPs until they have received back all capital
         contributed, including capital called to pay fees and expenses.
   \item \emph{Preferred return}: everything goes to the LPs until they have also received a return at the
-        \emph{hurdle rate} $h$ on that capital, compounded; the examples use 8\% a year, a common
+        \emph{hurdle rate}\index{hurdle rate} $h$ on that capital, compounded; the examples use 8\% a year, a common
         choice, though each agreement sets its own rate and some funds have no preferred return.
   \item \emph{Catch-up}: a share $k$ of each dollar, often all of it, goes to the GP until the GP has
         received its carried interest share $c$, commonly 20\%, of all profits distributed so far.
@@ -281,7 +281,7 @@ The first two tiers can be stated together with one quantity.
 
 \begin{definition}[Hurdle balance]\label{def2:balance}
 Let the LPs contribute $C_i$ at times $t_i$ and receive distributions $L_j$ at times $s_j$, over a
-finite history, and let $h>-1$. The \emph{hurdle balance} at time $t$ is
+finite history, and let $h>-1$. The \emph{hurdle balance}\index{hurdle balance} at time $t$ is
 \begin{equation}\label{eq2:balance}
   B(t) = \sum_{i:\,t_i\le t} C_i\,(1+h)^{t-t_i} \;-\; \sum_{j:\,s_j< t} L_j\,(1+h)^{t-s_j},
 \end{equation}
@@ -489,9 +489,9 @@ raise the appetite for risk.
 \label{sec2:dbd}
 
 \paragraph{Two ways to measure profit}
-A \emph{whole-fund} or \emph{European} waterfall applies the tiers of \cref{sec2:waterfall} to the cash
+A \emph{whole-fund}\index{whole-fund} or \emph{European} waterfall applies the tiers of \cref{sec2:waterfall} to the cash
 flows of the fund as a whole: the LPs get back all contributions, for every deal and for fees, plus the
-preferred return, before the GP receives any carry. A \emph{deal-by-deal} or \emph{American} waterfall
+preferred return, before the GP receives any carry. A \emph{deal-by-deal}\index{deal-by-deal} or \emph{American} waterfall
 applies the tiers to each investment separately, so the GP is paid carry on a profitable exit even if
 other investments are losing money. Many deal-by-deal agreements soften this by requiring that the
 costs of deals already realised, including written-off deals, be recovered first. Investor guidance
@@ -514,7 +514,7 @@ and $\sum\pi_i^{+} > 0$, so $\sum\pi_i^{+} > \max\{\sum\pi_i, 0\} = (\sum\pi_i)^
 
 With hurdles and dated flows the comparison is no longer exact: the whole-fund hurdle compounds on
 every contribution, fees and losing deals included, while a deal's hurdle compounds only on that
-deal's cost. A contractual \emph{clawback} seeks to reconcile the overpayment at the end of the fund,
+deal's cost. A contractual \emph{clawback}\index{clawback} seeks to reconcile the overpayment at the end of the fund,
 subject to any repayment caps and collection risk.
 
 \begin{definition}[Clawback]\label{def2:clawback}
@@ -702,7 +702,12 @@ redemptions during the year. Then
   \end{cases}
 \end{equation}
 and then $A_t = P_t - I_t$ and $M_t = \max\{M_{t-1}, A_t\}$.
-With $h = 0$ the two cases agree. Without a high-water mark, $M_{t-1}$ is replaced by $A_{t-1}$, so the
+With $h = 0$ the two cases agree. In both chapters on fees a soft hurdle means that once the fee is
+earned it is a share of the whole gain, and a hard hurdle that it is a share of the gain above the
+threshold only. The soft hurdle here pays on the whole gain as soon as the threshold is passed, a
+catch-up with no range; Chapter~9 writes it with a full catch-up, under which the manager takes all of
+the gain above the threshold until the fee is $p$ of the whole gain. The two give the same fee once the
+return is above $h/(1-p)$. Without a high-water mark, $M_{t-1}$ is replaced by $A_{t-1}$, so the
 manager is paid on every year's gain whatever happened before.
 
 \begin{example}{Four years of hedge fund fees}\label{ex2:hf}
@@ -969,7 +974,7 @@ gamble. Career concerns and the value of the future fee stream (\cref{prop2:annu
 against the option incentive.
 
 \paragraph{Fees on fees}
-A fund of funds adds its own fees, 1\% and 10\% in the illustration below (terms vary), on top of the
+A fund of funds\index{funds of funds} adds its own fees, 1\% and 10\% in the illustration below (terms vary), on top of the
 fees of the funds it holds, which are charged first, inside the underlying funds' NAVs.
 The two layers are not simply additive, because each underlying manager is paid on its own gains.
 
@@ -986,7 +991,7 @@ defined in the proof.
 \begin{proof}
 $x\mapsto x^{+}$ is convex, so by Jensen's inequality for the discrete distribution with weights $w_i$,
 $(\sum w_i X_i)^{+} \le \sum w_i X_i^{+}$ on every path; take expectations.
-Call $(X_i')$ a \emph{mean-preserving spread} of $(X_i)$ under the weights $w_i$ if $X_i' = X_i + \varepsilon_i$
+Call $(X_i')$ a \emph{mean-preserving spread}\index{mean-preserving spread} of $(X_i)$ under the weights $w_i$ if $X_i' = X_i + \varepsilon_i$
 where, for each value $x$ taken by the $X_i$, the weighted mean of the $\varepsilon_i$ over the funds with
 $X_i = x$ is zero: $\sum_{i:X_i=x} w_i\varepsilon_i = 0$. Equal weighted means alone are not enough; with
 two equally weighted funds, $X=(-1,1)$ and $X'=(0,0)$ have the same mean but the gap falls from $\tfrac12$
@@ -1039,12 +1044,12 @@ And a fee on assets rewards size whatever the return (\cref{sec2:mgmtfees}). Bec
 an LP usually answers these pressures with rights negotiated in advance and in writing, and leaves
 day-to-day control to the GP. \Cref{tab2:terms} lists which term answers which.
 
-The investor learns the strategy, team and terms from a \emph{private placement memorandum} (PPM),
+The investor learns the strategy, team and terms from a \emph{private placement memorandum}\index{private placement memorandum} (PPM),
 which describes the offer and its risks; the investor's enforceable rights and remedies come mainly
 from the governing documents, any representations made and the applicable securities law. It joins by signing a
-\emph{subscription agreement}, which fixes its commitment and confirms that it is eligible to invest.
-Its rights come from the \emph{limited partnership agreement} (LPA), together with any \emph{side letter}
-it negotiates for itself and, through a \emph{most favoured nation} clause, terms granted to comparable
+\emph{subscription agreement}\index{subscription agreement}, which fixes its commitment and confirms that it is eligible to invest.
+Its rights come from the \emph{limited partnership agreement}\index{limited partnership agreement} (LPA), together with any \emph{side letter}\index{side letter}
+it negotiates for itself and, through a \emph{most favoured nation}\index{most favoured nation} clause, terms granted to comparable
 investors, usually those of similar or smaller size. The LPA also fixes what the fund may buy, how
 large it may grow and how long it lasts, and the penalties for an investor that defaults on a call.
 Investors do not usually see the operating agreement of the management company, which divides fees
@@ -1072,7 +1077,7 @@ and carry among the principals.
 \paragraph{Sharing the downside}
 The direct answer to the option incentive is to make the GP lose money when the investors do. A
 commitment by the GP gives the principals a share of investment losses alongside the LPs, and
-practitioners call it \emph{hurt money} because it should be large next to the principals' own wealth.
+practitioners call it \emph{hurt money}\index{hurt money} because it should be large next to the principals' own wealth.
 Its size relative to that wealth, how it is financed and how it is shared among the principals say
 more about alignment than the headline percentage. A commitment funded by waiving management fees
 puts at risk fee income that the LPs paid for and leaves the principals' after-tax savings untouched,
@@ -1086,7 +1091,7 @@ principals.
 \paragraph{Keeping attention on the fund}
 Investors back people, and a manager far below its hurdle may have weaker reasons to spend its time
 on the existing portfolio, especially when it can raise another fund. A
-\emph{key person} clause names the principals the fund depends on and requires each to give it a
+\emph{key person}\index{key person} clause names the principals the fund depends on and requires each to give it a
 stated share of working time. A typical trigger is that two of three named principals leave or stop
 meeting that test. Many agreements then suspend the investment period, which ends unless investors
 vote to reinstate it, usually after the GP proposes replacements; others end it at once. Limits on
@@ -1098,7 +1103,7 @@ LPs and not others, may sell an asset from one fund to another and may collect t
 monitoring fees from portfolio companies. The LPA handles these with rules set in advance: an
 allocation policy, an offset of portfolio company fees against the management fee, limits on
 recycling proceeds into new deals and limits on fund level borrowing and guarantees. Cases the rules
-do not settle go to the \emph{limited partner advisory committee} (LPAC), made up of representatives
+do not settle go to the \emph{limited partner advisory committee}\index{limited partner advisory committee} (LPAC), made up of representatives
 of the larger investors. It reviews conflicts and, where the agreement gives it that authority,
 valuation questions and waivers of the investment restrictions. It does not take investment
 decisions, since that would compromise the LPs' passive status. The Institutional Limited Partners
@@ -1120,8 +1125,8 @@ managed to exit, and the third winds up the partnership. An agreement may attach
 each.
 
 The same logic applies inside the management company to principals who leave. Carry usually vests
-over the investment period. A \emph{good leaver}, who leaves for an accepted reason such as illness or
-retirement, keeps what has vested; a \emph{bad leaver}, who joins a competitor or leaves after
+over the investment period. A \emph{good leaver}\index{good leaver}, who leaves for an accepted reason such as illness or
+retirement, keeps what has vested; a \emph{bad leaver}\index{bad leaver}, who joins a competitor or leaves after
 misconduct, forfeits some or all of it. Vesting, forfeiture, repurchase and the definition of cause all depend on
 the management company's own agreements.
 
@@ -1350,6 +1355,22 @@ figure and says nothing by itself about whether a given call can be met.
         $G$, $B$ or $L$.
 \end{enumerate}
 
+\subsection*{Computing projects}
+\label{sec2:projects}
+These use the data and code in the repository. Each is solved by a function in
+\texttt{code/ch02/projects.py}, which \texttt{test\_projects.py} runs, so an answer can be
+checked with \texttt{python code/ch02/projects.py} from the root of the repository. The
+shipped series end in September 2026, and those that end earlier are noted.
+
+\begin{enumerate}[label=\textbf{P2.\arabic*}, leftmargin=*, ref=P2.\arabic*]
+\item Use \texttt{takahashi\_alexander} to trace a fund's cumulative net cash flow for annual growth of 6\%, 12\%
+and 18\%. In which year is the J-curve lowest and in which does it turn positive? Explain why the trough
+barely moves with growth while the break-even year can.
+\item With \texttt{fee\_annuity\_pv}, compute the present value of ten years of 2 and 20 fees as a share of
+the initial assets, for gross returns from 4\% to 12\% discounted at the gross return. Explain why the share
+rises with the gross return although the discount rate rises with it.
+\end{enumerate}
+
 \subsection*{Answers}
 \begin{enumerate}[label=\textbf{\thechapter.\arabic*}, leftmargin=*]
   \item $0.02\times200\times5 + 0.015\times120\times5 = 20 + 9 = \exOneA$; if all commitments are
@@ -1386,7 +1407,7 @@ figure and says nothing by itself about whether a given call can be met.
 
 \paragraph{Sources}
 The promote tier rates are illustrative assumptions with no market data behind them. The cash flow
-modelling of \cref{sec2:pacing} anticipates Chapter~10. The option
+modelling of \cref{sec2:pacing} anticipates the simulated funds of Chapter~11. The option
 valuation uses the formula of \textcite{black1973}, derived in Chapter~5; \textcite{hull2022} and
 \textcite{wilmott2006} give background. Statements about common terms, such as fund life, GP commitment, removal votes and hurdle rates,
 describe general market practice; the empirical findings are cited where they appear. Further reading: \textcite{metrick2010} on the economics of private equity fees, \textcite{phalippou2009}
@@ -1401,5 +1422,4 @@ implementation used in the tests, the R cross-checks run on R \parencite{rcore} 
 \parencite{octave}. The
 full list, with links, is in \texttt{CREDITS.md}.
 
-\printbibliography[heading=subbibliography,title={References for Chapter \thechapter}]
-\end{refsection}
+\end{chapterrefs}
